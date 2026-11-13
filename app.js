@@ -48,7 +48,7 @@ const TXT = {
       pHead:"¿Qué ver en Paris ?",pSub:"Descubre aquí tus próximas visitas en Paris",city:"Entender la ciudad",mapT:"Mapa de los distritos",mapAlt:"Mapa de los distritos de París",
       move:"Moverse",safety:"Seguridad",hours:"Horarios y cierres",credits:"Créditos de las fotos",src:"Fuente",lic:"Licencia",
       paid:"De pago",free:"Gratis",metro:"Metro cercano",go:"Cómo llegar",crnote:"Toca una foto para ver su autor y su licencia",
-      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
+      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
   en:{guide:"FRENCH",guide2:"Survival guide",from:"EN",start:"Start",dep:"DEPARTURE",now:"Now",dest:"DESTINATION",me:"The French me",first:"FIRST CLASS",
       search:"Search a phrase in English or French",searchL:"Search a phrase",resume:"Pick up where you left off",toc:"Table of contents",tap:"Tap a topic",
       paris:"Paris Guide",parisSub:"What to see in Paris? Monuments, museums, walks…",bonusT:"Bonus",bonusS:"Extra content",extra:"Extra content",
@@ -56,7 +56,7 @@ const TXT = {
       pHead:"What to see in Paris?",pSub:"Discover your next visits in Paris",city:"Understanding the city",mapT:"Map of the districts",mapAlt:"Map of the Paris districts",
       move:"Getting around",safety:"Safety",hours:"Opening hours",credits:"Photo credits",src:"Source",lic:"License",
       paid:"Paid",free:"Free",metro:"Nearest metro",go:"Directions",crnote:"Tap a photo to see its author and license",
-      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
+      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
 };
 const t = k => TXT[LANG][k];
 const homeTitle = (e, i) => LANG === "en" ? (i < 0 ? [t("bonusT"), t("bonusS")] : HOME_EN[i]) : [e[0], e[1]];
@@ -77,6 +77,52 @@ const slug = n => n.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ /g
 const mi = (name, cls="mi") => `<i class="${cls}" style="-webkit-mask-image:url('img/ui/${slug(name)}.png');mask-image:url('img/ui/${slug(name)}.png')"></i>`;
 const sec = name => C.sections.find(s => s.name === name);
 function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),1800); }
+
+/* ---------- Hub : page d'accueil avec toutes les guías ---------- */
+const HUB = {
+  es:{t1:"Una guía para",t2:"cada objetivo",sub:"Cada guía te acompaña hacia una meta concreta. Empieza por la que más te sirve hoy.",
+      subWide:" Viajar, empezar desde cero o aprobar el DELF: tú decides.",badge:"Versión de prueba",kicker:"Guía de supervivencia",title:"Francés para viajar",
+      mission:"Misión:",goal:"entender y hacerte entender en Francia durante tu viaje.",chips:["757 frases útiles","Audio y pronunciación","Guía de Paris","Todos los niveles"],
+      cta:"Empezar a aprender",others:"Otras guías",othersSub:"Cada una con su objetivo",level:"Nivel",soon:"Muy pronto",more:"Más guías en camino",
+      notify:"Avísame cuando salga una guía",notifyToast:"Muy pronto podrás dejar tu correo aquí.",how:"¿Cómo aprendes?",
+      steps:[["Elige tu objetivo","Viajar, empezar desde cero o preparar el DELF."],["Escucha y repite","Cada frase tiene su audio y su pronunciación escrita."],["Úsalo en la vida real","En tu teléfono, cuando lo necesites, incluso en Francia."]],
+      guides:[["Francés A1","desde cero","Descubrir el francés y dar tus primeros pasos"],["DELF A1","examen oficial","Hablar de ti, tu casa y tus gustos, y obtener tu primer diploma"],
+        ["DELF A2","examen oficial","Desenvolverte en la vida diaria: pedir, comprar, preguntar"],["DELF B1","examen oficial","Estudiar y conversar con autonomía"],["DELF B2","examen oficial","Debatir y defender tus ideas en francés"]]},
+  en:{t1:"A guide for",t2:"every goal",sub:"Each guide takes you toward a concrete goal. Start with the one that helps you most today.",
+      subWide:" Travel, start from scratch or pass the DELF: you decide.",badge:"Trial version",kicker:"Survival guide",title:"French for traveling",
+      mission:"Mission:",goal:"understand and make yourself understood in France during your trip.",chips:["757 useful phrases","Audio and pronunciation","Paris Guide","All levels"],
+      cta:"Start learning",others:"Other guides",othersSub:"Each with its own goal",level:"Level",soon:"Coming soon",more:"More guides on the way",
+      notify:"Let me know when a new guide is out",notifyToast:"Soon you'll be able to leave your email here.",how:"How do you learn?",
+      steps:[["Choose your goal","Travel, start from scratch or prepare for the DELF."],["Listen and repeat","Each phrase has its audio and its written pronunciation."],["Use it in real life","On your phone, whenever you need it, even in France."]],
+      guides:[["French A1","from scratch","Discover French and take your first steps"],["DELF A1","official exam","Talk about yourself, your home and your tastes, and earn your first diploma"],
+        ["DELF A2","official exam","Get by in daily life: ordering, buying, asking"],["DELF B1","official exam","Study and hold conversations with confidence"],["DELF B2","official exam","Debate and defend your ideas in French"]]}
+};
+const HUB_LOOK = [["a1","A1","#0F7C72","#E3F4F1"],["delfa1","A1","#C2410C","#FDEBDD"],["delfa2","A2","#BE185D","#FCE4EF"],["delfb1","B1","#1D4ED8","#E2EAFD"],["delfb2","B2","#6D28D9","#EDE7FC"]];
+function hub(){
+  const H = HUB[LANG], arrow = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  const card = (g, i) => { const [img, lvl, fg, bg] = HUB_LOOK[i];
+    return `<div class="gcard" style="--fg:${fg};--bg:${bg}"><div class="gcover"><img src="img/hub/${img}.webp" alt=""><span>${H.level} ${lvl}</span></div>
+      <div class="gbody"><b>${esc(g[0])} <small>· ${esc(g[1])}</small></b><p><strong>${H.mission}</strong> ${esc(g[2])}</p><em>${H.soon}</em></div></div>`; };
+  app.innerHTML = `
+  <header class="hubtop"><img src="img/ui/logo.webp" alt="evoala">
+    <div class="lang hl" role="group" aria-label="${t("lang")}"><button class="${LANG==='es'?'on':''}" data-lang="es" aria-pressed="${LANG==='es'}">ES</button><button class="${LANG==='en'?'on':''}" data-lang="en" aria-pressed="${LANG==='en'}">EN</button></div></header>
+  <main class="hubmain">
+    <div class="hero"><div><h1>${H.t1}<br><span>${H.t2}</span></h1><p>${H.sub}<span class="wideonly">${H.subWide}</span></p></div>
+      <section class="feat">
+        <div class="fhead"><span class="fimg"><img src="img/hub/voyage.webp" alt=""></span>
+          <div><span class="fbadge">${H.badge}</span><small>${H.kicker}</small><b>${H.title}</b></div></div>
+        <div class="fbody"><p><strong>${H.mission}</strong> ${H.goal}</p>
+          <div class="fchips">${H.chips.map(c => `<span>${c}</span>`).join("")}</div>
+          <button class="fcta" data-go="guia">${H.cta} ${arrow}</button></div>
+      </section></div>
+    <div class="ghead"><b>${H.others}</b><span>${H.othersSub}</span></div>
+    <div class="ggrid">${H.guides.map(card).join("")}<div class="gmore"><span>+</span>${H.more}</div></div>
+    <div class="hubfoot">
+      <section class="how"><b>${H.how}</b>${H.steps.map((s, i) => `<div><span>${i+1}</span><p><strong>${s[0]}</strong><br>${s[1]}</p></div>`).join("")}</section>
+      <button class="notify" data-notify><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>${H.notify}</button>
+    </div>
+  </main>`;
+}
 
 /* ---------- Accueil ---------- */
 // sous-catégorie -> bouton violet clair qui ouvre directement le bon onglet
@@ -103,6 +149,7 @@ function lastInfo(){
 function home(){
   const last = lastInfo();
   app.innerHTML = `
+  <button class="tohub" data-go="" data-home>‹ ${t("allGuides")}</button>
   <div class="ticket">
     <div class="tk-top"><img class="logo" src="img/ui/logo.webp" alt="evoala">
       <div class="lang" role="group" aria-label="${t("lang")}"><button class="${LANG==='es'?'on':''}" data-lang="es" aria-pressed="${LANG==='es'}">ES</button><button class="${LANG==='en'?'on':''}" data-lang="en" aria-pressed="${LANG==='en'}">EN</button></div></div>
@@ -128,14 +175,14 @@ function home(){
 
 /* ---------- Barre du haut ---------- */
 function topbar(where){
-  return `<div class="top"><button class="home" data-go="" aria-label="${t("home")}">${ICON.home}</button>
+  return `<div class="top"><button class="home" data-go="guia" aria-label="${t("home")}">${ICON.home}</button>
     <img class="logo" src="img/ui/logo.webp" alt="evoala"></div>`;
 }
 // barre du bas : Guía / Paris / Bonus, sur toutes les pages
 function navbar(where){
   const eiffel = '<svg class="nico" viewBox="0 0 24 24"><path d="M12 2v3M10.5 5h3l1 6h-5zM9.5 11h5l3.5 10h-3.8a2.2 2.2 0 0 0-4.4 0H6z"/><path d="M8 15h8"/></svg>';
   const it = (go, icon, label, on) => `<button class="${on?'on':''}" data-go="${go}">${icon ? mi(icon) : eiffel}<span>${label}</span></button>`;
-  return `<nav class="nav">${it("", "p-Guía", t("nGuide"), where==="guide"||where==="home")}${it("s8t0", "p-Bonus", t("nBonus"), where==="bonus")}${it("p1", "", t("nParis"), where==="paris")}</nav>`;
+  return `<nav class="nav">${it("guia", "p-Guía", t("nGuide"), where==="guide"||where==="home")}${it("s8t0", "p-Bonus", t("nBonus"), where==="bonus")}${it("p1", "", t("nParis"), where==="paris")}</nav>`;
 }
 
 /* ---------- Pages de phrases ---------- */
@@ -254,6 +301,7 @@ app.addEventListener("click", e => {
   if(lb){ setLang(lb.dataset.lang); return; }
   const go = e.target.closest("[data-go]");
   if(go){ if(go.dataset.go || go.classList.contains("home") || go.hasAttribute("data-home")){ location.hash = go.dataset.go; if(!go.dataset.go) route(); } return; }
+  if(e.target.closest("[data-notify]")){ toast(HUB[LANG].notifyToast); return; }
   if(e.target.closest("[data-hint]")){ try{ localStorage.setItem("evoala-hint","1"); }catch(_){} app.querySelector(".hint")?.remove(); return; }
   if(e.target.closest("[data-up]")){ scrollTo({top:0,behavior:"smooth"}); return; }
   const row = e.target.closest(".row"); if(!row) return;
@@ -300,12 +348,14 @@ function route(){
   if((m = h.match(/^s(\d+)t(\d+)$/))){ phrases(+m[1], +m[2]); where = +m[1] === 8 ? "bonus" : "guide"; store.set(h); }
   else if((m = h.match(/^p(\d+)$/))){ paris(+m[1]); where = "paris"; }
   else if(h === "creditos"){ credits(); where = "paris"; }
-  else home();
-  app.classList.toggle("wide", where === "home");
+  else if(h === "guia") home();
+  else { hub(); where = "hub"; }
+  app.classList.toggle("wide", where === "home" || where === "hub");
+  app.classList.toggle("hubmode", where === "hub");
   let nav = document.getElementById("navbar");
   if(!nav){ nav = document.createElement("div"); nav.id = "navbar"; document.body.appendChild(nav);
     nav.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if(!b) return; location.hash = b.dataset.go; if(!b.dataset.go) route(); }); }
-  nav.innerHTML = navbar(where);
+  nav.innerHTML = where === "hub" ? "" : navbar(where);
   scrollTo(0,0); preload();
 }
 addEventListener("hashchange", route);
