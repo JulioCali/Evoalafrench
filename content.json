@@ -869,546 +869,562 @@
     {
      "name": "Ropa",
      "intro": "Encuentra la ropa que quieres",
-     "groups": [
+     "groups": [],
+     "tips": [],
+     "subs": [
       {
-       "label": "Entrando al almacén",
-       "phrases": [
+       "name": "Elegir",
+       "intro": "Encuentra la ropa que quieres",
+       "groups": [
         {
-         "fr": "Je peux vous aider?",
-         "es": "¿Le puedo ayudar?",
-         "pr": "ye pó vu-se-DÉ",
-         "who": "staff",
-         "icon": [
-          "img/icons/p5.webp",
-          0
-         ],
-         "audio": [
-          "snd/p5.json",
-          "524021cad8"
+         "label": "Entrando al almacén",
+         "phrases": [
+          {
+           "fr": "Je peux vous aider?",
+           "es": "¿Le puedo ayudar?",
+           "pr": "ye pó vu-se-DÉ",
+           "who": "staff",
+           "icon": [
+            "img/icons/p5.webp",
+            0
+           ],
+           "audio": [
+            "snd/p5.json",
+            "524021cad8"
+           ]
+          },
+          {
+           "fr": "Je cherche…",
+           "es": "Yo busco…",
+           "pr": "ye SHÉRSH",
+           "icon": [
+            "img/icons/p5.webp",
+            1
+           ],
+           "audio": [
+            "snd/p5.json",
+            "2084e6f9be"
+           ]
+          }
          ]
         },
         {
-         "fr": "Je cherche…",
-         "es": "Yo busco…",
-         "pr": "ye SHÉRSH",
-         "icon": [
-          "img/icons/p5.webp",
-          1
-         ],
-         "audio": [
-          "snd/p5.json",
-          "2084e6f9be"
+         "label": "Ropa clásica",
+         "phrases": [
+          {
+           "fr": "Un t-shirt",
+           "es": "Una camiseta",
+           "pr": "an ti-SHÉRT",
+           "icon": [
+            "img/icons/p5.webp",
+            2
+           ],
+           "audio": [
+            "snd/p5.json",
+            "548e355b6d"
+           ]
+          },
+          {
+           "fr": "Un pantalon",
+           "es": "Un pantalón",
+           "pr": "an pan-ta-LÓN",
+           "icon": [
+            "img/icons/p5.webp",
+            3
+           ],
+           "audio": [
+            "snd/p5.json",
+            "3ef844048f"
+           ]
+          },
+          {
+           "fr": "Une robe",
+           "es": "Un vestido",
+           "pr": "ún RÓB",
+           "icon": [
+            "img/icons/p5.webp",
+            4
+           ],
+           "audio": [
+            "snd/p5.json",
+            "88fdbbb774"
+           ]
+          },
+          {
+           "fr": "Une jupe",
+           "es": "Una falda",
+           "pr": "ún YUP",
+           "icon": [
+            "img/icons/p5.webp",
+            5
+           ],
+           "audio": [
+            "snd/p5.json",
+            "b125982d74"
+           ]
+          },
+          {
+           "fr": "Un manteau",
+           "es": "Un abrigo",
+           "pr": "an man-TÓ",
+           "icon": [
+            "img/icons/p5.webp",
+            6
+           ],
+           "audio": [
+            "snd/p5.json",
+            "39be0888a7"
+           ]
+          },
+          {
+           "fr": "Une doudoune",
+           "es": "Un plumífero",
+           "pr": "ún du-DÚN",
+           "icon": [
+            "img/icons/p5.webp",
+            7
+           ],
+           "audio": [
+            "snd/p5.json",
+            "ab6ddfb107"
+           ]
+          },
+          {
+           "fr": "Un pull-over",
+           "es": "Un saco",
+           "pr": "an pú-lo-VÉR",
+           "icon": [
+            "img/icons/p5.webp",
+            8
+           ],
+           "audio": [
+            "snd/p5.json",
+            "53cd99b722"
+           ]
+          },
+          {
+           "fr": "Une écharpe",
+           "es": "Una bufanda",
+           "pr": "ú-ne-SHÁRP",
+           "icon": [
+            "img/icons/p5.webp",
+            9
+           ],
+           "audio": [
+            "snd/p5.json",
+            "a167ca0efa"
+           ]
+          },
+          {
+           "fr": "Un bonnet",
+           "es": "Un gorro",
+           "pr": "an bo-NÉ",
+           "icon": [
+            "img/icons/p5.webp",
+            10
+           ],
+           "audio": [
+            "snd/p5.json",
+            "b46a135263"
+           ]
+          },
+          {
+           "fr": "Des gants",
+           "es": "Guantes",
+           "pr": "de GÁN",
+           "icon": [
+            "img/icons/p5.webp",
+            11
+           ],
+           "audio": [
+            "snd/p5.json",
+            "7863d0980b"
+           ]
+          },
+          {
+           "fr": "Une casquette",
+           "es": "Una gorra",
+           "pr": "ún kas-KÉT",
+           "icon": [
+            "img/icons/p5.webp",
+            12
+           ],
+           "audio": [
+            "snd/p5.json",
+            "fae7e2e27f"
+           ]
+          }
          ]
+        },
+        {
+         "label": "Calzados",
+         "phrases": [
+          {
+           "fr": "Des chaussures",
+           "es": "Zapatos",
+           "pr": "de sho-SUR",
+           "icon": [
+            "img/icons/p5.webp",
+            13
+           ],
+           "audio": [
+            "snd/p5.json",
+            "3adf237d7f"
+           ]
+          },
+          {
+           "fr": "Des chaussettes",
+           "es": "Medias",
+           "pr": "de sho-SÉT",
+           "icon": [
+            "img/icons/p5.webp",
+            14
+           ],
+           "audio": [
+            "snd/p5.json",
+            "adb172e6d7"
+           ]
+          }
+         ]
+        },
+        {
+         "label": "Ropa interior",
+         "phrases": [
+          {
+           "fr": "Des collants",
+           "es": "Pantimedias",
+           "pr": "de ko-LÁN",
+           "icon": [
+            "img/icons/p5.webp",
+            15
+           ],
+           "audio": [
+            "snd/p5.json",
+            "73e7b43147"
+           ]
+          },
+          {
+           "fr": "Un soutien-gorge",
+           "es": "Un sujetador",
+           "pr": "an su-tian GÓRY",
+           "icon": [
+            "img/icons/p5.webp",
+            16
+           ],
+           "audio": [
+            "snd/p5.json",
+            "b6f38a7275"
+           ]
+          },
+          {
+           "fr": "Une culotte",
+           "es": "Un calzón",
+           "pr": "ún kúu-LÓT",
+           "icon": [
+            "img/icons/p5.webp",
+            17
+           ],
+           "audio": [
+            "snd/p5.json",
+            "d6c2d698c1"
+           ]
+          },
+          {
+           "fr": "Un caleçon",
+           "es": "Un calzoncillo",
+           "pr": "an kal-SÓN",
+           "icon": [
+            "img/icons/p5.webp",
+            18
+           ],
+           "audio": [
+            "snd/p5.json",
+            "3792609d3d"
+           ]
+          }
+         ]
+        }
+       ],
+       "tips": [
+        {
+         "title": "Dato cultural",
+         "text": "Aqui te compartimos una tabla comparativa de tallas de zapatos entre Colombia y Francia: ¡Pero no olvides medírtelos antes!"
         }
        ]
       },
       {
-       "label": "Ropa clásica",
-       "phrases": [
+       "name": "Probar y comprar",
+       "intro": "Encuentra la ropa que quieres",
+       "groups": [
         {
-         "fr": "Un t-shirt",
-         "es": "Una camiseta",
-         "pr": "an ti-SHÉRT",
-         "icon": [
-          "img/icons/p5.webp",
-          2
-         ],
-         "audio": [
-          "snd/p5.json",
-          "548e355b6d"
+         "label": "Evitando el vendedor",
+         "phrases": [
+          {
+           "fr": "Je regarde juste, merci",
+           "es": "Solo miro, gracias",
+           "pr": "ye re-gard YÚST, mer-síÍ",
+           "icon": [
+            "img/icons/p6.webp",
+            0
+           ],
+           "audio": [
+            "snd/p6.json",
+            "b0063fa276"
+           ]
+          },
+          {
+           "fr": "Je vous appelle si besoin",
+           "es": "Lo llamo si necesito",
+           "pr": "ye vu-sa-pel si be-SUÁN",
+           "icon": [
+            "img/icons/p6.webp",
+            1
+           ],
+           "audio": [
+            "snd/p6.json",
+            "2d86d205f3"
+           ]
+          }
          ]
         },
         {
-         "fr": "Un pantalon",
-         "es": "Un pantalón",
-         "pr": "an pan-ta-LÓN",
-         "icon": [
-          "img/icons/p5.webp",
-          3
-         ],
-         "audio": [
-          "snd/p5.json",
-          "3ef844048f"
+         "label": "Ensayando",
+         "phrases": [
+          {
+           "fr": "Je peux l'essayer?",
+           "es": "¿Puedo probármelo?",
+           "pr": "ye pó le-se-VÉ",
+           "icon": [
+            "img/icons/p6.webp",
+            2
+           ],
+           "audio": [
+            "snd/p6.json",
+            "0ea0e6e51a"
+           ]
+          },
+          {
+           "fr": "Où sont les cabines ?",
+           "es": "¿Dónde están las cabinas?",
+           "pr": "u son le ka-BÍN",
+           "icon": [
+            "img/icons/p6.webp",
+            3
+           ],
+           "audio": [
+            "snd/p6.json",
+            "e9424c9121"
+           ]
+          },
+          {
+           "fr": "Je vais l'essayer en S, M, L, XL …",
+           "es": "Lo voy a medir en S, M, L, XL…",
+           "pr": "ye ve le-se-ye an ES, EM, EL, ix-ÉL",
+           "icon": [
+            "img/icons/p6.webp",
+            4
+           ],
+           "audio": [
+            "snd/p6.json",
+            "aa128fde1c"
+           ]
+          },
+          {
+           "fr": "Vous avez la taille au-dessus?",
+           "es": "¿Lo tiene una talla más grande?",
+           "pr": "vu-sa-ve la tay o-de-SU",
+           "icon": [
+            "img/icons/p6.webp",
+            5
+           ],
+           "audio": [
+            "snd/p6.json",
+            "5745b5e4ed"
+           ]
+          },
+          {
+           "fr": "Vous avez la taille en-dessous?",
+           "es": "¿Lo tiene en una talla más pequeña?",
+           "pr": "vu-sa-ve la tay an-de-SÚ",
+           "icon": [
+            "img/icons/p6.webp",
+            6
+           ],
+           "audio": [
+            "snd/p6.json",
+            "ca9954ded9"
+           ]
+          },
+          {
+           "fr": "Vous l'avez en S, M, L, XL … ?",
+           "es": "¿Lo tiene en S, M, L, XL … ?",
+           "pr": "vu la-ve an ES, EM, EL, ix-ÉL",
+           "icon": [
+            "img/icons/p6.webp",
+            7
+           ],
+           "audio": [
+            "snd/p6.json",
+            "bd37b7fe14"
+           ]
+          },
+          {
+           "fr": "Je fais du …",
+           "es": "Soy talla …",
+           "pr": "ye fe DU ...",
+           "icon": [
+            "img/icons/p6.webp",
+            8
+           ],
+           "audio": [
+            "snd/p6.json",
+            "b7653b2ead"
+           ]
+          },
+          {
+           "fr": "Je chausse du …",
+           "es": "Mi talla de zapatos es …",
+           "pr": "ye shos DU ...",
+           "icon": [
+            "img/icons/p6.webp",
+            9
+           ],
+           "audio": [
+            "snd/p6.json",
+            "06695a958a"
+           ]
+          },
+          {
+           "fr": "C'est trop grand",
+           "es": "Es demasiado grande",
+           "pr": "se tro GRÁN",
+           "icon": [
+            "img/icons/p6.webp",
+            10
+           ],
+           "audio": [
+            "snd/p6.json",
+            "ce6390fa74"
+           ]
+          },
+          {
+           "fr": "C'est trop petit",
+           "es": "Es demasiado pequeño",
+           "pr": "se tro pe-TÍ",
+           "icon": [
+            "img/icons/p6.webp",
+            11
+           ],
+           "audio": [
+            "snd/p6.json",
+            "6eebcd1d7b"
+           ]
+          },
+          {
+           "fr": "C'est trop large",
+           "es": "Es demasiado ancho",
+           "pr": "se tro LÁRY",
+           "icon": [
+            "img/icons/p6.webp",
+            12
+           ],
+           "audio": [
+            "snd/p6.json",
+            "218f78ccd0"
+           ]
+          },
+          {
+           "fr": "C'est trop serré",
+           "es": "Es demasiado apretado",
+           "pr": "se tro se-RÉ",
+           "icon": [
+            "img/icons/p6.webp",
+            13
+           ],
+           "audio": [
+            "snd/p6.json",
+            "52bb9c3346"
+           ]
+          },
+          {
+           "fr": "Vous avez une autre couleur?",
+           "es": "¿Tiene otro color?",
+           "pr": "vu-sa-ve ú-notr ku-LOR",
+           "icon": [
+            "img/icons/p6.webp",
+            14
+           ],
+           "audio": [
+            "snd/p6.json",
+            "fc837d9509"
+           ]
+          },
+          {
+           "fr": "Vous l'avez en …?",
+           "es": "¿Lo tiene en …?",
+           "pr": "vu la-ve AN ...",
+           "icon": [
+            "img/icons/p6.webp",
+            15
+           ],
+           "audio": [
+            "snd/p6.json",
+            "bd37b7fe14"
+           ]
+          }
          ]
         },
         {
-         "fr": "Une robe",
-         "es": "Un vestido",
-         "pr": "ún RÓB",
-         "icon": [
-          "img/icons/p5.webp",
-          4
-         ],
-         "audio": [
-          "snd/p5.json",
-          "88fdbbb774"
-         ]
-        },
-        {
-         "fr": "Une jupe",
-         "es": "Una falda",
-         "pr": "ún YUP",
-         "icon": [
-          "img/icons/p5.webp",
-          5
-         ],
-         "audio": [
-          "snd/p5.json",
-          "b125982d74"
-         ]
-        },
-        {
-         "fr": "Un manteau",
-         "es": "Un abrigo",
-         "pr": "an man-TÓ",
-         "icon": [
-          "img/icons/p5.webp",
-          6
-         ],
-         "audio": [
-          "snd/p5.json",
-          "39be0888a7"
-         ]
-        },
-        {
-         "fr": "Une doudoune",
-         "es": "Un plumífero",
-         "pr": "ún du-DÚN",
-         "icon": [
-          "img/icons/p5.webp",
-          7
-         ],
-         "audio": [
-          "snd/p5.json",
-          "ab6ddfb107"
-         ]
-        },
-        {
-         "fr": "Un pull-over",
-         "es": "Un saco",
-         "pr": "an pú-lo-VÉR",
-         "icon": [
-          "img/icons/p5.webp",
-          8
-         ],
-         "audio": [
-          "snd/p5.json",
-          "53cd99b722"
-         ]
-        },
-        {
-         "fr": "Une écharpe",
-         "es": "Una bufanda",
-         "pr": "ú-ne-SHÁRP",
-         "icon": [
-          "img/icons/p5.webp",
-          9
-         ],
-         "audio": [
-          "snd/p5.json",
-          "a167ca0efa"
-         ]
-        },
-        {
-         "fr": "Un bonnet",
-         "es": "Un gorro",
-         "pr": "an bo-NÉ",
-         "icon": [
-          "img/icons/p5.webp",
-          10
-         ],
-         "audio": [
-          "snd/p5.json",
-          "b46a135263"
-         ]
-        },
-        {
-         "fr": "Des gants",
-         "es": "Guantes",
-         "pr": "de GÁN",
-         "icon": [
-          "img/icons/p5.webp",
-          11
-         ],
-         "audio": [
-          "snd/p5.json",
-          "7863d0980b"
-         ]
-        },
-        {
-         "fr": "Une casquette",
-         "es": "Una gorra",
-         "pr": "ún kas-KÉT",
-         "icon": [
-          "img/icons/p5.webp",
-          12
-         ],
-         "audio": [
-          "snd/p5.json",
-          "fae7e2e27f"
+         "label": "Compra",
+         "phrases": [
+          {
+           "fr": "Combien ça coûte?",
+           "es": "¿Cuánto cuesta?",
+           "pr": "kom-bian sa KÚT",
+           "icon": [
+            "img/icons/p6.webp",
+            16
+           ],
+           "audio": [
+            "snd/p6.json",
+            "b8b7ff8a61"
+           ]
+          },
+          {
+           "fr": "Je le prends",
+           "es": "Lo compro",
+           "pr": "ye le PRÁN",
+           "icon": [
+            "img/icons/p6.webp",
+            17
+           ],
+           "audio": [
+            "snd/p6.json",
+            "bd43906818"
+           ]
+          },
+          {
+           "fr": "Je voudrais un ticket cadeau",
+           "es": "Quisiera un recibo de regalo",
+           "pr": "ye vu-dre an ti-ke ka-DÓ",
+           "icon": [
+            "img/icons/p6.webp",
+            18
+           ],
+           "audio": [
+            "snd/p6.json",
+            "0f032e998c"
+           ]
+          }
          ]
         }
-       ]
-      },
-      {
-       "label": "Calzados",
-       "phrases": [
+       ],
+       "tips": [
         {
-         "fr": "Des chaussures",
-         "es": "Zapatos",
-         "pr": "de sho-SUR",
-         "icon": [
-          "img/icons/p5.webp",
-          13
-         ],
-         "audio": [
-          "snd/p5.json",
-          "3adf237d7f"
-         ]
-        },
-        {
-         "fr": "Des chaussettes",
-         "es": "Medias",
-         "pr": "de sho-SÉT",
-         "icon": [
-          "img/icons/p5.webp",
-          14
-         ],
-         "audio": [
-          "snd/p5.json",
-          "adb172e6d7"
-         ]
+         "title": "Dato cultural",
+         "text": "En Francia, los “soldes” son periodos oficiales de descuentos, duran 4 semanas: Soldes de invierno : principio de enero Soldes de verano : desde finales de junio"
         }
        ]
-      },
-      {
-       "label": "Ropa interior",
-       "phrases": [
-        {
-         "fr": "Des collants",
-         "es": "Pantimedias",
-         "pr": "de ko-LÁN",
-         "icon": [
-          "img/icons/p5.webp",
-          15
-         ],
-         "audio": [
-          "snd/p5.json",
-          "73e7b43147"
-         ]
-        },
-        {
-         "fr": "Un soutien-gorge",
-         "es": "Un sujetador",
-         "pr": "an su-tian GÓRY",
-         "icon": [
-          "img/icons/p5.webp",
-          16
-         ],
-         "audio": [
-          "snd/p5.json",
-          "b6f38a7275"
-         ]
-        },
-        {
-         "fr": "Une culotte",
-         "es": "Un calzón",
-         "pr": "ún kúu-LÓT",
-         "icon": [
-          "img/icons/p5.webp",
-          17
-         ],
-         "audio": [
-          "snd/p5.json",
-          "d6c2d698c1"
-         ]
-        },
-        {
-         "fr": "Un caleçon",
-         "es": "Un calzoncillo",
-         "pr": "an kal-SÓN",
-         "icon": [
-          "img/icons/p5.webp",
-          18
-         ],
-         "audio": [
-          "snd/p5.json",
-          "3792609d3d"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Evitando el vendedor",
-       "phrases": [
-        {
-         "fr": "Je regarde juste, merci",
-         "es": "Solo miro, gracias",
-         "pr": "ye re-gard YÚST, mer-síÍ",
-         "icon": [
-          "img/icons/p6.webp",
-          0
-         ],
-         "audio": [
-          "snd/p6.json",
-          "b0063fa276"
-         ]
-        },
-        {
-         "fr": "Je vous appelle si besoin",
-         "es": "Lo llamo si necesito",
-         "pr": "ye vu-sa-pel si be-SUÁN",
-         "icon": [
-          "img/icons/p6.webp",
-          1
-         ],
-         "audio": [
-          "snd/p6.json",
-          "2d86d205f3"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Ensayando",
-       "phrases": [
-        {
-         "fr": "Je peux l'essayer?",
-         "es": "¿Puedo probármelo?",
-         "pr": "ye pó le-se-VÉ",
-         "icon": [
-          "img/icons/p6.webp",
-          2
-         ],
-         "audio": [
-          "snd/p6.json",
-          "0ea0e6e51a"
-         ]
-        },
-        {
-         "fr": "Où sont les cabines ?",
-         "es": "¿Dónde están las cabinas?",
-         "pr": "u son le ka-BÍN",
-         "icon": [
-          "img/icons/p6.webp",
-          3
-         ],
-         "audio": [
-          "snd/p6.json",
-          "e9424c9121"
-         ]
-        },
-        {
-         "fr": "Je vais l'essayer en S, M, L, XL …",
-         "es": "Lo voy a medir en S, M, L, XL…",
-         "pr": "ye ve le-se-ye an ES, EM, EL, ix-ÉL",
-         "icon": [
-          "img/icons/p6.webp",
-          4
-         ],
-         "audio": [
-          "snd/p6.json",
-          "aa128fde1c"
-         ]
-        },
-        {
-         "fr": "Vous avez la taille au-dessus?",
-         "es": "¿Lo tiene una talla más grande?",
-         "pr": "vu-sa-ve la tay o-de-SU",
-         "icon": [
-          "img/icons/p6.webp",
-          5
-         ],
-         "audio": [
-          "snd/p6.json",
-          "5745b5e4ed"
-         ]
-        },
-        {
-         "fr": "Vous avez la taille en-dessous?",
-         "es": "¿Lo tiene en una talla más pequeña?",
-         "pr": "vu-sa-ve la tay an-de-SÚ",
-         "icon": [
-          "img/icons/p6.webp",
-          6
-         ],
-         "audio": [
-          "snd/p6.json",
-          "ca9954ded9"
-         ]
-        },
-        {
-         "fr": "Vous l'avez en S, M, L, XL … ?",
-         "es": "¿Lo tiene en S, M, L, XL … ?",
-         "pr": "vu la-ve an ES, EM, EL, ix-ÉL",
-         "icon": [
-          "img/icons/p6.webp",
-          7
-         ],
-         "audio": [
-          "snd/p6.json",
-          "bd37b7fe14"
-         ]
-        },
-        {
-         "fr": "Je fais du …",
-         "es": "Soy talla …",
-         "pr": "ye fe DU ...",
-         "icon": [
-          "img/icons/p6.webp",
-          8
-         ],
-         "audio": [
-          "snd/p6.json",
-          "b7653b2ead"
-         ]
-        },
-        {
-         "fr": "Je chausse du …",
-         "es": "Mi talla de zapatos es …",
-         "pr": "ye shos DU ...",
-         "icon": [
-          "img/icons/p6.webp",
-          9
-         ],
-         "audio": [
-          "snd/p6.json",
-          "06695a958a"
-         ]
-        },
-        {
-         "fr": "C'est trop grand",
-         "es": "Es demasiado grande",
-         "pr": "se tro GRÁN",
-         "icon": [
-          "img/icons/p6.webp",
-          10
-         ],
-         "audio": [
-          "snd/p6.json",
-          "ce6390fa74"
-         ]
-        },
-        {
-         "fr": "C'est trop petit",
-         "es": "Es demasiado pequeño",
-         "pr": "se tro pe-TÍ",
-         "icon": [
-          "img/icons/p6.webp",
-          11
-         ],
-         "audio": [
-          "snd/p6.json",
-          "6eebcd1d7b"
-         ]
-        },
-        {
-         "fr": "C'est trop large",
-         "es": "Es demasiado ancho",
-         "pr": "se tro LÁRY",
-         "icon": [
-          "img/icons/p6.webp",
-          12
-         ],
-         "audio": [
-          "snd/p6.json",
-          "218f78ccd0"
-         ]
-        },
-        {
-         "fr": "C'est trop serré",
-         "es": "Es demasiado apretado",
-         "pr": "se tro se-RÉ",
-         "icon": [
-          "img/icons/p6.webp",
-          13
-         ],
-         "audio": [
-          "snd/p6.json",
-          "52bb9c3346"
-         ]
-        },
-        {
-         "fr": "Vous avez une autre couleur?",
-         "es": "¿Tiene otro color?",
-         "pr": "vu-sa-ve ú-notr ku-LOR",
-         "icon": [
-          "img/icons/p6.webp",
-          14
-         ],
-         "audio": [
-          "snd/p6.json",
-          "fc837d9509"
-         ]
-        },
-        {
-         "fr": "Vous l'avez en …?",
-         "es": "¿Lo tiene en …?",
-         "pr": "vu la-ve AN ...",
-         "icon": [
-          "img/icons/p6.webp",
-          15
-         ],
-         "audio": [
-          "snd/p6.json",
-          "bd37b7fe14"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Compra",
-       "phrases": [
-        {
-         "fr": "Combien ça coûte?",
-         "es": "¿Cuánto cuesta?",
-         "pr": "kom-bian sa KÚT",
-         "icon": [
-          "img/icons/p6.webp",
-          16
-         ],
-         "audio": [
-          "snd/p6.json",
-          "b8b7ff8a61"
-         ]
-        },
-        {
-         "fr": "Je le prends",
-         "es": "Lo compro",
-         "pr": "ye le PRÁN",
-         "icon": [
-          "img/icons/p6.webp",
-          17
-         ],
-         "audio": [
-          "snd/p6.json",
-          "bd43906818"
-         ]
-        },
-        {
-         "fr": "Je voudrais un ticket cadeau",
-         "es": "Quisiera un recibo de regalo",
-         "pr": "ye vu-dre an ti-ke ka-DÓ",
-         "icon": [
-          "img/icons/p6.webp",
-          18
-         ],
-         "audio": [
-          "snd/p6.json",
-          "0f032e998c"
-         ]
-        }
-       ]
-      }
-     ],
-     "tips": [
-      {
-       "title": "Dato cultural",
-       "text": "Aqui te compartimos una tabla comparativa de tallas de zapatos entre Colombia y Francia: ¡Pero no olvides medírtelos antes!"
-      },
-      {
-       "title": "Dato cultural",
-       "text": "En Francia, los “soldes” son periodos oficiales de descuentos, duran 4 semanas: Soldes de invierno : principio de enero Soldes de verano : desde finales de junio"
       }
      ]
     },
@@ -3767,588 +3783,604 @@
     {
      "name": "El restaurante",
      "intro": "Pide tu comida en el",
-     "groups": [
+     "groups": [],
+     "tips": [],
+     "subs": [
       {
-       "label": "La llegada",
-       "phrases": [
+       "name": "Pedir",
+       "intro": "Pide tu comida en el",
+       "groups": [
         {
-         "fr": "Vous avez une réservation?",
-         "es": "¿Tiene una reserva?",
-         "pr": "vu-sa-ve ún re-ser-va-SIÓN",
-         "who": "staff",
-         "icon": [
-          "img/icons/p15.webp",
-          0
-         ],
-         "audio": [
-          "snd/p15.json",
-          "cff2780100"
+         "label": "La llegada",
+         "phrases": [
+          {
+           "fr": "Vous avez une réservation?",
+           "es": "¿Tiene una reserva?",
+           "pr": "vu-sa-ve ún re-ser-va-SIÓN",
+           "who": "staff",
+           "icon": [
+            "img/icons/p15.webp",
+            0
+           ],
+           "audio": [
+            "snd/p15.json",
+            "cff2780100"
+           ]
+          },
+          {
+           "fr": "J'ai une réservation au nom de …",
+           "es": "Tengo una reserva al nombre de …",
+           "pr": "ye ún re-ser-va-sion o NÓN de ...",
+           "icon": [
+            "img/icons/p15.webp",
+            1
+           ],
+           "audio": [
+            "snd/p15.json",
+            "7c6a9e7ff9"
+           ]
+          },
+          {
+           "fr": "Je n'ai pas de réservation",
+           "es": "No tengo reserva",
+           "pr": "ye ne pa de re-ser-va-SIÓN",
+           "icon": [
+            "img/icons/p15.webp",
+            2
+           ],
+           "audio": [
+            "snd/p15.json",
+            "19c29f82d0"
+           ]
+          },
+          {
+           "fr": "Vous avez une table en terrasse?",
+           "es": "¿Tiene una mesa en terraza?",
+           "pr": "vu-sa-ve ún ta-blan te-RÁS",
+           "icon": [
+            "img/icons/p15.webp",
+            3
+           ],
+           "audio": [
+            "snd/p15.json",
+            "7a4a496b54"
+           ]
+          },
+          {
+           "fr": "Une table pour deux",
+           "es": "Una mesa para dos",
+           "pr": "ún ta-ble pur DO",
+           "icon": [
+            "img/icons/p15.webp",
+            4
+           ],
+           "audio": [
+            "snd/p15.json",
+            "cf6327e7e4"
+           ]
+          }
          ]
         },
         {
-         "fr": "J'ai une réservation au nom de …",
-         "es": "Tengo una reserva al nombre de …",
-         "pr": "ye ún re-ser-va-sion o NÓN de ...",
-         "icon": [
-          "img/icons/p15.webp",
-          1
-         ],
-         "audio": [
-          "snd/p15.json",
-          "7c6a9e7ff9"
+         "label": "El pedido",
+         "phrases": [
+          {
+           "fr": "Voici la carte",
+           "es": "Aquí está el menú",
+           "pr": "vua-si la KÁRT",
+           "who": "staff",
+           "icon": [
+            "img/icons/p15.webp",
+            5
+           ],
+           "audio": [
+            "snd/p15.json",
+            "23675dce5c"
+           ]
+          },
+          {
+           "fr": "Je reviens tout de suite",
+           "es": "Vuelvo enseguida",
+           "pr": "ye re-vian tut de SÚÍT",
+           "who": "staff",
+           "icon": [
+            "img/icons/p15.webp",
+            6
+           ],
+           "audio": [
+            "snd/p15.json",
+            "x15_Jerevienstou"
+           ]
+          },
+          {
+           "fr": "Vous avez choisi?",
+           "es": "¿Eligió / Eligieron?",
+           "pr": "vu-sa-ve shua-SÍ",
+           "who": "staff",
+           "icon": [
+            "img/icons/p15.webp",
+            7
+           ],
+           "audio": [
+            "snd/p15.json",
+            "30944da412"
+           ]
+          },
+          {
+           "fr": "Je vais prendre …",
+           "es": "Voy a pedir …",
+           "pr": "ye ve PRÁNDR ...",
+           "icon": [
+            "img/icons/p15.webp",
+            8
+           ],
+           "audio": [
+            "snd/p15.json",
+            "27435e212f"
+           ]
+          },
+          {
+           "fr": "Pour moi, ce sera …",
+           "es": "Para mi, será …",
+           "pr": "pur MUÁ, se se-RÁ ...",
+           "icon": [
+            "img/icons/p15.webp",
+            9
+           ],
+           "audio": [
+            "snd/p15.json",
+            "25431d863d"
+           ]
+          },
+          {
+           "fr": "Quel est le plat du jour?",
+           "es": "¿Cuál es el plato del dia?",
+           "pr": "ke-le le pla dú YÚR",
+           "icon": [
+            "img/icons/p15.webp",
+            10
+           ],
+           "audio": [
+            "snd/p15.json",
+            "d879f03b0b"
+           ]
+          }
          ]
         },
         {
-         "fr": "Je n'ai pas de réservation",
-         "es": "No tengo reserva",
-         "pr": "ye ne pa de re-ser-va-SIÓN",
-         "icon": [
-          "img/icons/p15.webp",
-          2
-         ],
-         "audio": [
-          "snd/p15.json",
-          "19c29f82d0"
+         "label": "La carne",
+         "phrases": [
+          {
+           "fr": "Quelle cuisson pour la viande?",
+           "es": "¿Qué cocción para la carne?",
+           "pr": "kel kúi-son pur la VIÁND",
+           "who": "staff",
+           "icon": [
+            "img/icons/p15.webp",
+            11
+           ],
+           "audio": [
+            "snd/p15.json",
+            "0f643ac9e3"
+           ]
+          },
+          {
+           "fr": "Saignant, à point, bien cuit?",
+           "es": "¿Crudo, al punto, bien hecho?",
+           "pr": "se-ÑÁN, a PUÁN, bian KÚÍ",
+           "who": "staff",
+           "icon": [
+            "img/icons/p15.webp",
+            12
+           ],
+           "audio": [
+            "snd/p15.json",
+            "c95a45b737"
+           ]
+          },
+          {
+           "fr": "Vous avez des plats végétariens?",
+           "es": "¿Tienen platos vegetarianos?",
+           "pr": "vu-sa-ve de pla ve-ye-ta-RIÁN",
+           "icon": [
+            "img/icons/p15.webp",
+            13
+           ],
+           "audio": [
+            "snd/p15.json",
+            "9a9d2f1e18"
+           ]
+          }
          ]
         },
         {
-         "fr": "Vous avez une table en terrasse?",
-         "es": "¿Tiene una mesa en terraza?",
-         "pr": "vu-sa-ve ún ta-blan te-RÁS",
-         "icon": [
-          "img/icons/p15.webp",
-          3
-         ],
-         "audio": [
-          "snd/p15.json",
-          "7a4a496b54"
+         "label": "Solicitudes",
+         "phrases": [
+          {
+           "fr": "Vous me conseillez quoi?",
+           "es": "¿Qué me recomienda?",
+           "pr": "vu me kon-se-ye KUÁ",
+           "who": "staff",
+           "icon": [
+            "img/icons/p15.webp",
+            14
+           ],
+           "audio": [
+            "snd/p15.json",
+            "f452782e87"
+           ]
+          },
+          {
+           "fr": "Je pourrais avoir du pain?",
+           "es": "¿Podría tener pan?",
+           "pr": "ye pu-re a-vuar dú PÁN",
+           "icon": [
+            "img/icons/p15.webp",
+            15
+           ],
+           "audio": [
+            "snd/p15.json",
+            "b4aa0c66ba"
+           ]
+          },
+          {
+           "fr": "Il y a du gluten dans ce plat?",
+           "es": "¿Hay gluten en este plato?",
+           "pr": "il-ia dú glú-ten dan se PLÁ",
+           "icon": [
+            "img/icons/p15.webp",
+            16
+           ],
+           "audio": [
+            "snd/p15.json",
+            "ef83a2146a"
+           ]
+          },
+          {
+           "fr": "Je suis allergique à …",
+           "es": "Soy alérgico a …",
+           "pr": "ye súi-sa-ler-yi-Ká ...",
+           "icon": [
+            "img/icons/p15.webp",
+            17
+           ],
+           "audio": [
+            "snd/p15.json",
+            "cedeff1d24"
+           ]
+          },
+          {
+           "fr": "Sans oignons, s'il vous plaît",
+           "es": "Sin cebolla, por favor",
+           "pr": "san-so-ÑÓN, sil vu PLÉ",
+           "icon": [
+            "img/icons/p15.webp",
+            18
+           ],
+           "audio": [
+            "snd/p15.json",
+            "886a333b09"
+           ]
+          },
+          {
+           "fr": "C'est épicé?",
+           "es": "¿Es picante?",
+           "pr": "se-te-pi-SÉ",
+           "icon": [
+            "img/icons/p15.webp",
+            19
+           ],
+           "audio": [
+            "snd/p15.json",
+            "8a30ff4f42"
+           ]
+          }
          ]
-        },
+        }
+       ],
+       "tips": [
         {
-         "fr": "Une table pour deux",
-         "es": "Una mesa para dos",
-         "pr": "ún ta-ble pur DO",
-         "icon": [
-          "img/icons/p15.webp",
-          4
-         ],
-         "audio": [
-          "snd/p15.json",
-          "cf6327e7e4"
-         ]
+         "title": "Dato cultural",
+         "text": "Si deseas comer comida francesa a buen precio, busca “un Bouillon”: un restaurante francés a buen precio, de buena calidad y rico."
         }
        ]
       },
       {
-       "label": "El pedido",
-       "phrases": [
+       "name": "Bebidas y cuenta",
+       "intro": "Pide tu comida en el",
+       "groups": [
         {
-         "fr": "Voici la carte",
-         "es": "Aquí está el menú",
-         "pr": "vua-si la KÁRT",
-         "who": "staff",
-         "icon": [
-          "img/icons/p15.webp",
-          5
-         ],
-         "audio": [
-          "snd/p15.json",
-          "23675dce5c"
+         "label": "Las bebidas",
+         "phrases": [
+          {
+           "fr": "Et comme boisson?",
+           "es": "¿Y para beber?",
+           "pr": "e kom bua-SÓN",
+           "who": "staff",
+           "icon": [
+            "img/icons/p16.webp",
+            0
+           ],
+           "audio": [
+            "snd/p16.json",
+            "c7eb0f2bf6"
+           ]
+          },
+          {
+           "fr": "Une carafe d'eau, s'il vous plaît",
+           "es": "Una jarra de agua por favor",
+           "pr": "ún ka-raf DÓ, sil vu PLÉ",
+           "icon": [
+            "img/icons/p16.webp",
+            1
+           ],
+           "audio": [
+            "snd/p16.json",
+            "a092f8647e"
+           ]
+          },
+          {
+           "fr": "Je peux voir la carte des vins?",
+           "es": "¿Puedo ver la carta de los vinos?",
+           "pr": "ye pó vuar la kart de VÁN",
+           "icon": [
+            "img/icons/p16.webp",
+            2
+           ],
+           "audio": [
+            "snd/p16.json",
+            "f598ac50b0"
+           ]
+          }
          ]
         },
         {
-         "fr": "Je reviens tout de suite",
-         "es": "Vuelvo enseguida",
-         "pr": "ye re-vian tut de SÚÍT",
-         "who": "staff",
-         "icon": [
-          "img/icons/p15.webp",
-          6
-         ],
-         "audio": [
-          "snd/p15.json",
-          "x15_Jerevienstou"
+         "label": "Indicaciones",
+         "phrases": [
+          {
+           "fr": "Mon plat est froid",
+           "es": "Mi plato está frío",
+           "pr": "mon pla e FRUÁ",
+           "icon": [
+            "img/icons/p16.webp",
+            3
+           ],
+           "audio": [
+            "snd/p16.json",
+            "04248c67b2"
+           ]
+          },
+          {
+           "fr": "La viande est mal cuite",
+           "es": "La carne está mal cocida",
+           "pr": "la viand e mal KÚÍT",
+           "icon": [
+            "img/icons/p16.webp",
+            4
+           ],
+           "audio": [
+            "snd/p16.json",
+            "a100b45099"
+           ]
+          },
+          {
+           "fr": "Je vous change le plat",
+           "es": "Le cambio el plato",
+           "pr": "ye vu shany le PLÁ",
+           "who": "staff",
+           "icon": [
+            "img/icons/p16.webp",
+            5
+           ],
+           "audio": [
+            "snd/p16.json",
+            "240d35af16"
+           ]
+          },
+          {
+           "fr": "Je n'ai pas demandé ça",
+           "es": "No pedí eso",
+           "pr": "ye ne pa de-man-de SÁ",
+           "icon": [
+            "img/icons/p16.webp",
+            6
+           ],
+           "audio": [
+            "snd/p16.json",
+            "69ea289948"
+           ]
+          },
+          {
+           "fr": "Il manque un couvert",
+           "es": "Falta un cubierto",
+           "pr": "il man-kan ku-VÉR",
+           "icon": [
+            "img/icons/p16.webp",
+            7
+           ],
+           "audio": [
+            "snd/p16.json",
+            "12a12d8850"
+           ]
+          },
+          {
+           "fr": "Je n'ai pas reçu ma boisson",
+           "es": "No recibí mi bebida",
+           "pr": "ye ne pa re-sú ma bua-SÓN",
+           "icon": [
+            "img/icons/p16.webp",
+            8
+           ],
+           "audio": [
+            "snd/p16.json",
+            "616cb0acce"
+           ]
+          },
+          {
+           "fr": "Je suis désolé",
+           "es": "Lo siento",
+           "pr": "ye súi de-so-LÉ",
+           "who": "staff",
+           "icon": [
+            "img/icons/p16.webp",
+            9
+           ],
+           "audio": [
+            "snd/p16.json",
+            "531607bb48"
+           ]
+          },
+          {
+           "fr": "Je vous l'apporte tout de suite",
+           "es": "Se lo llevo enseguida",
+           "pr": "ye vu la-port tut de SÚÍT",
+           "who": "staff",
+           "icon": [
+            "img/icons/p16.webp",
+            10
+           ],
+           "audio": [
+            "snd/p16.json",
+            "f16db4942f"
+           ]
+          }
          ]
         },
         {
-         "fr": "Vous avez choisi?",
-         "es": "¿Eligió / Eligieron?",
-         "pr": "vu-sa-ve shua-SÍ",
-         "who": "staff",
-         "icon": [
-          "img/icons/p15.webp",
-          7
-         ],
-         "audio": [
-          "snd/p15.json",
-          "30944da412"
-         ]
-        },
-        {
-         "fr": "Je vais prendre …",
-         "es": "Voy a pedir …",
-         "pr": "ye ve PRÁNDR ...",
-         "icon": [
-          "img/icons/p15.webp",
-          8
-         ],
-         "audio": [
-          "snd/p15.json",
-          "27435e212f"
-         ]
-        },
-        {
-         "fr": "Pour moi, ce sera …",
-         "es": "Para mi, será …",
-         "pr": "pur MUÁ, se se-RÁ ...",
-         "icon": [
-          "img/icons/p15.webp",
-          9
-         ],
-         "audio": [
-          "snd/p15.json",
-          "25431d863d"
-         ]
-        },
-        {
-         "fr": "Quel est le plat du jour?",
-         "es": "¿Cuál es el plato del dia?",
-         "pr": "ke-le le pla dú YÚR",
-         "icon": [
-          "img/icons/p15.webp",
-          10
-         ],
-         "audio": [
-          "snd/p15.json",
-          "d879f03b0b"
+         "label": "El fin del almuerzo",
+         "phrases": [
+          {
+           "fr": "Ça a été?",
+           "es": "¿Todo estuvo bien?",
+           "pr": "sa a e-TÉ",
+           "who": "staff",
+           "icon": [
+            "img/icons/p16.webp",
+            11
+           ],
+           "audio": [
+            "snd/p16.json",
+            "b4bf85102a"
+           ]
+          },
+          {
+           "fr": "Vous prendrez un dessert?",
+           "es": "¿Pedirán un postre?",
+           "pr": "vu pran-dre-san de-SÉR",
+           "who": "staff",
+           "icon": [
+            "img/icons/p16.webp",
+            12
+           ],
+           "audio": [
+            "snd/p16.json",
+            "1239f7ee16"
+           ]
+          },
+          {
+           "fr": "Vous voulez un café?",
+           "es": "¿Quiere un café?",
+           "pr": "vu vu-le-san ka-FÉ",
+           "who": "staff",
+           "icon": [
+            "img/icons/p16.webp",
+            13
+           ],
+           "audio": [
+            "snd/p16.json",
+            "5ad50078af"
+           ]
+          },
+          {
+           "fr": "L'addition s'il vous plaît",
+           "es": "La cuenta por favor",
+           "pr": "la-di-SIÓN, sil vu PLÉ",
+           "icon": [
+            "img/icons/p16.webp",
+            14
+           ],
+           "audio": [
+            "snd/p16.json",
+            "00d3182519"
+           ]
+          },
+          {
+           "fr": "On peut payer séparément?",
+           "es": "¿Se puede pagar por separado?",
+           "pr": "on pó pe-ye se-pa-re-MÁN",
+           "icon": [
+            "img/icons/p16.webp",
+            15
+           ],
+           "audio": [
+            "snd/p16.json",
+            "8fa5b918a4"
+           ]
+          },
+          {
+           "fr": "Je vous apporte l'addition",
+           "es": "Ya le traigo la cuenta",
+           "pr": "ye vu-sa-port la-di-SIÓN",
+           "who": "staff",
+           "icon": [
+            "img/icons/p16.webp",
+            16
+           ],
+           "audio": [
+            "snd/p16.json",
+            "383773c1fb"
+           ]
+          },
+          {
+           "fr": "Il y a une erreur dans l'addition",
+           "es": "Hay un error en la cuenta",
+           "pr": "il-ia Uú-ne-rór dan la-di-SIÓN",
+           "icon": [
+            "img/icons/p16.webp",
+            17
+           ],
+           "audio": [
+            "snd/p16.json",
+            "23c7498356"
+           ]
+          },
+          {
+           "fr": "Je vérifie tout de suite",
+           "es": "La verifico enseguida",
+           "pr": "ye ve-ri-fi tut de SÚÍT",
+           "who": "staff",
+           "icon": [
+            "img/icons/p16.webp",
+            18
+           ],
+           "audio": [
+            "snd/p16.json",
+            "ad21e0fcf7"
+           ]
+          },
+          {
+           "fr": "Vous payez par carte?",
+           "es": "¿Paga con tarjeta?",
+           "pr": "vu pe-ye par KÁRT",
+           "who": "staff",
+           "icon": [
+            "img/icons/p16.webp",
+            19
+           ],
+           "audio": [
+            "snd/p16.json",
+            "04d80502e9"
+           ]
+          }
          ]
         }
-       ]
-      },
-      {
-       "label": "La carne",
-       "phrases": [
+       ],
+       "tips": [
         {
-         "fr": "Quelle cuisson pour la viande?",
-         "es": "¿Qué cocción para la carne?",
-         "pr": "kel kúi-son pur la VIÁND",
-         "who": "staff",
-         "icon": [
-          "img/icons/p15.webp",
-          11
-         ],
-         "audio": [
-          "snd/p15.json",
-          "0f643ac9e3"
-         ]
-        },
-        {
-         "fr": "Saignant, à point, bien cuit?",
-         "es": "¿Crudo, al punto, bien hecho?",
-         "pr": "se-ÑÁN, a PUÁN, bian KÚÍ",
-         "who": "staff",
-         "icon": [
-          "img/icons/p15.webp",
-          12
-         ],
-         "audio": [
-          "snd/p15.json",
-          "c95a45b737"
-         ]
-        },
-        {
-         "fr": "Vous avez des plats végétariens?",
-         "es": "¿Tienen platos vegetarianos?",
-         "pr": "vu-sa-ve de pla ve-ye-ta-RIÁN",
-         "icon": [
-          "img/icons/p15.webp",
-          13
-         ],
-         "audio": [
-          "snd/p15.json",
-          "9a9d2f1e18"
-         ]
+         "title": "Dato cultural",
+         "text": "Si no quieres pagar por una bebida, puedes pedir “une carafe d'eau”, ya que el agua en carrafa es gratis. Sí pides une “bouteille d'eau”, sí la cobrarán"
         }
        ]
-      },
-      {
-       "label": "Solicitudes",
-       "phrases": [
-        {
-         "fr": "Vous me conseillez quoi?",
-         "es": "¿Qué me recomienda?",
-         "pr": "vu me kon-se-ye KUÁ",
-         "who": "staff",
-         "icon": [
-          "img/icons/p15.webp",
-          14
-         ],
-         "audio": [
-          "snd/p15.json",
-          "f452782e87"
-         ]
-        },
-        {
-         "fr": "Je pourrais avoir du pain?",
-         "es": "¿Podría tener pan?",
-         "pr": "ye pu-re a-vuar dú PÁN",
-         "icon": [
-          "img/icons/p15.webp",
-          15
-         ],
-         "audio": [
-          "snd/p15.json",
-          "b4aa0c66ba"
-         ]
-        },
-        {
-         "fr": "Il y a du gluten dans ce plat?",
-         "es": "¿Hay gluten en este plato?",
-         "pr": "il-ia dú glú-ten dan se PLÁ",
-         "icon": [
-          "img/icons/p15.webp",
-          16
-         ],
-         "audio": [
-          "snd/p15.json",
-          "ef83a2146a"
-         ]
-        },
-        {
-         "fr": "Je suis allergique à …",
-         "es": "Soy alérgico a …",
-         "pr": "ye súi-sa-ler-yi-Ká ...",
-         "icon": [
-          "img/icons/p15.webp",
-          17
-         ],
-         "audio": [
-          "snd/p15.json",
-          "cedeff1d24"
-         ]
-        },
-        {
-         "fr": "Sans oignons, s'il vous plaît",
-         "es": "Sin cebolla, por favor",
-         "pr": "san-so-ÑÓN, sil vu PLÉ",
-         "icon": [
-          "img/icons/p15.webp",
-          18
-         ],
-         "audio": [
-          "snd/p15.json",
-          "886a333b09"
-         ]
-        },
-        {
-         "fr": "C'est épicé?",
-         "es": "¿Es picante?",
-         "pr": "se-te-pi-SÉ",
-         "icon": [
-          "img/icons/p15.webp",
-          19
-         ],
-         "audio": [
-          "snd/p15.json",
-          "8a30ff4f42"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Las bebidas",
-       "phrases": [
-        {
-         "fr": "Et comme boisson?",
-         "es": "¿Y para beber?",
-         "pr": "e kom bua-SÓN",
-         "who": "staff",
-         "icon": [
-          "img/icons/p16.webp",
-          0
-         ],
-         "audio": [
-          "snd/p16.json",
-          "c7eb0f2bf6"
-         ]
-        },
-        {
-         "fr": "Une carafe d'eau, s'il vous plaît",
-         "es": "Una jarra de agua por favor",
-         "pr": "ún ka-raf DÓ, sil vu PLÉ",
-         "icon": [
-          "img/icons/p16.webp",
-          1
-         ],
-         "audio": [
-          "snd/p16.json",
-          "a092f8647e"
-         ]
-        },
-        {
-         "fr": "Je peux voir la carte des vins?",
-         "es": "¿Puedo ver la carta de los vinos?",
-         "pr": "ye pó vuar la kart de VÁN",
-         "icon": [
-          "img/icons/p16.webp",
-          2
-         ],
-         "audio": [
-          "snd/p16.json",
-          "f598ac50b0"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Indicaciones",
-       "phrases": [
-        {
-         "fr": "Mon plat est froid",
-         "es": "Mi plato está frío",
-         "pr": "mon pla e FRUÁ",
-         "icon": [
-          "img/icons/p16.webp",
-          3
-         ],
-         "audio": [
-          "snd/p16.json",
-          "04248c67b2"
-         ]
-        },
-        {
-         "fr": "La viande est mal cuite",
-         "es": "La carne está mal cocida",
-         "pr": "la viand e mal KÚÍT",
-         "icon": [
-          "img/icons/p16.webp",
-          4
-         ],
-         "audio": [
-          "snd/p16.json",
-          "a100b45099"
-         ]
-        },
-        {
-         "fr": "Je vous change le plat",
-         "es": "Le cambio el plato",
-         "pr": "ye vu shany le PLÁ",
-         "who": "staff",
-         "icon": [
-          "img/icons/p16.webp",
-          5
-         ],
-         "audio": [
-          "snd/p16.json",
-          "240d35af16"
-         ]
-        },
-        {
-         "fr": "Je n'ai pas demandé ça",
-         "es": "No pedí eso",
-         "pr": "ye ne pa de-man-de SÁ",
-         "icon": [
-          "img/icons/p16.webp",
-          6
-         ],
-         "audio": [
-          "snd/p16.json",
-          "69ea289948"
-         ]
-        },
-        {
-         "fr": "Il manque un couvert",
-         "es": "Falta un cubierto",
-         "pr": "il man-kan ku-VÉR",
-         "icon": [
-          "img/icons/p16.webp",
-          7
-         ],
-         "audio": [
-          "snd/p16.json",
-          "12a12d8850"
-         ]
-        },
-        {
-         "fr": "Je n'ai pas reçu ma boisson",
-         "es": "No recibí mi bebida",
-         "pr": "ye ne pa re-sú ma bua-SÓN",
-         "icon": [
-          "img/icons/p16.webp",
-          8
-         ],
-         "audio": [
-          "snd/p16.json",
-          "616cb0acce"
-         ]
-        },
-        {
-         "fr": "Je suis désolé",
-         "es": "Lo siento",
-         "pr": "ye súi de-so-LÉ",
-         "who": "staff",
-         "icon": [
-          "img/icons/p16.webp",
-          9
-         ],
-         "audio": [
-          "snd/p16.json",
-          "531607bb48"
-         ]
-        },
-        {
-         "fr": "Je vous l'apporte tout de suite",
-         "es": "Se lo llevo enseguida",
-         "pr": "ye vu la-port tut de SÚÍT",
-         "who": "staff",
-         "icon": [
-          "img/icons/p16.webp",
-          10
-         ],
-         "audio": [
-          "snd/p16.json",
-          "f16db4942f"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "El fin del almuerzo",
-       "phrases": [
-        {
-         "fr": "Ça a été?",
-         "es": "¿Todo estuvo bien?",
-         "pr": "sa a e-TÉ",
-         "who": "staff",
-         "icon": [
-          "img/icons/p16.webp",
-          11
-         ],
-         "audio": [
-          "snd/p16.json",
-          "b4bf85102a"
-         ]
-        },
-        {
-         "fr": "Vous prendrez un dessert?",
-         "es": "¿Pedirán un postre?",
-         "pr": "vu pran-dre-san de-SÉR",
-         "who": "staff",
-         "icon": [
-          "img/icons/p16.webp",
-          12
-         ],
-         "audio": [
-          "snd/p16.json",
-          "1239f7ee16"
-         ]
-        },
-        {
-         "fr": "Vous voulez un café?",
-         "es": "¿Quiere un café?",
-         "pr": "vu vu-le-san ka-FÉ",
-         "who": "staff",
-         "icon": [
-          "img/icons/p16.webp",
-          13
-         ],
-         "audio": [
-          "snd/p16.json",
-          "5ad50078af"
-         ]
-        },
-        {
-         "fr": "L'addition s'il vous plaît",
-         "es": "La cuenta por favor",
-         "pr": "la-di-SIÓN, sil vu PLÉ",
-         "icon": [
-          "img/icons/p16.webp",
-          14
-         ],
-         "audio": [
-          "snd/p16.json",
-          "00d3182519"
-         ]
-        },
-        {
-         "fr": "On peut payer séparément?",
-         "es": "¿Se puede pagar por separado?",
-         "pr": "on pó pe-ye se-pa-re-MÁN",
-         "icon": [
-          "img/icons/p16.webp",
-          15
-         ],
-         "audio": [
-          "snd/p16.json",
-          "8fa5b918a4"
-         ]
-        },
-        {
-         "fr": "Je vous apporte l'addition",
-         "es": "Ya le traigo la cuenta",
-         "pr": "ye vu-sa-port la-di-SIÓN",
-         "who": "staff",
-         "icon": [
-          "img/icons/p16.webp",
-          16
-         ],
-         "audio": [
-          "snd/p16.json",
-          "383773c1fb"
-         ]
-        },
-        {
-         "fr": "Il y a une erreur dans l'addition",
-         "es": "Hay un error en la cuenta",
-         "pr": "il-ia Uú-ne-rór dan la-di-SIÓN",
-         "icon": [
-          "img/icons/p16.webp",
-          17
-         ],
-         "audio": [
-          "snd/p16.json",
-          "23c7498356"
-         ]
-        },
-        {
-         "fr": "Je vérifie tout de suite",
-         "es": "La verifico enseguida",
-         "pr": "ye ve-ri-fi tut de SÚÍT",
-         "who": "staff",
-         "icon": [
-          "img/icons/p16.webp",
-          18
-         ],
-         "audio": [
-          "snd/p16.json",
-          "ad21e0fcf7"
-         ]
-        },
-        {
-         "fr": "Vous payez par carte?",
-         "es": "¿Paga con tarjeta?",
-         "pr": "vu pe-ye par KÁRT",
-         "who": "staff",
-         "icon": [
-          "img/icons/p16.webp",
-          19
-         ],
-         "audio": [
-          "snd/p16.json",
-          "04d80502e9"
-         ]
-        }
-       ]
-      }
-     ],
-     "tips": [
-      {
-       "title": "Dato cultural",
-       "text": "Si deseas comer comida francesa a buen precio, busca “un Bouillon”: un restaurante francés a buen precio, de buena calidad y rico."
-      },
-      {
-       "title": "Dato cultural",
-       "text": "Si no quieres pagar por una bebida, puedes pedir “une carafe d'eau”, ya que el agua en carrafa es gratis. Sí pides une “bouteille d'eau”, sí la cobrarán"
       }
      ]
     },
@@ -5255,1132 +5287,1164 @@
     {
      "name": "En el hotel",
      "intro": "Maneja tu estadía",
-     "groups": [
+     "groups": [],
+     "tips": [],
+     "subs": [
       {
-       "label": "La llegada",
-       "phrases": [
+       "name": "Llegada y habitación",
+       "intro": "Maneja tu estadía",
+       "groups": [
         {
-         "fr": "J'ai une réservation au nom de …",
-         "es": "Tengo una reserva en nombre de …",
-         "pr": "ye ún re-ser-va-sion o NÓN de ...",
-         "icon": [
-          "img/icons/p20.webp",
-          0
-         ],
-         "audio": [
-          "snd/p20.json",
-          "7c6a9e7ff9"
+         "label": "La llegada",
+         "phrases": [
+          {
+           "fr": "J'ai une réservation au nom de …",
+           "es": "Tengo una reserva en nombre de …",
+           "pr": "ye ún re-ser-va-sion o NÓN de ...",
+           "icon": [
+            "img/icons/p20.webp",
+            0
+           ],
+           "audio": [
+            "snd/p20.json",
+            "7c6a9e7ff9"
+           ]
+          },
+          {
+           "fr": "Puis-je voir votre passeport?",
+           "es": "¿Puedo ver su pasaporte?",
+           "pr": "púiy vuar votr pas-PÓR",
+           "who": "staff",
+           "icon": [
+            "img/icons/p20.webp",
+            1
+           ],
+           "audio": [
+            "snd/p20.json",
+            "66cce89f06"
+           ]
+          },
+          {
+           "fr": "Voici votre clé",
+           "es": "Aquí está su llave",
+           "pr": "vua-si votr KLÉ",
+           "who": "staff",
+           "icon": [
+            "img/icons/p20.webp",
+            2
+           ],
+           "audio": [
+            "snd/p20.json",
+            "f71025cbf9"
+           ]
+          },
+          {
+           "fr": "Je peux laisser mes bagages ici ?",
+           "es": "¿ Puedo dejar mi equipaje aquí ?",
+           "pr": "ye pó le-se me ba-ga-yi-SÍ",
+           "icon": [
+            "img/icons/p20.webp",
+            3
+           ],
+           "audio": [
+            "snd/p20.json",
+            "78ce495144"
+           ]
+          },
+          {
+           "fr": "Mettez-les dans la bagagerie",
+           "es": "Póngalos en el guardaequipajes",
+           "pr": "me-te le dan la ba-ga-ye-RÍ",
+           "who": "staff",
+           "icon": [
+            "img/icons/p20.webp",
+            4
+           ],
+           "audio": [
+            "snd/p20.json",
+            "2f7488cd68"
+           ]
+          }
          ]
         },
         {
-         "fr": "Puis-je voir votre passeport?",
-         "es": "¿Puedo ver su pasaporte?",
-         "pr": "púiy vuar votr pas-PÓR",
-         "who": "staff",
-         "icon": [
-          "img/icons/p20.webp",
-          1
-         ],
-         "audio": [
-          "snd/p20.json",
-          "66cce89f06"
+         "label": "La habitación",
+         "phrases": [
+          {
+           "fr": "Vous avez la chambre …",
+           "es": "Tiene la habitación",
+           "pr": "vu-sa-ve la SHÁNBR ...",
+           "icon": [
+            "img/icons/p20.webp",
+            5
+           ],
+           "audio": [
+            "snd/p20.json",
+            "b404f7324d"
+           ]
+          },
+          {
+           "fr": "C'est au premier étage",
+           "es": "Está en el primer piso",
+           "pr": "se-to pre-mie-re-TÁY",
+           "who": "staff",
+           "icon": [
+            "img/icons/p20.webp",
+            6
+           ],
+           "audio": [
+            "snd/p20.json",
+            "c14c9761b5"
+           ]
+          },
+          {
+           "fr": "C'est au deuxième étage",
+           "es": "Está en el segundo piso",
+           "pr": "se-to dó-sie-me-TÁY",
+           "who": "staff",
+           "icon": [
+            "img/icons/p20.webp",
+            7
+           ],
+           "audio": [
+            "snd/p20.json",
+            "13d909b136"
+           ]
+          },
+          {
+           "fr": "Le coffre-fort est dans le placard",
+           "es": "La caja fuerte está en el armario",
+           "pr": "le ko-fre-for e dan le pla-KÁR",
+           "icon": [
+            "img/icons/p20.webp",
+            8
+           ],
+           "audio": [
+            "snd/p20.json",
+            "e311d6158e"
+           ]
+          },
+          {
+           "fr": "Votre chambre est prête",
+           "es": "Su habitación está lista",
+           "pr": "votr shan-bre PRÉT",
+           "icon": [
+            "img/icons/p20.webp",
+            9
+           ],
+           "audio": [
+            "snd/p20.json",
+            "7f92b17028"
+           ]
+          }
          ]
         },
         {
-         "fr": "Voici votre clé",
-         "es": "Aquí está su llave",
-         "pr": "vua-si votr KLÉ",
-         "who": "staff",
-         "icon": [
-          "img/icons/p20.webp",
-          2
-         ],
-         "audio": [
-          "snd/p20.json",
-          "f71025cbf9"
+         "label": "Inconvenientes",
+         "phrases": [
+          {
+           "fr": "J'aimerais changer de chambre",
+           "es": "Me gustaría cambiar de habitación",
+           "pr": "ye-me-re shan-ye de SHÁNBR",
+           "icon": [
+            "img/icons/p20.webp",
+            10
+           ],
+           "audio": [
+            "snd/p20.json",
+            "54359ed515"
+           ]
+          },
+          {
+           "fr": "La climatisation ne marche pas",
+           "es": "El aire acondicionado no funciona",
+           "pr": "la kli-ma-ti-sa-sion ne marsh PÁ",
+           "icon": [
+            "img/icons/p20.webp",
+            11
+           ],
+           "audio": [
+            "snd/p20.json",
+            "c953988996"
+           ]
+          },
+          {
+           "fr": "Je n'ai pas de serviette",
+           "es": "No tengo toalla",
+           "pr": "ye ne pa de ser-VIÉT",
+           "icon": [
+            "img/icons/p20.webp",
+            12
+           ],
+           "audio": [
+            "snd/p20.json",
+            "894dbe4ebe"
+           ]
+          },
+          {
+           "fr": "Il y a beaucoup de bruit",
+           "es": "Hay mucho ruido",
+           "pr": "il-ia bo-ku de BRÚÍ",
+           "icon": [
+            "img/icons/p20.webp",
+            13
+           ],
+           "audio": [
+            "snd/p20.json",
+            "2abab5aeab"
+           ]
+          },
+          {
+           "fr": "Ma carte ne fonctionne pas",
+           "es": "Mi tarjeta no funciona",
+           "pr": "ma kart ne fonk-sion PÁ",
+           "icon": [
+            "img/icons/p20.webp",
+            14
+           ],
+           "audio": [
+            "snd/p20.json",
+            "6db56f2844"
+           ]
+          },
+          {
+           "fr": "Je n'ai plus de savon",
+           "es": "Ya no tengo jabón",
+           "pr": "ye ne plú de sa-VÓN",
+           "icon": [
+            "img/icons/p20.webp",
+            15
+           ],
+           "audio": [
+            "snd/p20.json",
+            "81d7d6f818"
+           ]
+          },
+          {
+           "fr": "La chambre est différente des photos",
+           "es": "La habitación es diferente de las fotos",
+           "pr": "la shan-bre di-fe-rant de fo-TÓ",
+           "icon": [
+            "img/icons/p20.webp",
+            16
+           ],
+           "audio": [
+            "snd/p20.json",
+            "93bbc1d558"
+           ]
+          }
          ]
         },
         {
-         "fr": "Je peux laisser mes bagages ici ?",
-         "es": "¿ Puedo dejar mi equipaje aquí ?",
-         "pr": "ye pó le-se me ba-ga-yi-SÍ",
-         "icon": [
-          "img/icons/p20.webp",
-          3
-         ],
-         "audio": [
-          "snd/p20.json",
-          "78ce495144"
+         "label": "Soluciones",
+         "phrases": [
+          {
+           "fr": "Comment puis-je vous aider?",
+           "es": "¿Cómo le puedo ayudar?",
+           "pr": "ko-man púiy vu-se-DÉ",
+           "icon": [
+            "img/icons/p20.webp",
+            17
+           ],
+           "audio": [
+            "snd/p20.json",
+            "f0039c21aa"
+           ]
+          },
+          {
+           "fr": "Nous allons envoyer quelqu'un",
+           "es": "Vamos a mandar a alguien",
+           "pr": "nu-sa-lon an-vua-ye kel-KÁN",
+           "who": "staff",
+           "icon": [
+            "img/icons/p20.webp",
+            18
+           ],
+           "audio": [
+            "snd/p20.json",
+            "227144c99d"
+           ]
+          },
+          {
+           "fr": "Nous montons dans un instant",
+           "es": "Subimos en un momento",
+           "pr": "nu mon-ton dan-san-nans-TÁN",
+           "who": "staff",
+           "icon": [
+            "img/icons/p20.webp",
+            19
+           ],
+           "audio": [
+            "snd/p20.json",
+            "031f58ff7c"
+           ]
+          }
          ]
-        },
+        }
+       ],
+       "tips": [
         {
-         "fr": "Mettez-les dans la bagagerie",
-         "es": "Póngalos en el guardaequipajes",
-         "pr": "me-te le dan la ba-ga-ye-RÍ",
-         "who": "staff",
-         "icon": [
-          "img/icons/p20.webp",
-          4
-         ],
-         "audio": [
-          "snd/p20.json",
-          "2f7488cd68"
-         ]
+         "title": "Dato cultural",
+         "text": "Muchos hoteles franceses no tienen aire acondicionado. Si viajas en verano, averigua antes de reservar."
         }
        ]
       },
       {
-       "label": "La habitación",
-       "phrases": [
+       "name": "Servicios",
+       "intro": "Maneja tu estadía",
+       "groups": [
         {
-         "fr": "Vous avez la chambre …",
-         "es": "Tiene la habitación",
-         "pr": "vu-sa-ve la SHÁNBR ...",
-         "icon": [
-          "img/icons/p20.webp",
-          5
-         ],
-         "audio": [
-          "snd/p20.json",
-          "b404f7324d"
+         "label": "Comodidades",
+         "phrases": [
+          {
+           "fr": "Je pourrais avoir …",
+           "es": "Podría tener …",
+           "pr": "ye pu-re a-VUÁR ...",
+           "icon": [
+            "img/icons/p21.webp",
+            0
+           ],
+           "audio": [
+            "snd/p21.json",
+            "764b6e86eb"
+           ]
+          },
+          {
+           "fr": "Un drap",
+           "es": "Una sábana",
+           "pr": "an DRÁ",
+           "icon": [
+            "img/icons/p21.webp",
+            1
+           ],
+           "audio": [
+            "snd/p21.json",
+            "f31817974c"
+           ]
+          },
+          {
+           "fr": "Une serviette",
+           "es": "Una toalla",
+           "pr": "ún ser-VIÉT",
+           "icon": [
+            "img/icons/p21.webp",
+            2
+           ],
+           "audio": [
+            "snd/p21.json",
+            "1bb4976cba"
+           ]
+          },
+          {
+           "fr": "Un oreiller",
+           "es": "Una almohada",
+           "pr": "an-no-re-YÉ",
+           "icon": [
+            "img/icons/p21.webp",
+            3
+           ],
+           "audio": [
+            "snd/p21.json",
+            "8f24b9af58"
+           ]
+          },
+          {
+           "fr": "Un sèche-cheveux",
+           "es": "Un secador de cabello",
+           "pr": "an sesh-she-VO",
+           "icon": [
+            "img/icons/p21.webp",
+            4
+           ],
+           "audio": [
+            "snd/p21.json",
+            "4057e63d0b"
+           ]
+          },
+          {
+           "fr": "Du papier toilette",
+           "es": "Papel higiénico",
+           "pr": "dú pa-pie tua-LÉT",
+           "icon": [
+            "img/icons/p21.webp",
+            5
+           ],
+           "audio": [
+            "snd/p21.json",
+            "04dc0fffde"
+           ]
+          }
          ]
         },
         {
-         "fr": "C'est au premier étage",
-         "es": "Está en el primer piso",
-         "pr": "se-to pre-mie-re-TÁY",
-         "who": "staff",
-         "icon": [
-          "img/icons/p20.webp",
-          6
-         ],
-         "audio": [
-          "snd/p20.json",
-          "c14c9761b5"
+         "label": "Servicios y consejos",
+         "phrases": [
+          {
+           "fr": "Vous avez un plan du quartier?",
+           "es": "¿Tiene un mapa del barrio?",
+           "pr": "vu-sa-ve an plan dú kar-TIÉ",
+           "icon": [
+            "img/icons/p21.webp",
+            6
+           ],
+           "audio": [
+            "snd/p21.json",
+            "92466a6e16"
+           ]
+          },
+          {
+           "fr": "Il y a … dans le coin ?",
+           "es": "¿Hay … cerca ? (en la esquina)",
+           "pr": "il-ia .. dan le KUÁN",
+           "icon": [
+            "img/icons/p21.webp",
+            7
+           ],
+           "audio": [
+            "snd/p21.json",
+            "x21_Ilyadansleco"
+           ]
+          },
+          {
+           "fr": "Vous savez où je peux trouver…",
+           "es": "Sabe dónde puedo encontrar …",
+           "pr": "vu sa-ve u ye po tru-VÉ ...",
+           "icon": [
+            "img/icons/p21.webp",
+            8
+           ],
+           "audio": [
+            "snd/p21.json",
+            "e1baeb4ede"
+           ]
+          },
+          {
+           "fr": "Vous pouvez me conseiller …",
+           "es": "Me puede recomendar …",
+           "pr": "vu pu-ve me kon-se-YÉ ...",
+           "icon": [
+            "img/icons/p21.webp",
+            9
+           ],
+           "audio": [
+            "snd/p21.json",
+            "b72e9ecc4e"
+           ]
+          }
          ]
         },
         {
-         "fr": "C'est au deuxième étage",
-         "es": "Está en el segundo piso",
-         "pr": "se-to dó-sie-me-TÁY",
-         "who": "staff",
-         "icon": [
-          "img/icons/p20.webp",
-          7
-         ],
-         "audio": [
-          "snd/p20.json",
-          "13d909b136"
+         "label": "Transporte",
+         "phrases": [
+          {
+           "fr": "Vous pouvez m'appeler un taxi?",
+           "es": "¿Me puede llamar un taxi?",
+           "pr": "vu pu-ve ma-pe-le an tak-sí",
+           "icon": [
+            "img/icons/p21.webp",
+            10
+           ],
+           "audio": [
+            "snd/p21.json",
+            "98d6bb173d"
+           ]
+          },
+          {
+           "fr": "Quel est le métro le plus proche?",
+           "es": "¿Cuál es el metro más cercano?",
+           "pr": "ke-le le me-tro le plú PRÓSH",
+           "icon": [
+            "img/icons/p21.webp",
+            11
+           ],
+           "audio": [
+            "snd/p21.json",
+            "b8a49146aa"
+           ]
+          },
+          {
+           "fr": "Il y a une navette pour l'aéroport?",
+           "es": "¿Tienen un bus para el aeropuerto?",
+           "pr": "¡l-ia ún na-vet pur la-e-ro-PÓR",
+           "icon": [
+            "img/icons/p21.webp",
+            12
+           ],
+           "audio": [
+            "snd/p21.json",
+            "5a11b04d90"
+           ]
+          },
+          {
+           "fr": "Quel bus peut m'amener à … ?",
+           "es": "¿Qué bus me puede llevar a …?",
+           "pr": "kel bús pó ma-me-ne-á ...",
+           "icon": [
+            "img/icons/p21.webp",
+            13
+           ],
+           "audio": [
+            "snd/p21.json",
+            "f813ea53d1"
+           ]
+          }
          ]
         },
         {
-         "fr": "Le coffre-fort est dans le placard",
-         "es": "La caja fuerte está en el armario",
-         "pr": "le ko-fre-for e dan le pla-KÁR",
-         "icon": [
-          "img/icons/p20.webp",
-          8
-         ],
-         "audio": [
-          "snd/p20.json",
-          "e311d6158e"
-         ]
-        },
-        {
-         "fr": "Votre chambre est prête",
-         "es": "Su habitación está lista",
-         "pr": "votr shan-bre PRÉT",
-         "icon": [
-          "img/icons/p20.webp",
-          9
-         ],
-         "audio": [
-          "snd/p20.json",
-          "7f92b17028"
+         "label": "Imprevistos",
+         "phrases": [
+          {
+           "fr": "Je voudrais prolonger d'une nuit",
+           "es": "Quisiera prolongar una noche",
+           "pr": "ye vu-dre pro-lon-ye dún NÚÍ",
+           "icon": [
+            "img/icons/p21.webp",
+            14
+           ],
+           "audio": [
+            "snd/p21.json",
+            "462503d57b"
+           ]
+          },
+          {
+           "fr": "Vous avez une chambre ?",
+           "es": "¿Tiene una habitación?",
+           "pr": "vu-sa-ve Un SHÁNBR",
+           "icon": [
+            "img/icons/p21.webp",
+            15
+           ],
+           "audio": [
+            "snd/p21.json",
+            "d61fc8d088"
+           ]
+          },
+          {
+           "fr": "Je dois annuler ma dernière nuit",
+           "es": "Debo cancelar mi última noche",
+           "pr": "ye dua a-nú-le ma der-nier NÚÍ",
+           "icon": [
+            "img/icons/p21.webp",
+            16
+           ],
+           "audio": [
+            "snd/p21.json",
+            "22cb0058f1"
+           ]
+          },
+          {
+           "fr": "Je dois partir aujourd'hui",
+           "es": "Debo irme hoy",
+           "pr": "ye dua par-tir o-yur-DÚÍ",
+           "icon": [
+            "img/icons/p21.webp",
+            17
+           ],
+           "audio": [
+            "snd/p21.json",
+            "158257e7ef"
+           ]
+          }
          ]
         }
-       ]
-      },
-      {
-       "label": "Inconvenientes",
-       "phrases": [
+       ],
+       "tips": [
         {
-         "fr": "J'aimerais changer de chambre",
-         "es": "Me gustaría cambiar de habitación",
-         "pr": "ye-me-re shan-ye de SHÁNBR",
-         "icon": [
-          "img/icons/p20.webp",
-          10
-         ],
-         "audio": [
-          "snd/p20.json",
-          "54359ed515"
-         ]
-        },
-        {
-         "fr": "La climatisation ne marche pas",
-         "es": "El aire acondicionado no funciona",
-         "pr": "la kli-ma-ti-sa-sion ne marsh PÁ",
-         "icon": [
-          "img/icons/p20.webp",
-          11
-         ],
-         "audio": [
-          "snd/p20.json",
-          "c953988996"
-         ]
-        },
-        {
-         "fr": "Je n'ai pas de serviette",
-         "es": "No tengo toalla",
-         "pr": "ye ne pa de ser-VIÉT",
-         "icon": [
-          "img/icons/p20.webp",
-          12
-         ],
-         "audio": [
-          "snd/p20.json",
-          "894dbe4ebe"
-         ]
-        },
-        {
-         "fr": "Il y a beaucoup de bruit",
-         "es": "Hay mucho ruido",
-         "pr": "il-ia bo-ku de BRÚÍ",
-         "icon": [
-          "img/icons/p20.webp",
-          13
-         ],
-         "audio": [
-          "snd/p20.json",
-          "2abab5aeab"
-         ]
-        },
-        {
-         "fr": "Ma carte ne fonctionne pas",
-         "es": "Mi tarjeta no funciona",
-         "pr": "ma kart ne fonk-sion PÁ",
-         "icon": [
-          "img/icons/p20.webp",
-          14
-         ],
-         "audio": [
-          "snd/p20.json",
-          "6db56f2844"
-         ]
-        },
-        {
-         "fr": "Je n'ai plus de savon",
-         "es": "Ya no tengo jabón",
-         "pr": "ye ne plú de sa-VÓN",
-         "icon": [
-          "img/icons/p20.webp",
-          15
-         ],
-         "audio": [
-          "snd/p20.json",
-          "81d7d6f818"
-         ]
-        },
-        {
-         "fr": "La chambre est différente des photos",
-         "es": "La habitación es diferente de las fotos",
-         "pr": "la shan-bre di-fe-rant de fo-TÓ",
-         "icon": [
-          "img/icons/p20.webp",
-          16
-         ],
-         "audio": [
-          "snd/p20.json",
-          "93bbc1d558"
-         ]
+         "title": "Dato cultural",
+         "text": "Tabla de los pisos Primer piso Rez-de-chaussée 0 piso Segundo piso Premier étage 1 piso"
         }
        ]
-      },
-      {
-       "label": "Soluciones",
-       "phrases": [
-        {
-         "fr": "Comment puis-je vous aider?",
-         "es": "¿Cómo le puedo ayudar?",
-         "pr": "ko-man púiy vu-se-DÉ",
-         "icon": [
-          "img/icons/p20.webp",
-          17
-         ],
-         "audio": [
-          "snd/p20.json",
-          "f0039c21aa"
-         ]
-        },
-        {
-         "fr": "Nous allons envoyer quelqu'un",
-         "es": "Vamos a mandar a alguien",
-         "pr": "nu-sa-lon an-vua-ye kel-KÁN",
-         "who": "staff",
-         "icon": [
-          "img/icons/p20.webp",
-          18
-         ],
-         "audio": [
-          "snd/p20.json",
-          "227144c99d"
-         ]
-        },
-        {
-         "fr": "Nous montons dans un instant",
-         "es": "Subimos en un momento",
-         "pr": "nu mon-ton dan-san-nans-TÁN",
-         "who": "staff",
-         "icon": [
-          "img/icons/p20.webp",
-          19
-         ],
-         "audio": [
-          "snd/p20.json",
-          "031f58ff7c"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Comodidades",
-       "phrases": [
-        {
-         "fr": "Je pourrais avoir …",
-         "es": "Podría tener …",
-         "pr": "ye pu-re a-VUÁR ...",
-         "icon": [
-          "img/icons/p21.webp",
-          0
-         ],
-         "audio": [
-          "snd/p21.json",
-          "764b6e86eb"
-         ]
-        },
-        {
-         "fr": "Un drap",
-         "es": "Una sábana",
-         "pr": "an DRÁ",
-         "icon": [
-          "img/icons/p21.webp",
-          1
-         ],
-         "audio": [
-          "snd/p21.json",
-          "f31817974c"
-         ]
-        },
-        {
-         "fr": "Une serviette",
-         "es": "Una toalla",
-         "pr": "ún ser-VIÉT",
-         "icon": [
-          "img/icons/p21.webp",
-          2
-         ],
-         "audio": [
-          "snd/p21.json",
-          "1bb4976cba"
-         ]
-        },
-        {
-         "fr": "Un oreiller",
-         "es": "Una almohada",
-         "pr": "an-no-re-YÉ",
-         "icon": [
-          "img/icons/p21.webp",
-          3
-         ],
-         "audio": [
-          "snd/p21.json",
-          "8f24b9af58"
-         ]
-        },
-        {
-         "fr": "Un sèche-cheveux",
-         "es": "Un secador de cabello",
-         "pr": "an sesh-she-VO",
-         "icon": [
-          "img/icons/p21.webp",
-          4
-         ],
-         "audio": [
-          "snd/p21.json",
-          "4057e63d0b"
-         ]
-        },
-        {
-         "fr": "Du papier toilette",
-         "es": "Papel higiénico",
-         "pr": "dú pa-pie tua-LÉT",
-         "icon": [
-          "img/icons/p21.webp",
-          5
-         ],
-         "audio": [
-          "snd/p21.json",
-          "04dc0fffde"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Servicios y consejos",
-       "phrases": [
-        {
-         "fr": "Vous avez un plan du quartier?",
-         "es": "¿Tiene un mapa del barrio?",
-         "pr": "vu-sa-ve an plan dú kar-TIÉ",
-         "icon": [
-          "img/icons/p21.webp",
-          6
-         ],
-         "audio": [
-          "snd/p21.json",
-          "92466a6e16"
-         ]
-        },
-        {
-         "fr": "Il y a … dans le coin ?",
-         "es": "¿Hay … cerca ? (en la esquina)",
-         "pr": "il-ia .. dan le KUÁN",
-         "icon": [
-          "img/icons/p21.webp",
-          7
-         ],
-         "audio": [
-          "snd/p21.json",
-          "x21_Ilyadansleco"
-         ]
-        },
-        {
-         "fr": "Vous savez où je peux trouver…",
-         "es": "Sabe dónde puedo encontrar …",
-         "pr": "vu sa-ve u ye po tru-VÉ ...",
-         "icon": [
-          "img/icons/p21.webp",
-          8
-         ],
-         "audio": [
-          "snd/p21.json",
-          "e1baeb4ede"
-         ]
-        },
-        {
-         "fr": "Vous pouvez me conseiller …",
-         "es": "Me puede recomendar …",
-         "pr": "vu pu-ve me kon-se-YÉ ...",
-         "icon": [
-          "img/icons/p21.webp",
-          9
-         ],
-         "audio": [
-          "snd/p21.json",
-          "b72e9ecc4e"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Transporte",
-       "phrases": [
-        {
-         "fr": "Vous pouvez m'appeler un taxi?",
-         "es": "¿Me puede llamar un taxi?",
-         "pr": "vu pu-ve ma-pe-le an tak-sí",
-         "icon": [
-          "img/icons/p21.webp",
-          10
-         ],
-         "audio": [
-          "snd/p21.json",
-          "98d6bb173d"
-         ]
-        },
-        {
-         "fr": "Quel est le métro le plus proche?",
-         "es": "¿Cuál es el metro más cercano?",
-         "pr": "ke-le le me-tro le plú PRÓSH",
-         "icon": [
-          "img/icons/p21.webp",
-          11
-         ],
-         "audio": [
-          "snd/p21.json",
-          "b8a49146aa"
-         ]
-        },
-        {
-         "fr": "Il y a une navette pour l'aéroport?",
-         "es": "¿Tienen un bus para el aeropuerto?",
-         "pr": "¡l-ia ún na-vet pur la-e-ro-PÓR",
-         "icon": [
-          "img/icons/p21.webp",
-          12
-         ],
-         "audio": [
-          "snd/p21.json",
-          "5a11b04d90"
-         ]
-        },
-        {
-         "fr": "Quel bus peut m'amener à … ?",
-         "es": "¿Qué bus me puede llevar a …?",
-         "pr": "kel bús pó ma-me-ne-á ...",
-         "icon": [
-          "img/icons/p21.webp",
-          13
-         ],
-         "audio": [
-          "snd/p21.json",
-          "f813ea53d1"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Imprevistos",
-       "phrases": [
-        {
-         "fr": "Je voudrais prolonger d'une nuit",
-         "es": "Quisiera prolongar una noche",
-         "pr": "ye vu-dre pro-lon-ye dún NÚÍ",
-         "icon": [
-          "img/icons/p21.webp",
-          14
-         ],
-         "audio": [
-          "snd/p21.json",
-          "462503d57b"
-         ]
-        },
-        {
-         "fr": "Vous avez une chambre ?",
-         "es": "¿Tiene una habitación?",
-         "pr": "vu-sa-ve Un SHÁNBR",
-         "icon": [
-          "img/icons/p21.webp",
-          15
-         ],
-         "audio": [
-          "snd/p21.json",
-          "d61fc8d088"
-         ]
-        },
-        {
-         "fr": "Je dois annuler ma dernière nuit",
-         "es": "Debo cancelar mi última noche",
-         "pr": "ye dua a-nú-le ma der-nier NÚÍ",
-         "icon": [
-          "img/icons/p21.webp",
-          16
-         ],
-         "audio": [
-          "snd/p21.json",
-          "22cb0058f1"
-         ]
-        },
-        {
-         "fr": "Je dois partir aujourd'hui",
-         "es": "Debo irme hoy",
-         "pr": "ye dua par-tir o-yur-DÚÍ",
-         "icon": [
-          "img/icons/p21.webp",
-          17
-         ],
-         "audio": [
-          "snd/p21.json",
-          "158257e7ef"
-         ]
-        }
-       ]
-      }
-     ],
-     "tips": [
-      {
-       "title": "Dato cultural",
-       "text": "Muchos hoteles franceses no tienen aire acondicionado. Si viajas en verano, averigua antes de reservar."
-      },
-      {
-       "title": "Dato cultural",
-       "text": "Tabla de los pisos Primer piso Rez-de-chaussée 0 piso Segundo piso Premier étage 1 piso"
       }
      ]
     },
     {
      "name": "En el Airbnb",
      "intro": "Maneja tu estadía",
-     "groups": [
+     "groups": [],
+     "tips": [],
+     "subs": [
       {
-       "label": "La llegada",
-       "phrases": [
+       "name": "Llegada",
+       "intro": "Maneja tu estadía",
+       "groups": [
         {
-         "fr": "Je suis arrivé",
-         "es": "Ya llegué",
-         "pr": "ye súi-sa-ri-VÉ",
-         "icon": [
-          "img/icons/p22.webp",
-          0
-         ],
-         "audio": [
-          "snd/p22.json",
-          "5416b1cf0b"
+         "label": "La llegada",
+         "phrases": [
+          {
+           "fr": "Je suis arrivé",
+           "es": "Ya llegué",
+           "pr": "ye súi-sa-ri-VÉ",
+           "icon": [
+            "img/icons/p22.webp",
+            0
+           ],
+           "audio": [
+            "snd/p22.json",
+            "5416b1cf0b"
+           ]
+          },
+          {
+           "fr": "Je suis devant l'immeuble",
+           "es": "Estoy delante del edificio",
+           "pr": "ye súi de-van li-MOBL",
+           "icon": [
+            "img/icons/p22.webp",
+            1
+           ],
+           "audio": [
+            "snd/p22.json",
+            "f0edff7287"
+           ]
+          },
+          {
+           "fr": "Je suis devant la porte",
+           "es": "Estoy delante de la puerta",
+           "pr": "ye súi de-van la PÓRT",
+           "icon": [
+            "img/icons/p22.webp",
+            2
+           ],
+           "audio": [
+            "snd/p22.json",
+            "1441781f75"
+           ]
+          },
+          {
+           "fr": "Je ne trouve pas l'entrée",
+           "es": "No encuentro la entrada",
+           "pr": "ye ne truv pa lan-TRÉ",
+           "icon": [
+            "img/icons/p22.webp",
+            3
+           ],
+           "audio": [
+            "snd/p22.json",
+            "3d58d239e1"
+           ]
+          },
+          {
+           "fr": "La clé est dans la boîte à clés",
+           "es": "La llave está en la caja de llaves",
+           "pr": "la kle e dan la bua-ta KLÉ",
+           "who": "staff",
+           "icon": [
+            "img/icons/p22.webp",
+            4
+           ],
+           "audio": [
+            "snd/p22.json",
+            "e08e836d56"
+           ]
+          },
+          {
+           "fr": "Quel est le code?",
+           "es": "¿Cuál es la clave?",
+           "pr": "ke-le le KÓD",
+           "icon": [
+            "img/icons/p22.webp",
+            5
+           ],
+           "audio": [
+            "snd/p22.json",
+            "d81aa3b881"
+           ]
+          },
+          {
+           "fr": "Le code est …",
+           "es": "La clave es",
+           "pr": "le kod É ...",
+           "who": "staff",
+           "icon": [
+            "img/icons/p22.webp",
+            6
+           ],
+           "audio": [
+            "snd/p22.json",
+            "d7c8a9aa04"
+           ]
+          }
          ]
         },
         {
-         "fr": "Je suis devant l'immeuble",
-         "es": "Estoy delante del edificio",
-         "pr": "ye súi de-van li-MOBL",
-         "icon": [
-          "img/icons/p22.webp",
-          1
-         ],
-         "audio": [
-          "snd/p22.json",
-          "f0edff7287"
+         "label": "Seguimiento",
+         "phrases": [
+          {
+           "fr": "Tout va bien?",
+           "es": "¿Todo está bien?",
+           "pr": "tu va BIÁN",
+           "who": "staff",
+           "icon": [
+            "img/icons/p22.webp",
+            7
+           ],
+           "audio": [
+            "snd/p22.json",
+            "1058da8ef0"
+           ]
+          },
+          {
+           "fr": "Appelez-moi si besoin",
+           "es": "Llámeme si necesita algo",
+           "pr": "a-pe-le mua si be-SUÁN",
+           "who": "staff",
+           "icon": [
+            "img/icons/p22.webp",
+            8
+           ],
+           "audio": [
+            "snd/p22.json",
+            "8844753096"
+           ]
+          },
+          {
+           "fr": "Tout est parfait",
+           "es": "Todo está perfecto",
+           "pr": "tu-te par-FÉ",
+           "icon": [
+            "img/icons/p22.webp",
+            9
+           ],
+           "audio": [
+            "snd/p22.json",
+            "a3905b726e"
+           ]
+          },
+          {
+           "fr": "On a un problème avec …",
+           "es": "Tenemos un problema con …",
+           "pr": "on-na an pro-blem a-VÉK ...",
+           "icon": [
+            "img/icons/p22.webp",
+            10
+           ],
+           "audio": [
+            "snd/p22.json",
+            "ddf08c90e6"
+           ]
+          }
          ]
         },
         {
-         "fr": "Je suis devant la porte",
-         "es": "Estoy delante de la puerta",
-         "pr": "ye súi de-van la PÓRT",
-         "icon": [
-          "img/icons/p22.webp",
-          2
-         ],
-         "audio": [
-          "snd/p22.json",
-          "1441781f75"
+         "label": "Ubicaciones",
+         "phrases": [
+          {
+           "fr": "… est dans la cuisine",
+           "es": "… está en la cocina",
+           "pr": "... e dan la kui-SÍN",
+           "who": "staff",
+           "icon": [
+            "img/icons/p22.webp",
+            11
+           ],
+           "audio": [
+            "snd/p22.json",
+            "b978a282bc"
+           ]
+          },
+          {
+           "fr": "… est dans le placard",
+           "es": "… está en el cajón",
+           "pr": ".. € dan le pla-KÁR",
+           "who": "staff",
+           "icon": [
+            "img/icons/p22.webp",
+            12
+           ],
+           "audio": [
+            "snd/p22.json",
+            "767bec11d3"
+           ]
+          },
+          {
+           "fr": "… est dans la chambre",
+           "es": "… está en la habitación",
+           "pr": ".. e dan la SHÁNBR",
+           "who": "staff",
+           "icon": [
+            "img/icons/p22.webp",
+            13
+           ],
+           "audio": [
+            "snd/p22.json",
+            "57784ac931"
+           ]
+          },
+          {
+           "fr": "… est dans la salle de bains",
+           "es": "… está en el baño",
+           "pr": "... e dan la sal de BÁN",
+           "who": "staff",
+           "icon": [
+            "img/icons/p22.webp",
+            14
+           ],
+           "audio": [
+            "snd/p22.json",
+            "d5f92b304b"
+           ]
+          },
+          {
+           "fr": "… est sur le balcon",
+           "es": "… está en el balcón",
+           "pr": "... e súr le bal-KÓN",
+           "who": "staff",
+           "icon": [
+            "img/icons/p22.webp",
+            15
+           ],
+           "audio": [
+            "snd/p22.json",
+            "7ab5579391"
+           ]
+          }
          ]
         },
         {
-         "fr": "Je ne trouve pas l'entrée",
-         "es": "No encuentro la entrada",
-         "pr": "ye ne truv pa lan-TRÉ",
-         "icon": [
-          "img/icons/p22.webp",
-          3
-         ],
-         "audio": [
-          "snd/p22.json",
-          "3d58d239e1"
+         "label": "Objetos",
+         "phrases": [
+          {
+           "fr": "Il y a un fer à repasser?",
+           "es": "¿Hay una plancha?",
+           "pr": "il-ia an fe-ra re-pa-séÉ",
+           "icon": [
+            "img/icons/p22.webp",
+            16
+           ],
+           "audio": [
+            "snd/p22.json",
+            "b0b0e3d7a7"
+           ]
+          },
+          {
+           "fr": "Vous avez un sèche-cheveux?",
+           "es": "¿Tiene un secador de cabello?",
+           "pr": "vu-sa-ve an sesh-she-VO",
+           "icon": [
+            "img/icons/p22.webp",
+            17
+           ],
+           "audio": [
+            "snd/p22.json",
+            "14adff06e7"
+           ]
+          },
+          {
+           "fr": "Où est la télécommande?",
+           "es": "¿Dónde está el control?",
+           "pr": "ue la te-le-ko-MÁND",
+           "icon": [
+            "img/icons/p22.webp",
+            18
+           ],
+           "audio": [
+            "snd/p22.json",
+            "a87f3981ef"
+           ]
+          },
+          {
+           "fr": "Il n'y a pas de tire-bouchon?",
+           "es": "¿No hay sacacorcho?",
+           "pr": "il nia pa de tir-bu-SHÓN",
+           "icon": [
+            "img/icons/p22.webp",
+            19
+           ],
+           "audio": [
+            "snd/p22.json",
+            "6e3b5002cf"
+           ]
+          }
          ]
-        },
+        }
+       ],
+       "tips": [
         {
-         "fr": "La clé est dans la boîte à clés",
-         "es": "La llave está en la caja de llaves",
-         "pr": "la kle e dan la bua-ta KLÉ",
-         "who": "staff",
-         "icon": [
-          "img/icons/p22.webp",
-          4
-         ],
-         "audio": [
-          "snd/p22.json",
-          "e08e836d56"
-         ]
-        },
-        {
-         "fr": "Quel est le code?",
-         "es": "¿Cuál es la clave?",
-         "pr": "ke-le le KÓD",
-         "icon": [
-          "img/icons/p22.webp",
-          5
-         ],
-         "audio": [
-          "snd/p22.json",
-          "d81aa3b881"
-         ]
-        },
-        {
-         "fr": "Le code est …",
-         "es": "La clave es",
-         "pr": "le kod É ...",
-         "who": "staff",
-         "icon": [
-          "img/icons/p22.webp",
-          6
-         ],
-         "audio": [
-          "snd/p22.json",
-          "d7c8a9aa04"
-         ]
+         "title": "Dato cultural",
+         "text": "En París, muchos apartamentos turísticos están en edificios antiguos y no tienen ascensor. Comprueba si hay ascensor y en qué piso está el hospedaje"
         }
        ]
       },
       {
-       "label": "Seguimiento",
-       "phrases": [
+       "name": "Durante la estadía",
+       "intro": "Maneja tu estadía",
+       "groups": [
         {
-         "fr": "Tout va bien?",
-         "es": "¿Todo está bien?",
-         "pr": "tu va BIÁN",
-         "who": "staff",
-         "icon": [
-          "img/icons/p22.webp",
-          7
-         ],
-         "audio": [
-          "snd/p22.json",
-          "1058da8ef0"
+         "label": "Poblemas y usos",
+         "phrases": [
+          {
+           "fr": "Le chauffage ne fonctionne pas",
+           "es": "La calefacción no funciona",
+           "pr": "le sho-fay ne fonk-sion PÁ",
+           "icon": [
+            "img/icons/p23.webp",
+            0
+           ],
+           "audio": [
+            "snd/p23.json",
+            "3068a88dea"
+           ]
+          },
+          {
+           "fr": "Le wifi ne marche pas",
+           "es": "El wifi no funciona",
+           "pr": "le ui-fi ne marsh PÁ",
+           "icon": [
+            "img/icons/p23.webp",
+            1
+           ],
+           "audio": [
+            "snd/p23.json",
+            "4a119f86f7"
+           ]
+          },
+          {
+           "fr": "Il n'y a pas d'eau chaude",
+           "es": "No hay agua caliente",
+           "pr": "il nia pa do SHÓD",
+           "icon": [
+            "img/icons/p23.webp",
+            2
+           ],
+           "audio": [
+            "snd/p23.json",
+            "7154d107eb"
+           ]
+          },
+          {
+           "fr": "Comment fonctionne la machine à laver ?",
+           "es": "¿Cómo funciona la lavadora?",
+           "pr": "ko-man fonk-sion la ma-shi-na la-VÉ",
+           "icon": [
+            "img/icons/p23.webp",
+            3
+           ],
+           "audio": [
+            "snd/p23.json",
+            "35c175ede0"
+           ]
+          },
+          {
+           "fr": "Comment s'allume la cafetière?",
+           "es": "¿Cómo se prende la cafetera?",
+           "pr": "ko-man sa-lúm la kaf-TIÉR",
+           "icon": [
+            "img/icons/p23.webp",
+            4
+           ],
+           "audio": [
+            "snd/p23.json",
+            "a70ca4418e"
+           ]
+          },
+          {
+           "fr": "Où est le local poubelle?",
+           "es": "¿Dónde está el cuarto de basuras?",
+           "pr": "u e le lo-kal pu-BÉL",
+           "icon": [
+            "img/icons/p23.webp",
+            5
+           ],
+           "audio": [
+            "snd/p23.json",
+            "9d02e83fc5"
+           ]
+          },
+          {
+           "fr": "J'arrive dans un instant",
+           "es": "Llego en un momento",
+           "pr": "ya-riv dan-san-nans-TÁN",
+           "who": "staff",
+           "icon": [
+            "img/icons/p23.webp",
+            6
+           ],
+           "audio": [
+            "snd/p23.json",
+            "f682501a50"
+           ]
+          }
          ]
         },
         {
-         "fr": "Appelez-moi si besoin",
-         "es": "Llámeme si necesita algo",
-         "pr": "a-pe-le mua si be-SUÁN",
-         "who": "staff",
-         "icon": [
-          "img/icons/p22.webp",
-          8
-         ],
-         "audio": [
-          "snd/p22.json",
-          "8844753096"
+         "label": "Permisos",
+         "phrases": [
+          {
+           "fr": "Je peux utiliser … ?",
+           "es": "¿Puedo usar … ?",
+           "pr": "ye pó ú-ti-li-SÉ ..",
+           "icon": [
+            "img/icons/p23.webp",
+            7
+           ],
+           "audio": [
+            "snd/p23.json",
+            "11233823fa"
+           ]
+          },
+          {
+           "fr": "On peut fumer sur le balcon?",
+           "es": "¿Podemos fumar en el balcón?",
+           "pr": "on pó fú-me súr le bal-KÓN",
+           "icon": [
+            "img/icons/p23.webp",
+            8
+           ],
+           "audio": [
+            "snd/p23.json",
+            "3f377b68ff"
+           ]
+          },
+          {
+           "fr": "On peut inviter des amis?",
+           "es": "¿Podemos invitar amigos?",
+           "pr": "on pó an-vi-te de-sa-MÍ",
+           "icon": [
+            "img/icons/p23.webp",
+            9
+           ],
+           "audio": [
+            "snd/p23.json",
+            "e82697ea0c"
+           ]
+          },
+          {
+           "fr": "On peut se garer devant?",
+           "es": "¿Podemos parquear delante?",
+           "pr": "on pó se ga-re de-VÁN",
+           "icon": [
+            "img/icons/p23.webp",
+            10
+           ],
+           "audio": [
+            "snd/p23.json",
+            "74ec29d7c2"
+           ]
+          }
          ]
         },
         {
-         "fr": "Tout est parfait",
-         "es": "Todo está perfecto",
-         "pr": "tu-te par-FÉ",
-         "icon": [
-          "img/icons/p22.webp",
-          9
-         ],
-         "audio": [
-          "snd/p22.json",
-          "a3905b726e"
+         "label": "Solicitudes especiales",
+         "phrases": [
+          {
+           "fr": "On peut avoir une clé en plus?",
+           "es": "¿Podemos tener una llave más?",
+           "pr": "on pó a-vuar ún kle an PLUS",
+           "icon": [
+            "img/icons/p23.webp",
+            11
+           ],
+           "audio": [
+            "snd/p23.json",
+            "1b868a6a0b"
+           ]
+          },
+          {
+           "fr": "On pourrait rester jusqu'à midi?",
+           "es": "¿Podríamos quedarnos hasta las 12?",
+           "pr": "on pu-re res-te yús-ka mi-DÍ",
+           "icon": [
+            "img/icons/p23.webp",
+            12
+           ],
+           "audio": [
+            "snd/p23.json",
+            "0e5511fd87"
+           ]
+          },
+          {
+           "fr": "Oui, sans problème",
+           "es": "Sí, sin problema",
+           "pr": "UÍ, san pro-BLÉM",
+           "who": "staff",
+           "icon": [
+            "img/icons/p23.webp",
+            13
+           ],
+           "audio": [
+            "snd/p23.json",
+            "73b386a9b4"
+           ]
+          },
+          {
+           "fr": "Désolé, ce n'est pas possible",
+           "es": "Lo siento, no es posible",
+           "pr": "de-so-LÉ, se ne pa po-SÍBL",
+           "who": "staff",
+           "icon": [
+            "img/icons/p23.webp",
+            14
+           ],
+           "audio": [
+            "snd/p23.json",
+            "1fab26c092"
+           ]
+          }
          ]
         },
         {
-         "fr": "On a un problème avec …",
-         "es": "Tenemos un problema con …",
-         "pr": "on-na an pro-blem a-VÉK ...",
-         "icon": [
-          "img/icons/p22.webp",
-          10
-         ],
-         "audio": [
-          "snd/p22.json",
-          "ddf08c90e6"
+         "label": "Despedida",
+         "phrases": [
+          {
+           "fr": "Où laisse-t-on les clés?",
+           "es": "¿Dónde dejamos las llaves?",
+           "pr": "u les-ton le KLÉ",
+           "icon": [
+            "img/icons/p23.webp",
+            15
+           ],
+           "audio": [
+            "snd/p23.json",
+            "4e3a61be7d"
+           ]
+          },
+          {
+           "fr": "J'ai laissé les clés dans la boîte",
+           "es": "Dejé las llaves en la caja",
+           "pr": "ye le-se le kle dan la BUÁT",
+           "icon": [
+            "img/icons/p23.webp",
+            16
+           ],
+           "audio": [
+            "snd/p23.json",
+            "0cbac33a77"
+           ]
+          },
+          {
+           "fr": "Merci pour votre accueil",
+           "es": "Gracias por su acogida",
+           "pr": "mer-si pur vo-tra-KOY",
+           "icon": [
+            "img/icons/p23.webp",
+            17
+           ],
+           "audio": [
+            "snd/p23.json",
+            "5a730ac6d9"
+           ]
+          },
+          {
+           "fr": "On reviendra!",
+           "es": "¡Volveremos!",
+           "pr": "on re-vian-DRÁ",
+           "icon": [
+            "img/icons/p23.webp",
+            18
+           ],
+           "audio": [
+            "snd/p23.json",
+            "ee8044a433"
+           ]
+          }
          ]
         }
-       ]
-      },
-      {
-       "label": "Ubicaciones",
-       "phrases": [
+       ],
+       "tips": [
         {
-         "fr": "… est dans la cuisine",
-         "es": "… está en la cocina",
-         "pr": "... e dan la kui-SÍN",
-         "who": "staff",
-         "icon": [
-          "img/icons/p22.webp",
-          11
-         ],
-         "audio": [
-          "snd/p22.json",
-          "b978a282bc"
-         ]
-        },
-        {
-         "fr": "… est dans le placard",
-         "es": "… está en el cajón",
-         "pr": ".. € dan le pla-KÁR",
-         "who": "staff",
-         "icon": [
-          "img/icons/p22.webp",
-          12
-         ],
-         "audio": [
-          "snd/p22.json",
-          "767bec11d3"
-         ]
-        },
-        {
-         "fr": "… est dans la chambre",
-         "es": "… está en la habitación",
-         "pr": ".. e dan la SHÁNBR",
-         "who": "staff",
-         "icon": [
-          "img/icons/p22.webp",
-          13
-         ],
-         "audio": [
-          "snd/p22.json",
-          "57784ac931"
-         ]
-        },
-        {
-         "fr": "… est dans la salle de bains",
-         "es": "… está en el baño",
-         "pr": "... e dan la sal de BÁN",
-         "who": "staff",
-         "icon": [
-          "img/icons/p22.webp",
-          14
-         ],
-         "audio": [
-          "snd/p22.json",
-          "d5f92b304b"
-         ]
-        },
-        {
-         "fr": "… est sur le balcon",
-         "es": "… está en el balcón",
-         "pr": "... e súr le bal-KÓN",
-         "who": "staff",
-         "icon": [
-          "img/icons/p22.webp",
-          15
-         ],
-         "audio": [
-          "snd/p22.json",
-          "7ab5579391"
-         ]
+         "title": "Dato cultural",
+         "text": "En París, algunos apartamentos son muy pequeños. Revisa el tamaño, el número de camas y las fotos para saber qué tipo de alojamiento estás reservando."
         }
        ]
-      },
-      {
-       "label": "Objetos",
-       "phrases": [
-        {
-         "fr": "Il y a un fer à repasser?",
-         "es": "¿Hay una plancha?",
-         "pr": "il-ia an fe-ra re-pa-séÉ",
-         "icon": [
-          "img/icons/p22.webp",
-          16
-         ],
-         "audio": [
-          "snd/p22.json",
-          "b0b0e3d7a7"
-         ]
-        },
-        {
-         "fr": "Vous avez un sèche-cheveux?",
-         "es": "¿Tiene un secador de cabello?",
-         "pr": "vu-sa-ve an sesh-she-VO",
-         "icon": [
-          "img/icons/p22.webp",
-          17
-         ],
-         "audio": [
-          "snd/p22.json",
-          "14adff06e7"
-         ]
-        },
-        {
-         "fr": "Où est la télécommande?",
-         "es": "¿Dónde está el control?",
-         "pr": "ue la te-le-ko-MÁND",
-         "icon": [
-          "img/icons/p22.webp",
-          18
-         ],
-         "audio": [
-          "snd/p22.json",
-          "a87f3981ef"
-         ]
-        },
-        {
-         "fr": "Il n'y a pas de tire-bouchon?",
-         "es": "¿No hay sacacorcho?",
-         "pr": "il nia pa de tir-bu-SHÓN",
-         "icon": [
-          "img/icons/p22.webp",
-          19
-         ],
-         "audio": [
-          "snd/p22.json",
-          "6e3b5002cf"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Poblemas y usos",
-       "phrases": [
-        {
-         "fr": "Le chauffage ne fonctionne pas",
-         "es": "La calefacción no funciona",
-         "pr": "le sho-fay ne fonk-sion PÁ",
-         "icon": [
-          "img/icons/p23.webp",
-          0
-         ],
-         "audio": [
-          "snd/p23.json",
-          "3068a88dea"
-         ]
-        },
-        {
-         "fr": "Le wifi ne marche pas",
-         "es": "El wifi no funciona",
-         "pr": "le ui-fi ne marsh PÁ",
-         "icon": [
-          "img/icons/p23.webp",
-          1
-         ],
-         "audio": [
-          "snd/p23.json",
-          "4a119f86f7"
-         ]
-        },
-        {
-         "fr": "Il n'y a pas d'eau chaude",
-         "es": "No hay agua caliente",
-         "pr": "il nia pa do SHÓD",
-         "icon": [
-          "img/icons/p23.webp",
-          2
-         ],
-         "audio": [
-          "snd/p23.json",
-          "7154d107eb"
-         ]
-        },
-        {
-         "fr": "Comment fonctionne la machine à laver ?",
-         "es": "¿Cómo funciona la lavadora?",
-         "pr": "ko-man fonk-sion la ma-shi-na la-VÉ",
-         "icon": [
-          "img/icons/p23.webp",
-          3
-         ],
-         "audio": [
-          "snd/p23.json",
-          "35c175ede0"
-         ]
-        },
-        {
-         "fr": "Comment s'allume la cafetière?",
-         "es": "¿Cómo se prende la cafetera?",
-         "pr": "ko-man sa-lúm la kaf-TIÉR",
-         "icon": [
-          "img/icons/p23.webp",
-          4
-         ],
-         "audio": [
-          "snd/p23.json",
-          "a70ca4418e"
-         ]
-        },
-        {
-         "fr": "Où est le local poubelle?",
-         "es": "¿Dónde está el cuarto de basuras?",
-         "pr": "u e le lo-kal pu-BÉL",
-         "icon": [
-          "img/icons/p23.webp",
-          5
-         ],
-         "audio": [
-          "snd/p23.json",
-          "9d02e83fc5"
-         ]
-        },
-        {
-         "fr": "J'arrive dans un instant",
-         "es": "Llego en un momento",
-         "pr": "ya-riv dan-san-nans-TÁN",
-         "who": "staff",
-         "icon": [
-          "img/icons/p23.webp",
-          6
-         ],
-         "audio": [
-          "snd/p23.json",
-          "f682501a50"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Permisos",
-       "phrases": [
-        {
-         "fr": "Je peux utiliser … ?",
-         "es": "¿Puedo usar … ?",
-         "pr": "ye pó ú-ti-li-SÉ ..",
-         "icon": [
-          "img/icons/p23.webp",
-          7
-         ],
-         "audio": [
-          "snd/p23.json",
-          "11233823fa"
-         ]
-        },
-        {
-         "fr": "On peut fumer sur le balcon?",
-         "es": "¿Podemos fumar en el balcón?",
-         "pr": "on pó fú-me súr le bal-KÓN",
-         "icon": [
-          "img/icons/p23.webp",
-          8
-         ],
-         "audio": [
-          "snd/p23.json",
-          "3f377b68ff"
-         ]
-        },
-        {
-         "fr": "On peut inviter des amis?",
-         "es": "¿Podemos invitar amigos?",
-         "pr": "on pó an-vi-te de-sa-MÍ",
-         "icon": [
-          "img/icons/p23.webp",
-          9
-         ],
-         "audio": [
-          "snd/p23.json",
-          "e82697ea0c"
-         ]
-        },
-        {
-         "fr": "On peut se garer devant?",
-         "es": "¿Podemos parquear delante?",
-         "pr": "on pó se ga-re de-VÁN",
-         "icon": [
-          "img/icons/p23.webp",
-          10
-         ],
-         "audio": [
-          "snd/p23.json",
-          "74ec29d7c2"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Solicitudes especiales",
-       "phrases": [
-        {
-         "fr": "On peut avoir une clé en plus?",
-         "es": "¿Podemos tener una llave más?",
-         "pr": "on pó a-vuar ún kle an PLUS",
-         "icon": [
-          "img/icons/p23.webp",
-          11
-         ],
-         "audio": [
-          "snd/p23.json",
-          "1b868a6a0b"
-         ]
-        },
-        {
-         "fr": "On pourrait rester jusqu'à midi?",
-         "es": "¿Podríamos quedarnos hasta las 12?",
-         "pr": "on pu-re res-te yús-ka mi-DÍ",
-         "icon": [
-          "img/icons/p23.webp",
-          12
-         ],
-         "audio": [
-          "snd/p23.json",
-          "0e5511fd87"
-         ]
-        },
-        {
-         "fr": "Oui, sans problème",
-         "es": "Sí, sin problema",
-         "pr": "UÍ, san pro-BLÉM",
-         "who": "staff",
-         "icon": [
-          "img/icons/p23.webp",
-          13
-         ],
-         "audio": [
-          "snd/p23.json",
-          "73b386a9b4"
-         ]
-        },
-        {
-         "fr": "Désolé, ce n'est pas possible",
-         "es": "Lo siento, no es posible",
-         "pr": "de-so-LÉ, se ne pa po-SÍBL",
-         "who": "staff",
-         "icon": [
-          "img/icons/p23.webp",
-          14
-         ],
-         "audio": [
-          "snd/p23.json",
-          "1fab26c092"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Despedida",
-       "phrases": [
-        {
-         "fr": "Où laisse-t-on les clés?",
-         "es": "¿Dónde dejamos las llaves?",
-         "pr": "u les-ton le KLÉ",
-         "icon": [
-          "img/icons/p23.webp",
-          15
-         ],
-         "audio": [
-          "snd/p23.json",
-          "4e3a61be7d"
-         ]
-        },
-        {
-         "fr": "J'ai laissé les clés dans la boîte",
-         "es": "Dejé las llaves en la caja",
-         "pr": "ye le-se le kle dan la BUÁT",
-         "icon": [
-          "img/icons/p23.webp",
-          16
-         ],
-         "audio": [
-          "snd/p23.json",
-          "0cbac33a77"
-         ]
-        },
-        {
-         "fr": "Merci pour votre accueil",
-         "es": "Gracias por su acogida",
-         "pr": "mer-si pur vo-tra-KOY",
-         "icon": [
-          "img/icons/p23.webp",
-          17
-         ],
-         "audio": [
-          "snd/p23.json",
-          "5a730ac6d9"
-         ]
-        },
-        {
-         "fr": "On reviendra!",
-         "es": "¡Volveremos!",
-         "pr": "on re-vian-DRÁ",
-         "icon": [
-          "img/icons/p23.webp",
-          18
-         ],
-         "audio": [
-          "snd/p23.json",
-          "ee8044a433"
-         ]
-        }
-       ]
-      }
-     ],
-     "tips": [
-      {
-       "title": "Dato cultural",
-       "text": "En París, muchos apartamentos turísticos están en edificios antiguos y no tienen ascensor. Comprueba si hay ascensor y en qué piso está el hospedaje"
-      },
-      {
-       "title": "Dato cultural",
-       "text": "En París, algunos apartamentos son muy pequeños. Revisa el tamaño, el número de camas y las fotos para saber qué tipo de alojamiento estás reservando."
       }
      ]
     }
@@ -6671,572 +6735,588 @@
     {
      "name": "En la farmacia",
      "intro": "Compra en la farmacia",
-     "groups": [
+     "groups": [],
+     "tips": [],
+     "subs": [
       {
-       "label": "Medicamentos (1)",
-       "phrases": [
+       "name": "Medicamentos y síntomas",
+       "intro": "Compra en la farmacia",
+       "groups": [
         {
-         "fr": "Il me faut un médicament pour…",
-         "es": "Necesito un medicamento para …",
-         "pr": "il me fo-tan me-di-ka=-man PÚR ...",
-         "icon": [
-          "img/icons/p25.webp",
-          0
-         ],
-         "audio": [
-          "snd/p25.json",
-          "160e557b2f"
+         "label": "Medicamentos (1)",
+         "phrases": [
+          {
+           "fr": "Il me faut un médicament pour…",
+           "es": "Necesito un medicamento para …",
+           "pr": "il me fo-tan me-di-ka=-man PÚR ...",
+           "icon": [
+            "img/icons/p25.webp",
+            0
+           ],
+           "audio": [
+            "snd/p25.json",
+            "160e557b2f"
+           ]
+          },
+          {
+           "fr": "Le mal de gorge",
+           "es": "Los dolores de garganta",
+           "pr": "le mal de GÓRY",
+           "icon": [
+            "img/icons/p25.webp",
+            1
+           ],
+           "audio": [
+            "snd/p25.json",
+            "13d9742b2e"
+           ]
+          },
+          {
+           "fr": "Les maux de tête",
+           "es": "Los dolores de cabeza",
+           "pr": "le mo de TÉT",
+           "icon": [
+            "img/icons/p25.webp",
+            2
+           ],
+           "audio": [
+            "snd/p25.json",
+            "b76256b14b"
+           ]
+          },
+          {
+           "fr": "Les nausées",
+           "es": "Las náuseas",
+           "pr": "le no-SÉ",
+           "icon": [
+            "img/icons/p25.webp",
+            3
+           ],
+           "audio": [
+            "snd/p25.json",
+            "95d31ccf08"
+           ]
+          }
          ]
         },
         {
-         "fr": "Le mal de gorge",
-         "es": "Los dolores de garganta",
-         "pr": "le mal de GÓRY",
-         "icon": [
-          "img/icons/p25.webp",
-          1
-         ],
-         "audio": [
-          "snd/p25.json",
-          "13d9742b2e"
+         "label": "Medicamentos (2)",
+         "phrases": [
+          {
+           "fr": "De l'aspirine",
+           "es": "Aspirina",
+           "pr": "de las-pi-RÍN",
+           "icon": [
+            "img/icons/p25.webp",
+            4
+           ],
+           "audio": [
+            "snd/p25.json",
+            "f08fae8a9f"
+           ]
+          },
+          {
+           "fr": "Du paracétamol",
+           "es": "Paracetamol",
+           "pr": "dú pa-ra-se-ta-MÓL",
+           "icon": [
+            "img/icons/p25.webp",
+            5
+           ],
+           "audio": [
+            "snd/p25.json",
+            "6dfc267e7c"
+           ]
+          },
+          {
+           "fr": "De l'ibuprofène",
+           "es": "Ibuprofeno",
+           "pr": "de li-bú-pro-FÉN",
+           "icon": [
+            "img/icons/p25.webp",
+            6
+           ],
+           "audio": [
+            "snd/p25.json",
+            "48d8c5c314"
+           ]
+          },
+          {
+           "fr": "Du smecta",
+           "es": "(Medicamento contra la diarrea)",
+           "pr": "dú smek-TÁ",
+           "icon": [
+            "img/icons/p25.webp",
+            7
+           ],
+           "audio": [
+            "snd/p25.json",
+            "4b9fcb7a55"
+           ]
+          },
+          {
+           "fr": "Des pastilles pour la gorge",
+           "es": "Pastilla para la garganta",
+           "pr": "de pas-tiy pur la GÓRY",
+           "icon": [
+            "img/icons/p25.webp",
+            8
+           ],
+           "audio": [
+            "snd/p25.json",
+            "a0ec0ee180"
+           ]
+          },
+          {
+           "fr": "Du sirop contre la toux",
+           "es": "Jarabe para la tos",
+           "pr": "dú si-ro kon-tre la TÚ",
+           "icon": [
+            "img/icons/p25.webp",
+            9
+           ],
+           "audio": [
+            "snd/p25.json",
+            "74f1bc6347"
+           ]
+          },
+          {
+           "fr": "Des gouttes pour les yeux",
+           "es": "Gotas para los ojos",
+           "pr": "de gut pur le-SIÓ",
+           "icon": [
+            "img/icons/p25.webp",
+            10
+           ],
+           "audio": [
+            "snd/p25.json",
+            "0bd465cdd4"
+           ]
+          }
          ]
         },
         {
-         "fr": "Les maux de tête",
-         "es": "Los dolores de cabeza",
-         "pr": "le mo de TÉT",
-         "icon": [
-          "img/icons/p25.webp",
-          2
-         ],
-         "audio": [
-          "snd/p25.json",
-          "b76256b14b"
+         "label": "Dolores",
+         "phrases": [
+          {
+           "fr": "J'ai mal à la tête",
+           "es": "Me duele la cabeza",
+           "pr": "ye ma-la la TÉT",
+           "icon": [
+            "img/icons/p25.webp",
+            11
+           ],
+           "audio": [
+            "snd/p25.json",
+            "547fda045c"
+           ]
+          },
+          {
+           "fr": "J'ai mal au ventre",
+           "es": "Tengo dolor de estómago",
+           "pr": "ye ma-lo VÁNTR",
+           "icon": [
+            "img/icons/p25.webp",
+            12
+           ],
+           "audio": [
+            "snd/p25.json",
+            "2f547b61c6"
+           ]
+          },
+          {
+           "fr": "J'ai mal à la gorge",
+           "es": "Me duele la garganta",
+           "pr": "ye ma-la la GÓRY",
+           "icon": [
+            "img/icons/p25.webp",
+            13
+           ],
+           "audio": [
+            "snd/p25.json",
+            "7c8317a848"
+           ]
+          },
+          {
+           "fr": "J'ai mal quand j'avale",
+           "es": "Me duele cuando trago",
+           "pr": "ye mal kan ya-VÁL",
+           "icon": [
+            "img/icons/p25.webp",
+            14
+           ],
+           "audio": [
+            "snd/p25.json",
+            "bb5d19ba16"
+           ]
+          }
          ]
         },
         {
-         "fr": "Les nausées",
-         "es": "Las náuseas",
-         "pr": "le no-SÉ",
-         "icon": [
-          "img/icons/p25.webp",
-          3
-         ],
-         "audio": [
-          "snd/p25.json",
-          "95d31ccf08"
+         "label": "Síntomas",
+         "phrases": [
+          {
+           "fr": "Je tousse",
+           "es": "Toso",
+           "pr": "ye TÚS",
+           "icon": [
+            "img/icons/p25.webp",
+            15
+           ],
+           "audio": [
+            "snd/p25.json",
+            "5ceae799f8"
+           ]
+          },
+          {
+           "fr": "J'ai le nez bouché",
+           "es": "Tengo la nariz tapada",
+           "pr": "ye le ne bu-SHÉ",
+           "icon": [
+            "img/icons/p25.webp",
+            16
+           ],
+           "audio": [
+            "snd/p25.json",
+            "bf5e71421a"
+           ]
+          },
+          {
+           "fr": "J'ai la diarrhée",
+           "es": "Tengo diarrea",
+           "pr": "ye la dia-RÉ",
+           "icon": [
+            "img/icons/p25.webp",
+            17
+           ],
+           "audio": [
+            "snd/p25.json",
+            "47283d2e21"
+           ]
+          },
+          {
+           "fr": "J'ai la nausée",
+           "es": "Tengo nausea",
+           "pr": "ye la no-Sé",
+           "icon": [
+            "img/icons/p25.webp",
+            18
+           ],
+           "audio": [
+            "snd/p25.json",
+            "f92c3bcc0c"
+           ]
+          }
          ]
+        }
+       ],
+       "tips": [
+        {
+         "title": "Dato cultural",
+         "text": "Aquí te compartimos el link de las farmacias abiertas 24h en Paris"
         }
        ]
       },
       {
-       "label": "Medicamentos (2)",
-       "phrases": [
+       "name": "Enfermedades y consejos",
+       "intro": "Compra en la farmacia",
+       "groups": [
         {
-         "fr": "De l'aspirine",
-         "es": "Aspirina",
-         "pr": "de las-pi-RÍN",
-         "icon": [
-          "img/icons/p25.webp",
-          4
-         ],
-         "audio": [
-          "snd/p25.json",
-          "f08fae8a9f"
+         "label": "Enfermedades",
+         "phrases": [
+          {
+           "fr": "J'ai un rhume",
+           "es": "Tengo un resfriado",
+           "pr": "ye an RÚM",
+           "icon": [
+            "img/icons/p26.webp",
+            0
+           ],
+           "audio": [
+            "snd/p26.json",
+            "44567b02a8"
+           ]
+          },
+          {
+           "fr": "J'ai une allergie au pollen",
+           "es": "Tengo una alergia al polen",
+           "pr": "ye ú-na-ler-yio po-LÉN",
+           "icon": [
+            "img/icons/p26.webp",
+            1
+           ],
+           "audio": [
+            "snd/p26.json",
+            "49864c1bc9"
+           ]
+          },
+          {
+           "fr": "J'ai une angine",
+           "es": "Tengo amigdalitis",
+           "pr": "ye ú-nan-YÍN",
+           "icon": [
+            "img/icons/p26.webp",
+            2
+           ],
+           "audio": [
+            "snd/p26.json",
+            "8e2d7f0971"
+           ]
+          },
+          {
+           "fr": "J'ai une gastro",
+           "es": "Tengo gastroenteritis",
+           "pr": "ye ún gas-TRÓ",
+           "icon": [
+            "img/icons/p26.webp",
+            3
+           ],
+           "audio": [
+            "snd/p26.json",
+            "381a467182"
+           ]
+          }
          ]
         },
         {
-         "fr": "Du paracétamol",
-         "es": "Paracetamol",
-         "pr": "dú pa-ra-se-ta-MÓL",
-         "icon": [
-          "img/icons/p25.webp",
-          5
-         ],
-         "audio": [
-          "snd/p25.json",
-          "6dfc267e7c"
+         "label": "Para la piel",
+         "phrases": [
+          {
+           "fr": "Des pansements",
+           "es": "Curitas",
+           "pr": "de pans-MÁN",
+           "icon": [
+            "img/icons/p26.webp",
+            4
+           ],
+           "audio": [
+            "snd/p26.json",
+            "f42e7a8a9b"
+           ]
+          },
+          {
+           "fr": "Un désinfectant",
+           "es": "Un desinfectante",
+           "pr": "an de-san-fek-TÁN",
+           "icon": [
+            "img/icons/p26.webp",
+            5
+           ],
+           "audio": [
+            "snd/p26.json",
+            "0200b7f8d1"
+           ]
+          },
+          {
+           "fr": "Une crème solaire",
+           "es": "Un bloqueador",
+           "pr": "ún krem so-LÉR",
+           "icon": [
+            "img/icons/p26.webp",
+            6
+           ],
+           "audio": [
+            "snd/p26.json",
+            "2ca20759d3"
+           ]
+          },
+          {
+           "fr": "Un bandage",
+           "es": "Un vendaje",
+           "pr": "an ban-DÁY",
+           "icon": [
+            "img/icons/p26.webp",
+            7
+           ],
+           "audio": [
+            "snd/p26.json",
+            "72370f85f3"
+           ]
+          }
          ]
         },
         {
-         "fr": "De l'ibuprofène",
-         "es": "Ibuprofeno",
-         "pr": "de li-bú-pro-FÉN",
-         "icon": [
-          "img/icons/p25.webp",
-          6
-         ],
-         "audio": [
-          "snd/p25.json",
-          "48d8c5c314"
+         "label": "Preguntas",
+         "phrases": [
+          {
+           "fr": "C'est pour vous?",
+           "es": "¿Es para usted?",
+           "pr": "se pur VÚ",
+           "who": "staff",
+           "icon": [
+            "img/icons/p26.webp",
+            8
+           ],
+           "audio": [
+            "snd/p26.json",
+            "9017196c91"
+           ]
+          },
+          {
+           "fr": "Oui, c'est pour moi",
+           "es": "Si, es para mi",
+           "pr": "UÍ, se pur MUÁ",
+           "icon": [
+            "img/icons/p26.webp",
+            9
+           ],
+           "audio": [
+            "snd/p26.json",
+            "28aeb0057d"
+           ]
+          },
+          {
+           "fr": "C'est pour un enfant ou un adulte?",
+           "es": "¿Es para un niño o un adulto?",
+           "pr": "se pu-ran-=nan-FÁN u an-=na-DÚLT",
+           "who": "staff",
+           "icon": [
+            "img/icons/p26.webp",
+            10
+           ],
+           "audio": [
+            "snd/p26.json",
+            "7b98d44e3a"
+           ]
+          },
+          {
+           "fr": "C'est pour un enfant",
+           "es": "Es para un niño",
+           "pr": "se pu-ran-nan-FÁN",
+           "icon": [
+            "img/icons/p26.webp",
+            11
+           ],
+           "audio": [
+            "snd/p26.json",
+            "3d5684be53"
+           ]
+          },
+          {
+           "fr": "Vous avez mal depuis quand?",
+           "es": "¿Cuánto hace que le duele?",
+           "pr": "vu-sa-ve mal de-púi KÁN",
+           "who": "staff",
+           "icon": [
+            "img/icons/p26.webp",
+            12
+           ],
+           "audio": [
+            "snd/p26.json",
+            "2461c0d621"
+           ]
+          },
+          {
+           "fr": "Depuis hier",
+           "es": "Desde ayer",
+           "pr": "de-púi-SIÉR",
+           "icon": [
+            "img/icons/p26.webp",
+            13
+           ],
+           "audio": [
+            "snd/p26.json",
+            "9b828ec2df"
+           ]
+          }
          ]
         },
         {
-         "fr": "Du smecta",
-         "es": "(Medicamento contra la diarrea)",
-         "pr": "dú smek-TÁ",
-         "icon": [
-          "img/icons/p25.webp",
-          7
-         ],
-         "audio": [
-          "snd/p25.json",
-          "4b9fcb7a55"
-         ]
-        },
-        {
-         "fr": "Des pastilles pour la gorge",
-         "es": "Pastilla para la garganta",
-         "pr": "de pas-tiy pur la GÓRY",
-         "icon": [
-          "img/icons/p25.webp",
-          8
-         ],
-         "audio": [
-          "snd/p25.json",
-          "a0ec0ee180"
-         ]
-        },
-        {
-         "fr": "Du sirop contre la toux",
-         "es": "Jarabe para la tos",
-         "pr": "dú si-ro kon-tre la TÚ",
-         "icon": [
-          "img/icons/p25.webp",
-          9
-         ],
-         "audio": [
-          "snd/p25.json",
-          "74f1bc6347"
-         ]
-        },
-        {
-         "fr": "Des gouttes pour les yeux",
-         "es": "Gotas para los ojos",
-         "pr": "de gut pur le-SIÓ",
-         "icon": [
-          "img/icons/p25.webp",
-          10
-         ],
-         "audio": [
-          "snd/p25.json",
-          "0bd465cdd4"
+         "label": "Indicaciones",
+         "phrases": [
+          {
+           "fr": "Un comprimé le matin",
+           "es": "Un comprimido por la mañana",
+           "pr": "an kom-pri-me le ma-TÁN",
+           "who": "staff",
+           "icon": [
+            "img/icons/p26.webp",
+            14
+           ],
+           "audio": [
+            "snd/p26.json",
+            "6f4b2890a0"
+           ]
+          },
+          {
+           "fr": "Un comprimé le soir",
+           "es": "Un comprimido por la noche",
+           "pr": "an kom-pri-me le SUÁR",
+           "who": "staff",
+           "icon": [
+            "img/icons/p26.webp",
+            15
+           ],
+           "audio": [
+            "snd/p26.json",
+            "907f819434"
+           ]
+          },
+          {
+           "fr": "Prenez-le avec un verre d'eau",
+           "es": "Tómelo con un vaso de agua",
+           "pr": "pre-ne-le a-vek an ver DÓ",
+           "who": "staff",
+           "icon": [
+            "img/icons/p26.webp",
+            16
+           ],
+           "audio": [
+            "snd/p26.json",
+            "41d92ea892"
+           ]
+          },
+          {
+           "fr": "Prenez-le avant de manger",
+           "es": "Tómelo antes de comer",
+           "pr": "pre-ne-le a-van de man-YéÉ",
+           "who": "staff",
+           "icon": [
+            "img/icons/p26.webp",
+            17
+           ],
+           "audio": [
+            "snd/p26.json",
+            "c810ef7e8f"
+           ]
+          },
+          {
+           "fr": "Prenez-le après manger",
+           "es": "Tómelo después de comer",
+           "pr": "pre-ne-le a-pre man-YÉ",
+           "who": "staff",
+           "icon": [
+            "img/icons/p26.webp",
+            18
+           ],
+           "audio": [
+            "snd/p26.json",
+            "c86590ac1e"
+           ]
+          },
+          {
+           "fr": "Il faut une ordonnance",
+           "es": "Se necesita una receta",
+           "pr": "il fo-tú-nor-do-NÁNS",
+           "who": "staff",
+           "icon": [
+            "img/icons/p26.webp",
+            19
+           ],
+           "audio": [
+            "snd/p26.json",
+            "4316413f78"
+           ]
+          }
          ]
         }
-       ]
-      },
-      {
-       "label": "Dolores",
-       "phrases": [
+       ],
+       "tips": [
         {
-         "fr": "J'ai mal à la tête",
-         "es": "Me duele la cabeza",
-         "pr": "ye ma-la la TÉT",
-         "icon": [
-          "img/icons/p25.webp",
-          11
-         ],
-         "audio": [
-          "snd/p25.json",
-          "547fda045c"
-         ]
-        },
-        {
-         "fr": "J'ai mal au ventre",
-         "es": "Tengo dolor de estómago",
-         "pr": "ye ma-lo VÁNTR",
-         "icon": [
-          "img/icons/p25.webp",
-          12
-         ],
-         "audio": [
-          "snd/p25.json",
-          "2f547b61c6"
-         ]
-        },
-        {
-         "fr": "J'ai mal à la gorge",
-         "es": "Me duele la garganta",
-         "pr": "ye ma-la la GÓRY",
-         "icon": [
-          "img/icons/p25.webp",
-          13
-         ],
-         "audio": [
-          "snd/p25.json",
-          "7c8317a848"
-         ]
-        },
-        {
-         "fr": "J'ai mal quand j'avale",
-         "es": "Me duele cuando trago",
-         "pr": "ye mal kan ya-VÁL",
-         "icon": [
-          "img/icons/p25.webp",
-          14
-         ],
-         "audio": [
-          "snd/p25.json",
-          "bb5d19ba16"
-         ]
+         "title": "Dato cultural",
+         "text": "Los medicamentos como el paracetamol o el ibuprofeno se piden al farmacéutico: no están al alcance en las estanterías. Se necesita una receta para antibióticos"
         }
        ]
-      },
-      {
-       "label": "Síntomas",
-       "phrases": [
-        {
-         "fr": "Je tousse",
-         "es": "Toso",
-         "pr": "ye TÚS",
-         "icon": [
-          "img/icons/p25.webp",
-          15
-         ],
-         "audio": [
-          "snd/p25.json",
-          "5ceae799f8"
-         ]
-        },
-        {
-         "fr": "J'ai le nez bouché",
-         "es": "Tengo la nariz tapada",
-         "pr": "ye le ne bu-SHÉ",
-         "icon": [
-          "img/icons/p25.webp",
-          16
-         ],
-         "audio": [
-          "snd/p25.json",
-          "bf5e71421a"
-         ]
-        },
-        {
-         "fr": "J'ai la diarrhée",
-         "es": "Tengo diarrea",
-         "pr": "ye la dia-RÉ",
-         "icon": [
-          "img/icons/p25.webp",
-          17
-         ],
-         "audio": [
-          "snd/p25.json",
-          "47283d2e21"
-         ]
-        },
-        {
-         "fr": "J'ai la nausée",
-         "es": "Tengo nausea",
-         "pr": "ye la no-Sé",
-         "icon": [
-          "img/icons/p25.webp",
-          18
-         ],
-         "audio": [
-          "snd/p25.json",
-          "f92c3bcc0c"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Enfermedades",
-       "phrases": [
-        {
-         "fr": "J'ai un rhume",
-         "es": "Tengo un resfriado",
-         "pr": "ye an RÚM",
-         "icon": [
-          "img/icons/p26.webp",
-          0
-         ],
-         "audio": [
-          "snd/p26.json",
-          "44567b02a8"
-         ]
-        },
-        {
-         "fr": "J'ai une allergie au pollen",
-         "es": "Tengo una alergia al polen",
-         "pr": "ye ú-na-ler-yio po-LÉN",
-         "icon": [
-          "img/icons/p26.webp",
-          1
-         ],
-         "audio": [
-          "snd/p26.json",
-          "49864c1bc9"
-         ]
-        },
-        {
-         "fr": "J'ai une angine",
-         "es": "Tengo amigdalitis",
-         "pr": "ye ú-nan-YÍN",
-         "icon": [
-          "img/icons/p26.webp",
-          2
-         ],
-         "audio": [
-          "snd/p26.json",
-          "8e2d7f0971"
-         ]
-        },
-        {
-         "fr": "J'ai une gastro",
-         "es": "Tengo gastroenteritis",
-         "pr": "ye ún gas-TRÓ",
-         "icon": [
-          "img/icons/p26.webp",
-          3
-         ],
-         "audio": [
-          "snd/p26.json",
-          "381a467182"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Para la piel",
-       "phrases": [
-        {
-         "fr": "Des pansements",
-         "es": "Curitas",
-         "pr": "de pans-MÁN",
-         "icon": [
-          "img/icons/p26.webp",
-          4
-         ],
-         "audio": [
-          "snd/p26.json",
-          "f42e7a8a9b"
-         ]
-        },
-        {
-         "fr": "Un désinfectant",
-         "es": "Un desinfectante",
-         "pr": "an de-san-fek-TÁN",
-         "icon": [
-          "img/icons/p26.webp",
-          5
-         ],
-         "audio": [
-          "snd/p26.json",
-          "0200b7f8d1"
-         ]
-        },
-        {
-         "fr": "Une crème solaire",
-         "es": "Un bloqueador",
-         "pr": "ún krem so-LÉR",
-         "icon": [
-          "img/icons/p26.webp",
-          6
-         ],
-         "audio": [
-          "snd/p26.json",
-          "2ca20759d3"
-         ]
-        },
-        {
-         "fr": "Un bandage",
-         "es": "Un vendaje",
-         "pr": "an ban-DÁY",
-         "icon": [
-          "img/icons/p26.webp",
-          7
-         ],
-         "audio": [
-          "snd/p26.json",
-          "72370f85f3"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Preguntas",
-       "phrases": [
-        {
-         "fr": "C'est pour vous?",
-         "es": "¿Es para usted?",
-         "pr": "se pur VÚ",
-         "who": "staff",
-         "icon": [
-          "img/icons/p26.webp",
-          8
-         ],
-         "audio": [
-          "snd/p26.json",
-          "9017196c91"
-         ]
-        },
-        {
-         "fr": "Oui, c'est pour moi",
-         "es": "Si, es para mi",
-         "pr": "UÍ, se pur MUÁ",
-         "icon": [
-          "img/icons/p26.webp",
-          9
-         ],
-         "audio": [
-          "snd/p26.json",
-          "28aeb0057d"
-         ]
-        },
-        {
-         "fr": "C'est pour un enfant ou un adulte?",
-         "es": "¿Es para un niño o un adulto?",
-         "pr": "se pu-ran-=nan-FÁN u an-=na-DÚLT",
-         "who": "staff",
-         "icon": [
-          "img/icons/p26.webp",
-          10
-         ],
-         "audio": [
-          "snd/p26.json",
-          "7b98d44e3a"
-         ]
-        },
-        {
-         "fr": "C'est pour un enfant",
-         "es": "Es para un niño",
-         "pr": "se pu-ran-nan-FÁN",
-         "icon": [
-          "img/icons/p26.webp",
-          11
-         ],
-         "audio": [
-          "snd/p26.json",
-          "3d5684be53"
-         ]
-        },
-        {
-         "fr": "Vous avez mal depuis quand?",
-         "es": "¿Cuánto hace que le duele?",
-         "pr": "vu-sa-ve mal de-púi KÁN",
-         "who": "staff",
-         "icon": [
-          "img/icons/p26.webp",
-          12
-         ],
-         "audio": [
-          "snd/p26.json",
-          "2461c0d621"
-         ]
-        },
-        {
-         "fr": "Depuis hier",
-         "es": "Desde ayer",
-         "pr": "de-púi-SIÉR",
-         "icon": [
-          "img/icons/p26.webp",
-          13
-         ],
-         "audio": [
-          "snd/p26.json",
-          "9b828ec2df"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Indicaciones",
-       "phrases": [
-        {
-         "fr": "Un comprimé le matin",
-         "es": "Un comprimido por la mañana",
-         "pr": "an kom-pri-me le ma-TÁN",
-         "who": "staff",
-         "icon": [
-          "img/icons/p26.webp",
-          14
-         ],
-         "audio": [
-          "snd/p26.json",
-          "6f4b2890a0"
-         ]
-        },
-        {
-         "fr": "Un comprimé le soir",
-         "es": "Un comprimido por la noche",
-         "pr": "an kom-pri-me le SUÁR",
-         "who": "staff",
-         "icon": [
-          "img/icons/p26.webp",
-          15
-         ],
-         "audio": [
-          "snd/p26.json",
-          "907f819434"
-         ]
-        },
-        {
-         "fr": "Prenez-le avec un verre d'eau",
-         "es": "Tómelo con un vaso de agua",
-         "pr": "pre-ne-le a-vek an ver DÓ",
-         "who": "staff",
-         "icon": [
-          "img/icons/p26.webp",
-          16
-         ],
-         "audio": [
-          "snd/p26.json",
-          "41d92ea892"
-         ]
-        },
-        {
-         "fr": "Prenez-le avant de manger",
-         "es": "Tómelo antes de comer",
-         "pr": "pre-ne-le a-van de man-YéÉ",
-         "who": "staff",
-         "icon": [
-          "img/icons/p26.webp",
-          17
-         ],
-         "audio": [
-          "snd/p26.json",
-          "c810ef7e8f"
-         ]
-        },
-        {
-         "fr": "Prenez-le après manger",
-         "es": "Tómelo después de comer",
-         "pr": "pre-ne-le a-pre man-YÉ",
-         "who": "staff",
-         "icon": [
-          "img/icons/p26.webp",
-          18
-         ],
-         "audio": [
-          "snd/p26.json",
-          "c86590ac1e"
-         ]
-        },
-        {
-         "fr": "Il faut une ordonnance",
-         "es": "Se necesita una receta",
-         "pr": "il fo-tú-nor-do-NÁNS",
-         "who": "staff",
-         "icon": [
-          "img/icons/p26.webp",
-          19
-         ],
-         "audio": [
-          "snd/p26.json",
-          "4316413f78"
-         ]
-        }
-       ]
-      }
-     ],
-     "tips": [
-      {
-       "title": "Dato cultural",
-       "text": "Aquí te compartimos el link de las farmacias abiertas 24h en Paris"
-      },
-      {
-       "title": "Dato cultural",
-       "text": "Los medicamentos como el paracetamol o el ibuprofeno se piden al farmacéutico: no están al alcance en las estanterías. Se necesita una receta para antibióticos"
       }
      ]
     },
@@ -10273,571 +10353,587 @@
     {
      "name": "La ciudad",
      "intro": "Conoce los lugares de la ciudad",
-     "groups": [
+     "groups": [],
+     "tips": [],
+     "subs": [
       {
-       "label": "Alimentación",
-       "phrases": [
+       "name": "Comercios y transporte",
+       "intro": "Conoce los lugares de la ciudad",
+       "groups": [
         {
-         "fr": "Une boulangerie",
-         "es": "Una panadería",
-         "pr": "ún bu-lan-ye-RíÍ",
-         "icon": [
-          "img/icons/p38.webp",
-          0
-         ],
-         "audio": [
-          "snd/p38.json",
-          "ef66c4eaa4"
+         "label": "Alimentación",
+         "phrases": [
+          {
+           "fr": "Une boulangerie",
+           "es": "Una panadería",
+           "pr": "ún bu-lan-ye-RíÍ",
+           "icon": [
+            "img/icons/p38.webp",
+            0
+           ],
+           "audio": [
+            "snd/p38.json",
+            "ef66c4eaa4"
+           ]
+          },
+          {
+           "fr": "Un restaurant",
+           "es": "Un restaurante",
+           "pr": "an res-to-RÁN",
+           "icon": [
+            "img/icons/p38.webp",
+            1
+           ],
+           "audio": [
+            "snd/p38.json",
+            "49fe2ae638"
+           ]
+          },
+          {
+           "fr": "Un supermarché",
+           "es": "Un supermercado",
+           "pr": "an sú-per-mar-SHÉ",
+           "icon": [
+            "img/icons/p38.webp",
+            2
+           ],
+           "audio": [
+            "snd/p38.json",
+            "47f33bb26b"
+           ]
+          },
+          {
+           "fr": "Un café",
+           "es": "Un café",
+           "pr": "an ka-FÉ",
+           "icon": [
+            "img/icons/p38.webp",
+            3
+           ],
+           "audio": [
+            "snd/p38.json",
+            "790bb8730c"
+           ]
+          },
+          {
+           "fr": "Une épicerie",
+           "es": "Una tienda (de alimentación)",
+           "pr": "ú-ne-pi-se-RÍ",
+           "icon": [
+            "img/icons/p38.webp",
+            4
+           ],
+           "audio": [
+            "snd/p38.json",
+            "37c366b004"
+           ]
+          },
+          {
+           "fr": "Une boucherie",
+           "es": "Una carnicería",
+           "pr": "ún bu-she-RÍ",
+           "icon": [
+            "img/icons/p38.webp",
+            5
+           ],
+           "audio": [
+            "snd/p38.json",
+            "a4a1acea77"
+           ]
+          }
          ]
         },
         {
-         "fr": "Un restaurant",
-         "es": "Un restaurante",
-         "pr": "an res-to-RÁN",
-         "icon": [
-          "img/icons/p38.webp",
-          1
-         ],
-         "audio": [
-          "snd/p38.json",
-          "49fe2ae638"
+         "label": "Comercios",
+         "phrases": [
+          {
+           "fr": "Un magasin de vêtement",
+           "es": "Una tienda de ropa",
+           "pr": "an ma-ga-san de vet-MÁN",
+           "icon": [
+            "img/icons/p38.webp",
+            6
+           ],
+           "audio": [
+            "snd/p38.json",
+            "0770d52276"
+           ]
+          },
+          {
+           "fr": "Une pharmacie",
+           "es": "Una farmacia",
+           "pr": "ún far-ma-SÍ",
+           "icon": [
+            "img/icons/p38.webp",
+            7
+           ],
+           "audio": [
+            "snd/p38.json",
+            "b6f12c9b24"
+           ]
+          },
+          {
+           "fr": "Une librairie",
+           "es": "Una librería",
+           "pr": "ún li-bre-RÍ",
+           "icon": [
+            "img/icons/p38.webp",
+            8
+           ],
+           "audio": [
+            "snd/p38.json",
+            "058bdc67dd"
+           ]
+          },
+          {
+           "fr": "Un magasin multimédia",
+           "es": "Un almacén multimedia",
+           "pr": "an ma-ga-san múl-ti-me-DIÁ",
+           "icon": [
+            "img/icons/p38.webp",
+            9
+           ],
+           "audio": [
+            "snd/p38.json",
+            "5125d513a8"
+           ]
+          },
+          {
+           "fr": "Un centre commercial",
+           "es": "Un centro comercial",
+           "pr": "an san-tre ko-mer-SIÁL",
+           "icon": [
+            "img/icons/p38.webp",
+            10
+           ],
+           "audio": [
+            "snd/p38.json",
+            "abc675849b"
+           ]
+          },
+          {
+           "fr": "Un salon de coiffure",
+           "es": "Una peluquería",
+           "pr": "an sa-lon de kua-FUR",
+           "icon": [
+            "img/icons/p38.webp",
+            11
+           ],
+           "audio": [
+            "snd/p38.json",
+            "4cfe625e3a"
+           ]
+          },
+          {
+           "fr": "Une bijouterie",
+           "es": "Una joyería",
+           "pr": "ún bi-yu-te-RíÍ",
+           "icon": [
+            "img/icons/p38.webp",
+            12
+           ],
+           "audio": [
+            "snd/p38.json",
+            "73ff4dd707"
+           ]
+          }
          ]
         },
         {
-         "fr": "Un supermarché",
-         "es": "Un supermercado",
-         "pr": "an sú-per-mar-SHÉ",
-         "icon": [
-          "img/icons/p38.webp",
-          2
-         ],
-         "audio": [
-          "snd/p38.json",
-          "47f33bb26b"
+         "label": "Transporte",
+         "phrases": [
+          {
+           "fr": "Une station de métro",
+           "es": "Una estación de metro",
+           "pr": "ún sta-sion de me-TRÓ",
+           "icon": [
+            "img/icons/p38.webp",
+            13
+           ],
+           "audio": [
+            "snd/p38.json",
+            "d6787d4040"
+           ]
+          },
+          {
+           "fr": "Une gare",
+           "es": "Una estación de tren",
+           "pr": "ún GÁR",
+           "icon": [
+            "img/icons/p38.webp",
+            14
+           ],
+           "audio": [
+            "snd/p38.json",
+            "40b8826a67"
+           ]
+          },
+          {
+           "fr": "Un aéroport",
+           "es": "Un aeropuerto",
+           "pr": "an-na-e-ro-PÓR",
+           "icon": [
+            "img/icons/p38.webp",
+            15
+           ],
+           "audio": [
+            "snd/p38.json",
+            "86d3f28ac7"
+           ]
+          },
+          {
+           "fr": "Un musée",
+           "es": "Un museo",
+           "pr": "an muú-Ssé",
+           "icon": [
+            "img/icons/p38.webp",
+            16
+           ],
+           "audio": [
+            "snd/p38.json",
+            "7e3a8ebfef"
+           ]
+          },
+          {
+           "fr": "Une église",
+           "es": "Una iglesia",
+           "pr": "ú-ne-GLÍS",
+           "icon": [
+            "img/icons/p38.webp",
+            17
+           ],
+           "audio": [
+            "snd/p38.json",
+            "0bce9ac846"
+           ]
+          },
+          {
+           "fr": "Une cathédrale",
+           "es": "Una catedral",
+           "pr": "ún ka-te-DRÁL",
+           "icon": [
+            "img/icons/p38.webp",
+            18
+           ],
+           "audio": [
+            "snd/p38.json",
+            "2eb1135aba"
+           ]
+          },
+          {
+           "fr": "Un château",
+           "es": "Un castillo",
+           "pr": "an sha-TÓ",
+           "icon": [
+            "img/icons/p38.webp",
+            19
+           ],
+           "audio": [
+            "snd/p38.json",
+            "d0437bd7cc"
+           ]
+          }
          ]
-        },
+        }
+       ],
+       "tips": [
         {
-         "fr": "Un café",
-         "es": "Un café",
-         "pr": "an ka-FÉ",
-         "icon": [
-          "img/icons/p38.webp",
-          3
-         ],
-         "audio": [
-          "snd/p38.json",
-          "790bb8730c"
-         ]
-        },
-        {
-         "fr": "Une épicerie",
-         "es": "Una tienda (de alimentación)",
-         "pr": "ú-ne-pi-se-RÍ",
-         "icon": [
-          "img/icons/p38.webp",
-          4
-         ],
-         "audio": [
-          "snd/p38.json",
-          "37c366b004"
-         ]
-        },
-        {
-         "fr": "Une boucherie",
-         "es": "Una carnicería",
-         "pr": "ún bu-she-RÍ",
-         "icon": [
-          "img/icons/p38.webp",
-          5
-         ],
-         "audio": [
-          "snd/p38.json",
-          "a4a1acea77"
-         ]
+         "title": "Dato de comunicación",
+         "text": "Usa estas palabras con estas dos frases para empezar: Je cherche un musée Il y a un musée ?"
         }
        ]
       },
       {
-       "label": "Comercios",
-       "phrases": [
+       "name": "Servicios y ocio",
+       "intro": "Conoce los lugares de la ciudad",
+       "groups": [
         {
-         "fr": "Un magasin de vêtement",
-         "es": "Una tienda de ropa",
-         "pr": "an ma-ga-san de vet-MÁN",
-         "icon": [
-          "img/icons/p38.webp",
-          6
-         ],
-         "audio": [
-          "snd/p38.json",
-          "0770d52276"
+         "label": "Servicios",
+         "phrases": [
+          {
+           "fr": "Une mairie",
+           "es": "Una alcaldía",
+           "pr": "ún me-Rí",
+           "icon": [
+            "img/icons/p39.webp",
+            0
+           ],
+           "audio": [
+            "snd/p39.json",
+            "3cf1d67b9d"
+           ]
+          },
+          {
+           "fr": "Un commissariat",
+           "es": "Una estación de policía",
+           "pr": "an ko-mi-sa-RIÁ",
+           "icon": [
+            "img/icons/p39.webp",
+            1
+           ],
+           "audio": [
+            "snd/p39.json",
+            "348ecef437"
+           ]
+          },
+          {
+           "fr": "Un hôpital",
+           "es": "Un hospital",
+           "pr": "an-no-pi-TÁL",
+           "icon": [
+            "img/icons/p39.webp",
+            2
+           ],
+           "audio": [
+            "snd/p39.json",
+            "0dc5ee9b00"
+           ]
+          },
+          {
+           "fr": "Un hôtel",
+           "es": "Un hotel",
+           "pr": "an-no-TÉL",
+           "icon": [
+            "img/icons/p39.webp",
+            3
+           ],
+           "audio": [
+            "snd/p39.json",
+            "f0864b0b16"
+           ]
+          },
+          {
+           "fr": "Une banque",
+           "es": "Un banco",
+           "pr": "ún BÁNK",
+           "icon": [
+            "img/icons/p39.webp",
+            4
+           ],
+           "audio": [
+            "snd/p39.json",
+            "1e2dee4274"
+           ]
+          },
+          {
+           "fr": "Un distributeur automatique",
+           "es": "Un cajero",
+           "pr": "an dis-tri-bú-tór o-to-ma-TÍK",
+           "icon": [
+            "img/icons/p39.webp",
+            5
+           ],
+           "audio": [
+            "snd/p39.json",
+            "1cdbecfca7"
+           ]
+          }
          ]
         },
         {
-         "fr": "Une pharmacie",
-         "es": "Una farmacia",
-         "pr": "ún far-ma-SÍ",
-         "icon": [
-          "img/icons/p38.webp",
-          7
-         ],
-         "audio": [
-          "snd/p38.json",
-          "b6f12c9b24"
+         "label": "Actividades deportivas",
+         "phrases": [
+          {
+           "fr": "Une piscine",
+           "es": "Una piscina",
+           "pr": "ún pi-SÍN",
+           "icon": [
+            "img/icons/p39.webp",
+            6
+           ],
+           "audio": [
+            "snd/p39.json",
+            "ebbafa3213"
+           ]
+          },
+          {
+           "fr": "Un stade",
+           "es": "Un estadio",
+           "pr": "an STÁD",
+           "icon": [
+            "img/icons/p39.webp",
+            7
+           ],
+           "audio": [
+            "snd/p39.json",
+            "71ae01a202"
+           ]
+          },
+          {
+           "fr": "Une salle de sport",
+           "es": "Un gimnasio",
+           "pr": "ún sal de SPÓR",
+           "icon": [
+            "img/icons/p39.webp",
+            8
+           ],
+           "audio": [
+            "snd/p39.json",
+            "1bc145bcdf"
+           ]
+          },
+          {
+           "fr": "Un parc",
+           "es": "Un parque",
+           "pr": "an PÁRK",
+           "icon": [
+            "img/icons/p39.webp",
+            9
+           ],
+           "audio": [
+            "snd/p39.json",
+            "4b90880f22"
+           ]
+          }
          ]
         },
         {
-         "fr": "Une librairie",
-         "es": "Una librería",
-         "pr": "ún li-bre-RÍ",
-         "icon": [
-          "img/icons/p38.webp",
-          8
-         ],
-         "audio": [
-          "snd/p38.json",
-          "058bdc67dd"
+         "label": "Diversión",
+         "phrases": [
+          {
+           "fr": "Un cinéma",
+           "es": "Un cine",
+           "pr": "an si-ne-MÁ",
+           "icon": [
+            "img/icons/p39.webp",
+            10
+           ],
+           "audio": [
+            "snd/p39.json",
+            "e0f2b1ce1d"
+           ]
+          },
+          {
+           "fr": "Une bibliothèque",
+           "es": "Una biblioteca",
+           "pr": "ún bi-blio-TÉK",
+           "icon": [
+            "img/icons/p39.webp",
+            11
+           ],
+           "audio": [
+            "snd/p39.json",
+            "c58e8be4e8"
+           ]
+          },
+          {
+           "fr": "Un cirque",
+           "es": "Un circo",
+           "pr": "an SÍRK",
+           "icon": [
+            "img/icons/p39.webp",
+            12
+           ],
+           "audio": [
+            "snd/p39.json",
+            "523ea9bef5"
+           ]
+          },
+          {
+           "fr": "Un zoo",
+           "es": "Un zoológico",
+           "pr": "an so-Ó",
+           "icon": [
+            "img/icons/p39.webp",
+            13
+           ],
+           "audio": [
+            "snd/p39.json",
+            "4ea506831e"
+           ]
+          },
+          {
+           "fr": "Un parc d'attraction",
+           "es": "Un parque de atracciones",
+           "pr": "an park da-trak-SIÓN",
+           "icon": [
+            "img/icons/p39.webp",
+            14
+           ],
+           "audio": [
+            "snd/p39.json",
+            "1c6d231f8f"
+           ]
+          }
          ]
         },
         {
-         "fr": "Un magasin multimédia",
-         "es": "Un almacén multimedia",
-         "pr": "an ma-ga-san múl-ti-me-DIÁ",
-         "icon": [
-          "img/icons/p38.webp",
-          9
-         ],
-         "audio": [
-          "snd/p38.json",
-          "5125d513a8"
-         ]
-        },
-        {
-         "fr": "Un centre commercial",
-         "es": "Un centro comercial",
-         "pr": "an san-tre ko-mer-SIÁL",
-         "icon": [
-          "img/icons/p38.webp",
-          10
-         ],
-         "audio": [
-          "snd/p38.json",
-          "abc675849b"
-         ]
-        },
-        {
-         "fr": "Un salon de coiffure",
-         "es": "Una peluquería",
-         "pr": "an sa-lon de kua-FUR",
-         "icon": [
-          "img/icons/p38.webp",
-          11
-         ],
-         "audio": [
-          "snd/p38.json",
-          "4cfe625e3a"
-         ]
-        },
-        {
-         "fr": "Une bijouterie",
-         "es": "Una joyería",
-         "pr": "ún bi-yu-te-RíÍ",
-         "icon": [
-          "img/icons/p38.webp",
-          12
-         ],
-         "audio": [
-          "snd/p38.json",
-          "73ff4dd707"
+         "label": "Otros lugares",
+         "phrases": [
+          {
+           "fr": "Un monument",
+           "es": "Un monumento",
+           "pr": "an mo-nú-MÁN",
+           "icon": [
+            "img/icons/p39.webp",
+            15
+           ],
+           "audio": [
+            "snd/p39.json",
+            "32c2f61d08"
+           ]
+          },
+          {
+           "fr": "Une statue",
+           "es": "Una estatua",
+           "pr": "ún sta-TU",
+           "icon": [
+            "img/icons/p39.webp",
+            16
+           ],
+           "audio": [
+            "snd/p39.json",
+            "8fa55a7547"
+           ]
+          },
+          {
+           "fr": "Une fontaine",
+           "es": "Una fuente",
+           "pr": "ún fon-TÉN",
+           "icon": [
+            "img/icons/p39.webp",
+            17
+           ],
+           "audio": [
+            "snd/p39.json",
+            "43657beb3b"
+           ]
+          },
+          {
+           "fr": "Un parking",
+           "es": "Un parqueadero",
+           "pr": "an par-KÍiNG",
+           "icon": [
+            "img/icons/p39.webp",
+            18
+           ],
+           "audio": [
+            "snd/p39.json",
+            "ba54fe427a"
+           ]
+          },
+          {
+           "fr": "Des toilettes publiques",
+           "es": "Un baño público",
+           "pr": "de tua-let pú-BLÍK",
+           "icon": [
+            "img/icons/p39.webp",
+            19
+           ],
+           "audio": [
+            "snd/p39.json",
+            "a321810db5"
+           ]
+          }
          ]
         }
-       ]
-      },
-      {
-       "label": "Transporte",
-       "phrases": [
+       ],
+       "tips": [
         {
-         "fr": "Une station de métro",
-         "es": "Una estación de metro",
-         "pr": "ún sta-sion de me-TRÓ",
-         "icon": [
-          "img/icons/p38.webp",
-          13
-         ],
-         "audio": [
-          "snd/p38.json",
-          "d6787d4040"
-         ]
-        },
-        {
-         "fr": "Une gare",
-         "es": "Una estación de tren",
-         "pr": "ún GÁR",
-         "icon": [
-          "img/icons/p38.webp",
-          14
-         ],
-         "audio": [
-          "snd/p38.json",
-          "40b8826a67"
-         ]
-        },
-        {
-         "fr": "Un aéroport",
-         "es": "Un aeropuerto",
-         "pr": "an-na-e-ro-PÓR",
-         "icon": [
-          "img/icons/p38.webp",
-          15
-         ],
-         "audio": [
-          "snd/p38.json",
-          "86d3f28ac7"
-         ]
-        },
-        {
-         "fr": "Un musée",
-         "es": "Un museo",
-         "pr": "an muú-Ssé",
-         "icon": [
-          "img/icons/p38.webp",
-          16
-         ],
-         "audio": [
-          "snd/p38.json",
-          "7e3a8ebfef"
-         ]
-        },
-        {
-         "fr": "Une église",
-         "es": "Una iglesia",
-         "pr": "ú-ne-GLÍS",
-         "icon": [
-          "img/icons/p38.webp",
-          17
-         ],
-         "audio": [
-          "snd/p38.json",
-          "0bce9ac846"
-         ]
-        },
-        {
-         "fr": "Une cathédrale",
-         "es": "Una catedral",
-         "pr": "ún ka-te-DRÁL",
-         "icon": [
-          "img/icons/p38.webp",
-          18
-         ],
-         "audio": [
-          "snd/p38.json",
-          "2eb1135aba"
-         ]
-        },
-        {
-         "fr": "Un château",
-         "es": "Un castillo",
-         "pr": "an sha-TÓ",
-         "icon": [
-          "img/icons/p38.webp",
-          19
-         ],
-         "audio": [
-          "snd/p38.json",
-          "d0437bd7cc"
-         ]
+         "title": "Dato gramatical",
+         "text": "Je cherche le musée du Louvre Je cherche un musée"
         }
        ]
-      },
-      {
-       "label": "Servicios",
-       "phrases": [
-        {
-         "fr": "Une mairie",
-         "es": "Una alcaldía",
-         "pr": "ún me-Rí",
-         "icon": [
-          "img/icons/p39.webp",
-          0
-         ],
-         "audio": [
-          "snd/p39.json",
-          "3cf1d67b9d"
-         ]
-        },
-        {
-         "fr": "Un commissariat",
-         "es": "Una estación de policía",
-         "pr": "an ko-mi-sa-RIÁ",
-         "icon": [
-          "img/icons/p39.webp",
-          1
-         ],
-         "audio": [
-          "snd/p39.json",
-          "348ecef437"
-         ]
-        },
-        {
-         "fr": "Un hôpital",
-         "es": "Un hospital",
-         "pr": "an-no-pi-TÁL",
-         "icon": [
-          "img/icons/p39.webp",
-          2
-         ],
-         "audio": [
-          "snd/p39.json",
-          "0dc5ee9b00"
-         ]
-        },
-        {
-         "fr": "Un hôtel",
-         "es": "Un hotel",
-         "pr": "an-no-TÉL",
-         "icon": [
-          "img/icons/p39.webp",
-          3
-         ],
-         "audio": [
-          "snd/p39.json",
-          "f0864b0b16"
-         ]
-        },
-        {
-         "fr": "Une banque",
-         "es": "Un banco",
-         "pr": "ún BÁNK",
-         "icon": [
-          "img/icons/p39.webp",
-          4
-         ],
-         "audio": [
-          "snd/p39.json",
-          "1e2dee4274"
-         ]
-        },
-        {
-         "fr": "Un distributeur automatique",
-         "es": "Un cajero",
-         "pr": "an dis-tri-bú-tór o-to-ma-TÍK",
-         "icon": [
-          "img/icons/p39.webp",
-          5
-         ],
-         "audio": [
-          "snd/p39.json",
-          "1cdbecfca7"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Actividades deportivas",
-       "phrases": [
-        {
-         "fr": "Une piscine",
-         "es": "Una piscina",
-         "pr": "ún pi-SÍN",
-         "icon": [
-          "img/icons/p39.webp",
-          6
-         ],
-         "audio": [
-          "snd/p39.json",
-          "ebbafa3213"
-         ]
-        },
-        {
-         "fr": "Un stade",
-         "es": "Un estadio",
-         "pr": "an STÁD",
-         "icon": [
-          "img/icons/p39.webp",
-          7
-         ],
-         "audio": [
-          "snd/p39.json",
-          "71ae01a202"
-         ]
-        },
-        {
-         "fr": "Une salle de sport",
-         "es": "Un gimnasio",
-         "pr": "ún sal de SPÓR",
-         "icon": [
-          "img/icons/p39.webp",
-          8
-         ],
-         "audio": [
-          "snd/p39.json",
-          "1bc145bcdf"
-         ]
-        },
-        {
-         "fr": "Un parc",
-         "es": "Un parque",
-         "pr": "an PÁRK",
-         "icon": [
-          "img/icons/p39.webp",
-          9
-         ],
-         "audio": [
-          "snd/p39.json",
-          "4b90880f22"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Diversión",
-       "phrases": [
-        {
-         "fr": "Un cinéma",
-         "es": "Un cine",
-         "pr": "an si-ne-MÁ",
-         "icon": [
-          "img/icons/p39.webp",
-          10
-         ],
-         "audio": [
-          "snd/p39.json",
-          "e0f2b1ce1d"
-         ]
-        },
-        {
-         "fr": "Une bibliothèque",
-         "es": "Una biblioteca",
-         "pr": "ún bi-blio-TÉK",
-         "icon": [
-          "img/icons/p39.webp",
-          11
-         ],
-         "audio": [
-          "snd/p39.json",
-          "c58e8be4e8"
-         ]
-        },
-        {
-         "fr": "Un cirque",
-         "es": "Un circo",
-         "pr": "an SÍRK",
-         "icon": [
-          "img/icons/p39.webp",
-          12
-         ],
-         "audio": [
-          "snd/p39.json",
-          "523ea9bef5"
-         ]
-        },
-        {
-         "fr": "Un zoo",
-         "es": "Un zoológico",
-         "pr": "an so-Ó",
-         "icon": [
-          "img/icons/p39.webp",
-          13
-         ],
-         "audio": [
-          "snd/p39.json",
-          "4ea506831e"
-         ]
-        },
-        {
-         "fr": "Un parc d'attraction",
-         "es": "Un parque de atracciones",
-         "pr": "an park da-trak-SIÓN",
-         "icon": [
-          "img/icons/p39.webp",
-          14
-         ],
-         "audio": [
-          "snd/p39.json",
-          "1c6d231f8f"
-         ]
-        }
-       ]
-      },
-      {
-       "label": "Otros lugares",
-       "phrases": [
-        {
-         "fr": "Un monument",
-         "es": "Un monumento",
-         "pr": "an mo-nú-MÁN",
-         "icon": [
-          "img/icons/p39.webp",
-          15
-         ],
-         "audio": [
-          "snd/p39.json",
-          "32c2f61d08"
-         ]
-        },
-        {
-         "fr": "Une statue",
-         "es": "Una estatua",
-         "pr": "ún sta-TU",
-         "icon": [
-          "img/icons/p39.webp",
-          16
-         ],
-         "audio": [
-          "snd/p39.json",
-          "8fa55a7547"
-         ]
-        },
-        {
-         "fr": "Une fontaine",
-         "es": "Una fuente",
-         "pr": "ún fon-TÉN",
-         "icon": [
-          "img/icons/p39.webp",
-          17
-         ],
-         "audio": [
-          "snd/p39.json",
-          "43657beb3b"
-         ]
-        },
-        {
-         "fr": "Un parking",
-         "es": "Un parqueadero",
-         "pr": "an par-KÍiNG",
-         "icon": [
-          "img/icons/p39.webp",
-          18
-         ],
-         "audio": [
-          "snd/p39.json",
-          "ba54fe427a"
-         ]
-        },
-        {
-         "fr": "Des toilettes publiques",
-         "es": "Un baño público",
-         "pr": "de tua-let pú-BLÍK",
-         "icon": [
-          "img/icons/p39.webp",
-          19
-         ],
-         "audio": [
-          "snd/p39.json",
-          "a321810db5"
-         ]
-        }
-       ]
-      }
-     ],
-     "tips": [
-      {
-       "title": "Dato de comunicación",
-       "text": "Usa estas palabras con estas dos frases para empezar: Je cherche un musée Il y a un musée ?"
-      },
-      {
-       "title": "Dato gramatical",
-       "text": "Je cherche le musée du Louvre Je cherche un musée"
       }
      ]
     }

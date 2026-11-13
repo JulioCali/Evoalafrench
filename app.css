@@ -162,7 +162,7 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .ic.num{display:grid;place-items:center;background:#FFF7E8;color:var(--violet-dark);font-size:22px;font-weight:500}
 .ic.num.long{width:auto;min-width:56px;padding:0 6px;font-size:19px}
 .subs{display:flex;margin:4px 8px 0;border-bottom:1px solid #DDD9EE}
-.subs button{flex:1;font-size:13px;color:#B5B1C8;padding:6px 0 7px;white-space:nowrap}
+.subs button{flex:1;font-size:13px;color:#6E6680;padding:8px 4px 9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:40px}
 .subs button.on{color:var(--violet);border-bottom:3px solid var(--violet);margin-bottom:-1px}
 .dsub{background:#fff;border-radius:999px;padding:1px 10px;color:var(--ink);font-size:12px;margin-left:6px}
 .dtab{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border-radius:12px;overflow:hidden;margin-top:6px;font-size:12px}
@@ -277,3 +277,6 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
   .gmore{display:none}
   .hubfoot{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
 }
+
+.nextsub{display:flex;align-items:center;justify-content:center;gap:4px;width:calc(100% - 16px);margin:4px 8px 4px;min-height:52px;border-radius:14px;background:var(--violet);color:#fff;font-size:15px;padding:0 12px}
+.nextsub b{font-weight:600}
