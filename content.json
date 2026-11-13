@@ -6169,7 +6169,7 @@
        "intro": "Maneja tu estadía",
        "groups": [
         {
-         "label": "Poblemas y usos",
+         "label": "Problemas y usos",
          "phrases": [
           {
            "fr": "Le chauffage ne fonctionne pas",
@@ -9891,7 +9891,7 @@
       },
       {
        "name": "60-79",
-       "intro": "Cuenta hasta 69",
+       "intro": "Cuenta hasta 79",
        "groups": [
         {
          "label": "60 a 69",
