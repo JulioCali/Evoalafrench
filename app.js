@@ -85,7 +85,7 @@ if(AUTH_ON){ const s = document.createElement("script"); s.type = "module"; s.sr
 const onboarded = { get(){ try{ return localStorage.getItem("evoala-onb") === "1"; }catch(e){ return true; } },
                     set(){ try{ localStorage.setItem("evoala-onb", "1"); }catch(e){} } };
 const ACC = {
-  es:{wTitle:"Aprende francés", wHi:"alcanzando objetivos", wEnd:"concretos", wSub:"Viajar, empezar desde cero o aprobar el DELF: cada guía te lleva a una meta clara, con audio y pronunciación.",
+  es:{wTitle:"Aprende francés", wHi:"alcanzando objetivos", wEnd:"concretos", course:"Curso de francés",wSub:"Viajar, empezar desde cero o aprobar el DELF: cada guía te lleva a una meta clara, con audio y pronunciación.",
       start:"Empezar", have:"¿Ya tienes una cuenta?", login:"Iniciar sesión", goal:"Objetivo cumplido", goalSub:"Pedir en un café",
       upT:"Guarda tu progreso", upS:"Crea tu cuenta gratis y retoma tus guías en cualquier dispositivo.", inT:"Bienvenido de nuevo", inS:"Inicia sesión para retomar tus guías donde las dejaste.",
       later:"Ahora no", back:"Volver", google:"Continuar con Google", or:"o con tu correo", email:"Correo electrónico", emailPh:"tu@correo.com", pass:"Contraseña", passPh:"8 caracteres como mínimo",
@@ -93,7 +93,7 @@ const ACC = {
       legal:"Al continuar, aceptas las Condiciones de uso y la Política de privacidad de Evoala.", wait:"Un momento…", welcome:"¡Listo! Tu progreso se guarda en tu cuenta.",
       resetSent:"Te enviamos un correo para cambiar tu contraseña.", needEmail:"Escribe tu correo arriba y vuelve a tocar aquí.", account:"Mi cuenta", signout:"Cerrar sesión", signedOut:"Sesión cerrada.", signedAs:"Conectado como",
       err:{"auth/invalid-email":"Ese correo no parece válido.","auth/missing-password":"Escribe una contraseña.","auth/weak-password":"La contraseña debe tener al menos 8 caracteres.","auth/email-already-in-use":"Ya existe una cuenta con ese correo. Toca « Iniciar sesión ».","auth/invalid-credential":"Correo o contraseña incorrectos.","auth/wrong-password":"Correo o contraseña incorrectos.","auth/user-not-found":"No encontramos una cuenta con ese correo.","auth/too-many-requests":"Demasiados intentos. Espera unos minutos.","auth/network-request-failed":"Sin conexión. Revisa tu internet.","auth/popup-closed-by-user":"Se cerró la ventana de Google.","auth/unauthorized-domain":"Este sitio todavía no está autorizado en Firebase.","auth/operation-not-allowed":"Este método de conexión todavía no está activado.","off":"Las cuentas no están disponibles por el momento.","x":"Algo salió mal. Inténtalo de nuevo."}},
-  en:{wTitle:"Learn French", wHi:"by reaching", wEnd:"concrete goals", wSub:"Travel, start from scratch or pass the DELF: each guide takes you to a clear goal, with audio and pronunciation.",
+  en:{wTitle:"Learn French", wHi:"by reaching", wEnd:"concrete goals", course:"French course",wSub:"Travel, start from scratch or pass the DELF: each guide takes you to a clear goal, with audio and pronunciation.",
       start:"Get started", have:"Already have an account?", login:"Log in", goal:"Goal reached", goalSub:"Ordering at a café",
       upT:"Save your progress", upS:"Create your free account and pick up your guides on any device.", inT:"Welcome back", inS:"Log in to pick up your guides where you left off.",
       later:"Not now", back:"Back", google:"Continue with Google", or:"or with your email", email:"Email", emailPh:"you@email.com", pass:"Password", passPh:"At least 8 characters",
@@ -103,6 +103,7 @@ const ACC = {
       err:{"auth/invalid-email":"That email doesn't look valid.","auth/missing-password":"Type a password.","auth/weak-password":"Your password needs at least 8 characters.","auth/email-already-in-use":"An account already exists with that email. Tap “Log in”.","auth/invalid-credential":"Wrong email or password.","auth/wrong-password":"Wrong email or password.","auth/user-not-found":"No account found with that email.","auth/too-many-requests":"Too many attempts. Please wait a few minutes.","auth/network-request-failed":"No connection. Check your internet.","auth/popup-closed-by-user":"The Google window was closed.","auth/unauthorized-domain":"This site isn't authorized in Firebase yet.","auth/operation-not-allowed":"This sign-in method isn't enabled yet.","off":"Accounts aren't available right now.","x":"Something went wrong. Please try again."}}
 };
 const a = k => ACC[LANG][k];
+const MINIFLAG = '<span class="miniflag" aria-hidden="true"><i></i><i></i><i></i></span>';
 const authErr = e => a("err")[e && e.code] || a("err")[e === "off" ? "off" : "x"];
 const langToggle = cls => `<div class="lang ${cls}" role="group" aria-label="${t("lang")}"><button class="${LANG==='es'?'on':''}" data-lang="es" aria-pressed="${LANG==='es'}">ES</button><button class="${LANG==='en'?'on':''}" data-lang="en" aria-pressed="${LANG==='en'}">EN</button></div>`;
 
@@ -111,10 +112,11 @@ function welcome(){
   app.innerHTML = `
   <section class="wtop">
     <div class="wbar"><span class="wlogo"><img src="img/ui/logo.webp" alt="evoala"></span>${langToggle("wl")}</div>
-    <div class="wart" aria-hidden="true">${tile("a1","t1")}${tile("voyage","t2")}${tile("delfb1","t3")}${tile("delfa2","t4")}
+    <div class="wart" aria-hidden="true">${tile("a1","t1")}${tile("voyage","t2")}${tile("delfb1","t3")}${tile("delfa2","t4")}${tile("drapeau","t5")}
       <span class="wgoal"><i><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></i><span><b>${a("goal")}</b>${a("goalSub")}</span></span></div>
   </section>
   <section class="wtext">
+    <span class="fpill">${MINIFLAG}${a("course")}</span>
     <h1>${a("wTitle")}<br><span>${a("wHi")}</span> ${a("wEnd")}</h1>
     <p>${a("wSub")}</p>
     <div class="wact"><button class="bigbtn" data-start>${a("start")} <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
@@ -224,7 +226,7 @@ function hub(){
     <div class="hero"><div><h1>${H.t1}<br><span>${H.t2}</span></h1><p>${H.sub}<span class="wideonly">${H.subWide}</span></p></div>
       <section class="feat">
         <div class="fhead"><span class="fimg"><img src="img/hub/voyage.webp" alt=""></span>
-          <div><span class="fbadge">${H.badge}</span><small>${H.kicker}</small><b>${H.title}</b></div></div>
+          <div><span class="fbadge">${H.badge}</span><small>${MINIFLAG}${H.kicker}</small><b>${H.title}</b></div></div>
         <div class="fbody"><p><strong>${H.mission}</strong> ${H.goal}</p>
           <div class="fchips">${H.chips.map(c => `<span>${c}</span>`).join("")}</div>
           <button class="fcta" data-go="guia">${H.cta} ${arrow}</button></div>

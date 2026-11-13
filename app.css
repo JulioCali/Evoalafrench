@@ -295,7 +295,7 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .wtile.t2{left:117px;top:92px;width:156px;height:156px;transform:rotate(3deg);z-index:3}
 .wtile.t3{left:246px;top:138px;width:118px;height:118px;transform:rotate(9deg);z-index:2}
 .wtile.t4{left:58px;top:286px;width:96px;height:96px;transform:rotate(-4deg);z-index:2}
-.wgoal{position:absolute;left:196px;top:304px;z-index:4;background:#fff;border-radius:16px;padding:8px 12px;box-shadow:0 8px 20px rgba(30,15,90,.2);display:flex;align-items:center;gap:8px;font-size:12px;line-height:1.25;color:#6E6680}
+.wgoal{position:absolute;left:16px;top:398px;z-index:4;background:#fff;border-radius:16px;padding:8px 12px;box-shadow:0 8px 20px rgba(30,15,90,.2);display:flex;align-items:center;gap:8px;font-size:12px;line-height:1.25;color:#6E6680}
 .wgoal b{display:block;color:var(--ink);font-weight:600}
 .wgoal i{width:30px;height:30px;border-radius:50%;background:#E2F5E8;display:grid;place-items:center;flex:none}
 .wgoal svg{width:16px;height:16px;fill:none;stroke:#166534;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
@@ -347,3 +347,12 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .apop small{font-size:11px;color:#6E6680}
 .apop b{font-size:14px;font-weight:600;word-break:break-all;margin-bottom:8px}
 .apop button{min-height:42px;border-radius:10px;background:var(--lavender-soft);color:#4A33B0;font-weight:600;font-size:14px;text-align:center}
+
+/* ---------- Drapeau français ---------- */
+.miniflag{display:inline-flex;width:21px;height:14px;border-radius:3px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.08);flex:none;vertical-align:-2px}
+.miniflag i{flex:1}.miniflag i:nth-child(1){background:#1E4FB5}.miniflag i:nth-child(2){background:#fff}.miniflag i:nth-child(3){background:#EF3340}
+.fpill{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--card-border);border-radius:999px;padding:5px 12px 5px 8px;font-size:13px;font-weight:600;margin-bottom:12px}
+.wtext{padding-top:22px}
+.wtile.t5{left:226px;top:294px;width:112px;height:112px;transform:rotate(6deg);z-index:3;display:grid;place-items:center;padding:6px;box-sizing:border-box}
+.wtile.t5 img{height:auto;object-fit:contain}
+.fhead small{display:flex;align-items:center;gap:6px}
