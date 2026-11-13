@@ -19,6 +19,7 @@ puis ouvrir http://localhost:8000. (Ouvrir `index.html` directement depuis le di
 |---|---|
 | `index.html` | Page d'entrée |
 | `app.js` | Tout l'affichage : accueil (sommaire), pages de phrases, Guía de Paris, recherche, audio, langue |
+| `auth.js` | Comptes (Firebase) : création de compte, connexion e-mail ou Google, sauvegarde de la langue et de la dernière page. Actif seulement sur le site Netlify |
 | `app.css` | Les styles (les couleurs principales sont en haut du fichier) |
 | `content.json` | Contenu en espagnol : sections, phrases (`fr`, `es`, `pr` = prononciation), datos culturales, Guía de Paris |
 | `content-en.json` | Même structure, version anglaise (traductions et prononciations pour anglophones) |

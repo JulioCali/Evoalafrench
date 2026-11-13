@@ -280,3 +280,70 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 
 .nextsub{display:flex;align-items:center;justify-content:center;gap:4px;width:calc(100% - 16px);margin:4px 8px 4px;min-height:52px;border-radius:14px;background:var(--violet);color:#fff;font-size:15px;padding:0 12px}
 .nextsub b{font-weight:600}
+
+/* ---------- Accueil (bienvenue) ---------- */
+.app.onbmode{padding-bottom:0;min-height:100vh;display:flex;flex-direction:column}
+.wtop{background:var(--violet);border-radius:0 0 36px 36px;position:relative;height:min(470px,56vh);min-height:400px;flex:none;overflow:hidden}
+.wbar{display:flex;align-items:center;justify-content:space-between;padding:calc(16px + env(safe-area-inset-top)) 18px 0;position:relative;z-index:5}
+.wlogo{background:#fff;border-radius:999px;padding:6px 14px;display:flex}
+.wlogo img{height:30px}
+.lang.wl{background:rgba(255,255,255,.18)}
+.wart{position:absolute;inset:0;max-width:390px;margin:0 auto}
+.wtile{position:absolute;border-radius:26px;overflow:hidden;background:#fff;border:4px solid #fff;box-shadow:0 10px 24px rgba(30,15,90,.25)}
+.wtile img{width:100%;height:100%;object-fit:cover;display:block}
+.wtile.t1{left:26px;top:120px;width:118px;height:118px;transform:rotate(-8deg);z-index:1}
+.wtile.t2{left:117px;top:92px;width:156px;height:156px;transform:rotate(3deg);z-index:3}
+.wtile.t3{left:246px;top:138px;width:118px;height:118px;transform:rotate(9deg);z-index:2}
+.wtile.t4{left:58px;top:286px;width:96px;height:96px;transform:rotate(-4deg);z-index:2}
+.wgoal{position:absolute;left:196px;top:304px;z-index:4;background:#fff;border-radius:16px;padding:8px 12px;box-shadow:0 8px 20px rgba(30,15,90,.2);display:flex;align-items:center;gap:8px;font-size:12px;line-height:1.25;color:#6E6680}
+.wgoal b{display:block;color:var(--ink);font-weight:600}
+.wgoal i{width:30px;height:30px;border-radius:50%;background:#E2F5E8;display:grid;place-items:center;flex:none}
+.wgoal svg{width:16px;height:16px;fill:none;stroke:#166534;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.wtext{padding:28px 24px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;flex:1;max-width:520px;width:100%;margin:0 auto;box-sizing:border-box}
+.wtext h1{margin:0;font-size:28px;line-height:1.15;font-weight:600}
+.wtext h1 span{color:var(--violet)}
+.wtext>p{margin:12px 0 0;font-size:15px;line-height:1.5;color:#5A5370}
+.wact{margin-top:auto;padding-top:24px;display:flex;flex-direction:column;gap:12px}
+.bigbtn{min-height:56px;border-radius:16px;background:var(--violet);color:#fff;font-size:17px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+.bigbtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.bigbtn.busy,.social.busy{opacity:.6;pointer-events:none}
+.wlink{text-align:center;font-size:14px;color:#5A5370}
+.wlink button{color:var(--violet);font-weight:600;min-height:40px;padding:0 4px}
+
+/* ---------- Créer un compte / se connecter ---------- */
+.abar{display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top)) 16px 0;max-width:520px;margin:0 auto}
+.aback{width:44px;height:44px;border-radius:50%;background:var(--lavender-soft);display:grid;place-items:center;color:var(--violet)}
+.aback svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.alater{min-height:44px;padding:0 12px;font-size:15px;font-weight:500;color:#5A5370}
+.aform{padding:10px 24px 24px;display:flex;flex-direction:column;gap:14px;max-width:520px;margin:0 auto}
+.ahead{display:flex;align-items:center;gap:14px}
+.ahead>span{flex:none;width:64px;height:64px;border-radius:18px;overflow:hidden;border:1.5px solid var(--card-border)}
+.ahead img{width:100%;height:100%;object-fit:cover}
+.ahead h1{margin:0;font-size:22px;line-height:1.2;font-weight:600}
+.ahead p{margin:4px 0 0;font-size:13px;line-height:1.4;color:#5A5370}
+.social{min-height:52px;border-radius:14px;border:1.5px solid var(--card-border);background:#fff;display:flex;align-items:center;gap:12px;padding:0 16px;font-size:15px;font-weight:500;margin-top:4px}
+.social span{flex:1;text-align:center;margin-right:28px}
+.gmark{width:28px;height:28px;border-radius:50%;background:#F1F5F9;color:#334155;display:grid;place-items:center;font-style:normal;font-weight:600;font-size:14px}
+.aor{display:flex;align-items:center;gap:12px;font-size:13px;color:#6E6680}
+.aor span{flex:1;height:1px;background:var(--card-border)}
+.aform label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:#3A3550}
+.afield{display:flex;align-items:center;min-height:50px;border:1.5px solid var(--card-border);border-radius:14px;background:var(--list-bg);padding:0 6px 0 14px}
+.afield:focus-within{border-color:var(--violet)}
+.afield input{border:0;outline:0;background:transparent;font:inherit;font-size:16px;font-weight:400;flex:1;min-width:0;color:var(--ink);padding:12px 0}
+.eye{width:40px;height:40px;display:grid;place-items:center;color:#6E6680}
+.eye svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.forgot{align-self:flex-end;font-size:13px;color:var(--violet);font-weight:500;min-height:36px;margin-top:-8px}
+.aerr{margin:0;min-height:0;font-size:13px;color:#B42318}
+.aerr:empty{display:none}
+.alegal{margin:8px 0 0;font-size:11px;line-height:1.45;color:#6E6680;text-align:center}
+
+/* ---------- Bouton compte dans le hub ---------- */
+.hubright{display:flex;align-items:center;gap:8px}
+.achip{min-height:40px;padding:0 10px;font-size:14px;font-weight:600;color:var(--violet)}
+.amenu{position:relative}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--violet);color:#fff;font-weight:600;font-size:16px}
+.apop{position:absolute;right:0;top:48px;z-index:20;background:#fff;border:1.5px solid var(--card-border);border-radius:16px;box-shadow:0 12px 28px rgba(30,15,90,.15);padding:12px;min-width:220px;display:flex;flex-direction:column;gap:2px}
+.apop[hidden]{display:none}
+.apop small{font-size:11px;color:#6E6680}
+.apop b{font-size:14px;font-weight:600;word-break:break-all;margin-bottom:8px}
+.apop button{min-height:42px;border-radius:10px;background:var(--lavender-soft);color:#4A33B0;font-weight:600;font-size:14px;text-align:center}

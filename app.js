@@ -78,6 +78,120 @@ const mi = (name, cls="mi") => `<i class="${cls}" style="-webkit-mask-image:url(
 const sec = name => C.sections.find(s => s.name === name);
 function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),1800); }
 
+/* ---------- Comptes : accueil, création de compte, connexion ----------
+   Actif seulement sur le site publié (Netlify / domaine Evoala), où Firebase est autorisé. */
+const AUTH_ON = /netlify\.app$|evoala|^localhost$|^127\./.test(location.hostname);
+if(AUTH_ON){ const s = document.createElement("script"); s.type = "module"; s.src = "auth.js"; document.head.appendChild(s); }
+const onboarded = { get(){ try{ return localStorage.getItem("evoala-onb") === "1"; }catch(e){ return true; } },
+                    set(){ try{ localStorage.setItem("evoala-onb", "1"); }catch(e){} } };
+const ACC = {
+  es:{wTitle:"Aprende francés", wHi:"alcanzando objetivos", wEnd:"concretos", wSub:"Viajar, empezar desde cero o aprobar el DELF: cada guía te lleva a una meta clara, con audio y pronunciación.",
+      start:"Empezar", have:"¿Ya tienes una cuenta?", login:"Iniciar sesión", goal:"Objetivo cumplido", goalSub:"Pedir en un café",
+      upT:"Guarda tu progreso", upS:"Crea tu cuenta gratis y retoma tus guías en cualquier dispositivo.", inT:"Bienvenido de nuevo", inS:"Inicia sesión para retomar tus guías donde las dejaste.",
+      later:"Ahora no", back:"Volver", google:"Continuar con Google", or:"o con tu correo", email:"Correo electrónico", emailPh:"tu@correo.com", pass:"Contraseña", passPh:"8 caracteres como mínimo",
+      show:"Mostrar la contraseña", create:"Crear mi cuenta", enter:"Entrar", noAcc:"¿No tienes cuenta?", createLink:"Crear una cuenta", forgot:"¿Olvidaste tu contraseña?",
+      legal:"Al continuar, aceptas las Condiciones de uso y la Política de privacidad de Evoala.", wait:"Un momento…", welcome:"¡Listo! Tu progreso se guarda en tu cuenta.",
+      resetSent:"Te enviamos un correo para cambiar tu contraseña.", needEmail:"Escribe tu correo arriba y vuelve a tocar aquí.", account:"Mi cuenta", signout:"Cerrar sesión", signedOut:"Sesión cerrada.", signedAs:"Conectado como",
+      err:{"auth/invalid-email":"Ese correo no parece válido.","auth/missing-password":"Escribe una contraseña.","auth/weak-password":"La contraseña debe tener al menos 8 caracteres.","auth/email-already-in-use":"Ya existe una cuenta con ese correo. Toca « Iniciar sesión ».","auth/invalid-credential":"Correo o contraseña incorrectos.","auth/wrong-password":"Correo o contraseña incorrectos.","auth/user-not-found":"No encontramos una cuenta con ese correo.","auth/too-many-requests":"Demasiados intentos. Espera unos minutos.","auth/network-request-failed":"Sin conexión. Revisa tu internet.","auth/popup-closed-by-user":"Se cerró la ventana de Google.","auth/unauthorized-domain":"Este sitio todavía no está autorizado en Firebase.","auth/operation-not-allowed":"Este método de conexión todavía no está activado.","off":"Las cuentas no están disponibles por el momento.","x":"Algo salió mal. Inténtalo de nuevo."}},
+  en:{wTitle:"Learn French", wHi:"by reaching", wEnd:"concrete goals", wSub:"Travel, start from scratch or pass the DELF: each guide takes you to a clear goal, with audio and pronunciation.",
+      start:"Get started", have:"Already have an account?", login:"Log in", goal:"Goal reached", goalSub:"Ordering at a café",
+      upT:"Save your progress", upS:"Create your free account and pick up your guides on any device.", inT:"Welcome back", inS:"Log in to pick up your guides where you left off.",
+      later:"Not now", back:"Back", google:"Continue with Google", or:"or with your email", email:"Email", emailPh:"you@email.com", pass:"Password", passPh:"At least 8 characters",
+      show:"Show password", create:"Create my account", enter:"Log in", noAcc:"Don't have an account?", createLink:"Create one", forgot:"Forgot your password?",
+      legal:"By continuing, you accept Evoala's Terms of use and Privacy policy.", wait:"One moment…", welcome:"Done! Your progress is saved to your account.",
+      resetSent:"We sent you an email to reset your password.", needEmail:"Type your email above, then tap here again.", account:"My account", signout:"Log out", signedOut:"Logged out.", signedAs:"Signed in as",
+      err:{"auth/invalid-email":"That email doesn't look valid.","auth/missing-password":"Type a password.","auth/weak-password":"Your password needs at least 8 characters.","auth/email-already-in-use":"An account already exists with that email. Tap “Log in”.","auth/invalid-credential":"Wrong email or password.","auth/wrong-password":"Wrong email or password.","auth/user-not-found":"No account found with that email.","auth/too-many-requests":"Too many attempts. Please wait a few minutes.","auth/network-request-failed":"No connection. Check your internet.","auth/popup-closed-by-user":"The Google window was closed.","auth/unauthorized-domain":"This site isn't authorized in Firebase yet.","auth/operation-not-allowed":"This sign-in method isn't enabled yet.","off":"Accounts aren't available right now.","x":"Something went wrong. Please try again."}}
+};
+const a = k => ACC[LANG][k];
+const authErr = e => a("err")[e && e.code] || a("err")[e === "off" ? "off" : "x"];
+const langToggle = cls => `<div class="lang ${cls}" role="group" aria-label="${t("lang")}"><button class="${LANG==='es'?'on':''}" data-lang="es" aria-pressed="${LANG==='es'}">ES</button><button class="${LANG==='en'?'on':''}" data-lang="en" aria-pressed="${LANG==='en'}">EN</button></div>`;
+
+function welcome(){
+  const tile = (img, cls) => `<span class="wtile ${cls}"><img src="img/hub/${img}.webp" alt=""></span>`;
+  app.innerHTML = `
+  <section class="wtop">
+    <div class="wbar"><span class="wlogo"><img src="img/ui/logo.webp" alt="evoala"></span>${langToggle("wl")}</div>
+    <div class="wart" aria-hidden="true">${tile("a1","t1")}${tile("voyage","t2")}${tile("delfb1","t3")}${tile("delfa2","t4")}
+      <span class="wgoal"><i><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></i><span><b>${a("goal")}</b>${a("goalSub")}</span></span></div>
+  </section>
+  <section class="wtext">
+    <h1>${a("wTitle")}<br><span>${a("wHi")}</span> ${a("wEnd")}</h1>
+    <p>${a("wSub")}</p>
+    <div class="wact"><button class="bigbtn" data-start>${a("start")} <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      <div class="wlink">${a("have")} <button data-go="entrar">${a("login")}</button></div></div>
+  </section>`;
+}
+function account(mode){
+  const up = mode === "up";
+  app.innerHTML = `
+  <div class="abar"><button class="aback" data-aback aria-label="${a("back")}"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button class="alater" data-later>${a("later")}</button></div>
+  <form class="aform" novalidate>
+    <div class="ahead"><span><img src="img/hub/voyage.webp" alt=""></span><div><h1>${a(up ? "upT" : "inT")}</h1><p>${a(up ? "upS" : "inS")}</p></div></div>
+    <button type="button" class="social" data-google><i class="gmark" aria-hidden="true">G</i><span>${a("google")}</span></button>
+    <div class="aor"><span></span>${a("or")}<span></span></div>
+    <label>${a("email")}<span class="afield"><input type="email" name="email" autocomplete="email" placeholder="${a("emailPh")}" required></span></label>
+    <label>${a("pass")}<span class="afield"><input type="password" name="pass" autocomplete="${up ? "new-password" : "current-password"}" placeholder="${a("passPh")}" minlength="8" required>
+      <button type="button" class="eye" data-eye aria-label="${a("show")}"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>
+    ${up ? "" : `<button type="button" class="forgot" data-forgot>${a("forgot")}</button>`}
+    <p class="aerr" role="alert"></p>
+    <button type="submit" class="bigbtn">${a(up ? "create" : "enter")}</button>
+    <div class="wlink">${up ? `${a("have")} <button type="button" data-go="entrar">${a("login")}</button>` : `${a("noAcc")} <button type="button" data-go="cuenta">${a("createLink")}</button>`}</div>
+    <p class="alegal">${a("legal")}</p>
+  </form>`;
+  const form = app.querySelector(".aform"), err = app.querySelector(".aerr"), btn = form.querySelector('[type="submit"]');
+  const busy = (on, b = btn) => { b.disabled = on; b.classList.toggle("busy", on); };
+  const done = () => { onboarded.set(); toast(a("welcome")); location.hash = ""; route(); };
+  const fail = e => { err.textContent = authErr(e); };
+  const authOk = () => window.EvoAuth && !window.EvoAuth.disabled;
+  form.onsubmit = async ev => {
+    ev.preventDefault(); err.textContent = "";
+    if(!authOk()) return fail("off");
+    const email = form.email.value.trim(), pass = form.pass.value;
+    if(up && pass.length < 8) return fail({ code: "auth/weak-password" });
+    busy(true);
+    try{ await (up ? window.EvoAuth.signUp(email, pass) : window.EvoAuth.signIn(email, pass)); done(); }
+    catch(e){ fail(e); } finally{ busy(false); }
+  };
+  form.querySelector("[data-google]").onclick = async ev => {
+    err.textContent = ""; if(!authOk()) return fail("off");
+    const b = ev.currentTarget; busy(true, b);
+    try{ const r = await window.EvoAuth.google(); if(r) done(); } catch(e){ fail(e); } finally{ busy(false, b); }
+  };
+  form.querySelector("[data-eye]").onclick = () => { const i = form.pass; i.type = i.type === "password" ? "text" : "password"; };
+  const fg = form.querySelector("[data-forgot]");
+  if(fg) fg.onclick = async () => {
+    err.textContent = ""; if(!authOk()) return fail("off");
+    const email = form.email.value.trim(); if(!email) return (err.textContent = a("needEmail"));
+    try{ await window.EvoAuth.reset(email); toast(a("resetSent")); } catch(e){ fail(e); }
+  };
+}
+// bouton « compte » discret dans le hub
+function accountChip(){
+  if(!AUTH_ON) return "";
+  const u = window.EvoAuth && window.EvoAuth.user;
+  if(!u) return `<button class="achip" data-go="entrar">${a("login")}</button>`;
+  const ini = esc(((u.displayName || u.email || "?").trim()[0] || "?").toUpperCase());
+  return `<div class="amenu"><button class="avatar" data-amenu aria-label="${a("account")}" aria-expanded="false">${ini}</button>
+    <div class="apop" hidden><small>${a("signedAs")}</small><b>${esc(u.email || u.displayName || "")}</b><button data-signout>${a("signout")}</button></div></div>`;
+}
+// quand on se connecte : on récupère la langue et la dernière page du compte
+let lastUid = null;
+function onAuth(u){
+  const uid = u ? u.uid : null;
+  if(uid && uid !== lastUid){
+    window.EvoAuth.load().then(d => {
+      if(d && d.last){ try{ localStorage.setItem("evoala-last", d.last); }catch(e){} }
+      if(d && d.lang && d.lang !== LANG) setLang(d.lang, true);
+      else if(!location.hash) route();
+      if(!d) window.EvoAuth.save({ lang: LANG, last: store.get() || null });
+    });
+  }
+  lastUid = uid;
+  const h = location.hash.slice(1);
+  if(!h || h === "cuenta" || h === "entrar") route();
+}
+
 /* ---------- Hub : page d'accueil avec toutes les guías ---------- */
 const HUB = {
   es:{t1:"Una guía para",t2:"cada objetivo",sub:"Cada guía te acompaña hacia una meta concreta. Empieza por la que más te sirve hoy.",
@@ -105,7 +219,7 @@ function hub(){
       <div class="gbody"><b>${esc(g[0])} <small>· ${esc(g[1])}</small></b><p><strong>${H.mission}</strong> ${esc(g[2])}</p><em>${H.soon}</em></div></div>`; };
   app.innerHTML = `
   <header class="hubtop"><img src="img/ui/logo.webp" alt="evoala">
-    <div class="lang hl" role="group" aria-label="${t("lang")}"><button class="${LANG==='es'?'on':''}" data-lang="es" aria-pressed="${LANG==='es'}">ES</button><button class="${LANG==='en'?'on':''}" data-lang="en" aria-pressed="${LANG==='en'}">EN</button></div></header>
+    <div class="hubright">${accountChip()}${langToggle("hl")}</div></header>
   <main class="hubmain">
     <div class="hero"><div><h1>${H.t1}<br><span>${H.t2}</span></h1><p>${H.sub}<span class="wideonly">${H.subWide}</span></p></div>
       <section class="feat">
@@ -138,7 +252,7 @@ function scard(e, i){
 }
 // dernière page de phrases ouverte (gardée sur le téléphone)
 const store = { get(){ try{ return localStorage.getItem("evoala-last"); }catch(e){ return null; } },
-                set(v){ try{ localStorage.setItem("evoala-last", v); }catch(e){} } };
+                set(v){ try{ localStorage.setItem("evoala-last", v); }catch(e){} window.EvoAuth?.save({ last: v }); } };
 function lastInfo(){
   const h = store.get(), m = h && h.match(/^s(\d+)t(\d+)$/); if(!m) return null;
   const si = +m[1], s = si === 8 ? "Bonus" : GRID[si], tab = sec(s)?.tabs[+m[2]]; if(!tab) return null;
@@ -302,6 +416,12 @@ app.addEventListener("click", e => {
   if(lb){ setLang(lb.dataset.lang); return; }
   const go = e.target.closest("[data-go]");
   if(go){ if(go.dataset.go || go.classList.contains("home") || go.hasAttribute("data-home")){ location.hash = go.dataset.go; if(!go.dataset.go) route(); } return; }
+  if(e.target.closest("[data-start]")){ onboarded.set(); location.hash = "cuenta"; return; }
+  if(e.target.closest("[data-later]")){ onboarded.set(); location.hash = ""; route(); return; }
+  if(e.target.closest("[data-aback]")){ if(history.length > 1) history.back(); else { location.hash = ""; } return; }
+  const am = e.target.closest("[data-amenu]");
+  if(am){ const pop = am.parentElement.querySelector(".apop"); pop.hidden = !pop.hidden; am.setAttribute("aria-expanded", String(!pop.hidden)); return; }
+  if(e.target.closest("[data-signout]")){ window.EvoAuth.signOut().then(() => { toast(a("signedOut")); route(); }); return; }
   if(e.target.closest("[data-notify]")){ toast(HUB[LANG].notifyToast); return; }
   if(e.target.closest("[data-hint]")){ try{ localStorage.setItem("evoala-hint","1"); }catch(_){} app.querySelector(".hint")?.remove(); return; }
   if(e.target.closest("[data-up]")){ scrollTo({top:0,behavior:"smooth"}); return; }
@@ -350,26 +470,31 @@ function route(){
   else if((m = h.match(/^p(\d+)$/))){ paris(+m[1]); where = "paris"; }
   else if(h === "creditos"){ credits(); where = "paris"; }
   else if(h === "guia") home();
+  else if(AUTH_ON && (h === "cuenta" || h === "entrar")){ if(window.EvoAuth && window.EvoAuth.user){ location.hash = ""; return; } account(h === "cuenta" ? "up" : "in"); where = "hub"; }
+  else if(AUTH_ON && !onboarded.get() && !(window.EvoAuth && window.EvoAuth.user)){ welcome(); where = "onb"; }
   else { hub(); where = "hub"; }
   app.classList.toggle("wide", where === "home" || where === "hub");
-  app.classList.toggle("hubmode", where === "hub");
+  app.classList.toggle("hubmode", where === "hub" || where === "onb");
+  app.classList.toggle("onbmode", where === "onb");
   let nav = document.getElementById("navbar");
   if(!nav){ nav = document.createElement("div"); nav.id = "navbar"; document.body.appendChild(nav);
     nav.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if(!b) return; location.hash = b.dataset.go; if(!b.dataset.go) route(); }); }
-  nav.innerHTML = where === "hub" ? "" : navbar(where);
+  nav.innerHTML = where === "hub" || where === "onb" ? "" : navbar(where);
   scrollTo(0,0); preload();
 }
 addEventListener("hashchange", route);
 const contents = {};
 const loadContent = l => contents[l] ??= fetch(l === "en" ? "content-en.json" : "content.json").then(r => r.json());
-function setLang(l){
+function setLang(l, fromAccount){
   if(l === LANG) return;
   LANG = l; try{ localStorage.setItem("evoala-lang", l); }catch(e){}
+  if(!fromAccount) window.EvoAuth?.save({ lang: l });
   document.documentElement.lang = l;
   loadContent(l).then(c => { C = c; const y = scrollY; route(); scrollTo(0, y); })
     .catch(() => toast(t("noLoad")));
 }
 document.documentElement.lang = LANG;
 Promise.all([loadContent(LANG), fetch("ui.json").then(r=>r.json())])
-  .then(([c,u]) => { C = c; UI = u; route(); })
+  .then(([c,u]) => { C = c; UI = u; route();
+    if(AUTH_ON){ const hook = () => window.EvoAuth ? window.EvoAuth.onChange(onAuth) : setTimeout(hook, 150); hook(); } })
   .catch(() => app.innerHTML = `<div class="empty">${t("noLoad")}</div>`);
