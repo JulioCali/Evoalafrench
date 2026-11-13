@@ -80,7 +80,7 @@ function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.
 
 /* ---------- Comptes : accueil, création de compte, connexion ----------
    Actif seulement sur le site publié (Netlify / domaine Evoala), où Firebase est autorisé. */
-const AUTH_ON = /netlify\.app$|evoala|^localhost$|^127\./.test(location.hostname);
+const AUTH_ON = /netlify\.app$|pages\.dev$|web\.app$|evoala|^localhost$|^127\./.test(location.hostname);
 if(AUTH_ON){ const s = document.createElement("script"); s.type = "module"; s.src = "auth.js"; document.head.appendChild(s); }
 const onboarded = { get(){ try{ return localStorage.getItem("evoala-onb") === "1"; }catch(e){ return true; } },
                     set(){ try{ localStorage.setItem("evoala-onb", "1"); }catch(e){} } };
