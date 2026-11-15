@@ -356,3 +356,24 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .wtile.t5{left:226px;top:294px;width:112px;height:112px;transform:rotate(6deg);z-index:3;display:grid;place-items:center;padding:6px;box-sizing:border-box}
 .wtile.t5 img{height:auto;object-fit:contain}
 .fhead small{display:flex;align-items:center;gap:6px}
+
+/* ---------- Pages de phrases : menu compact (catégories défilantes, fixées en haut) ---------- */
+.top.flow{position:static}
+.psearch{margin:2px 12px 0;border-radius:999px;height:46px;background:#F3F1FA;border-color:transparent}
+.psearch:focus-within{border-color:var(--violet)}
+.cathint{font-size:13px;color:#6E6680;margin:12px 16px -4px}
+.cats{position:sticky;top:0;z-index:6;background:#fff;display:flex;gap:8px;overflow-x:auto;padding:12px 12px 10px;scrollbar-width:none;box-shadow:0 8px 12px -12px rgba(60,40,140,.45)}
+.cats::-webkit-scrollbar{display:none}
+.cat{flex:none;height:42px;display:flex;align-items:center;gap:8px;padding:0 16px 0 12px;border-radius:999px;border:1.5px solid var(--card-border);background:#fff;color:var(--violet);font-size:14px;font-weight:500;white-space:nowrap}
+.cat span{color:#1A1A1A}
+.cat .mi{width:20px;height:20px;flex:none}
+.cat.on{background:var(--violet);border-color:var(--violet);color:#fff}
+.cat.on span{color:#fff}
+.ptabs{display:flex;gap:22px;padding:0 16px;border-bottom:1px solid #EFEDF6;overflow-x:auto;scrollbar-width:none}
+.ptabs::-webkit-scrollbar{display:none}
+.ptabs .tab{flex:none;padding:0 2px;height:46px;border-radius:0;font-size:15px;font-weight:500;color:#6E6680;border-bottom:3px solid transparent;overflow:visible}
+.ptabs .tab.on{background:none;color:#5940BF;font-weight:600;border-bottom-color:var(--violet)}
+.psubs{display:flex;gap:8px;margin:12px 12px 0;overflow-x:auto;scrollbar-width:none}
+.psubs button{flex:none;min-height:36px;padding:0 14px;border-radius:999px;background:#F3F1FA;color:#5940BF;font-size:13px;font-weight:500;border:1.5px solid transparent}
+.psubs button.on{background:#EEEBFD;border-color:var(--violet);font-weight:600}
+.crumb{display:block;font-size:11px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:#5940BF;margin-bottom:2px;text-align:left}

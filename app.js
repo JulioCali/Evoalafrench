@@ -48,7 +48,7 @@ const TXT = {
       pHead:"¿Qué ver en Paris ?",pSub:"Descubre aquí tus próximas visitas en Paris",city:"Entender la ciudad",mapT:"Mapa de los distritos",mapAlt:"Mapa de los distritos de París",
       move:"Moverse",safety:"Seguridad",hours:"Horarios y cierres",credits:"Créditos de las fotos",src:"Fuente",lic:"Licencia",
       paid:"De pago",free:"Gratis",metro:"Metro cercano",go:"Cómo llegar",crnote:"Toca una foto para ver su autor y su licencia",
-      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",next:"Página siguiente",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
+      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",next:"Página siguiente",pick:"Elige la categoría que quieres estudiar",found:"frases encontradas",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
   en:{guide:"FRENCH",guide2:"Survival guide",from:"EN",start:"Start",dep:"DEPARTURE",now:"Now",dest:"DESTINATION",me:"The French me",first:"FIRST CLASS",
       search:"Search a phrase in English or French",searchL:"Search a phrase",resume:"Pick up where you left off",toc:"Table of contents",tap:"Tap a topic",
       paris:"Paris Guide",parisSub:"What to see in Paris? Monuments, museums, walks…",bonusT:"Bonus",bonusS:"Extra content",extra:"Extra content",
@@ -56,7 +56,7 @@ const TXT = {
       pHead:"What to see in Paris?",pSub:"Discover your next visits in Paris",city:"Understanding the city",mapT:"Map of the districts",mapAlt:"Map of the Paris districts",
       move:"Getting around",safety:"Safety",hours:"Opening hours",credits:"Photo credits",src:"Source",lic:"License",
       paid:"Paid",free:"Free",metro:"Nearest metro",go:"Directions",crnote:"Tap a photo to see its author and license",
-      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",next:"Next page",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
+      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",next:"Next page",pick:"Choose the category you want to study",found:"phrases found",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
 };
 const t = k => TXT[LANG][k];
 const homeTitle = (e, i) => LANG === "en" ? (i < 0 ? [t("bonusT"), t("bonusS")] : HOME_EN[i]) : [e[0], e[1]];
@@ -256,7 +256,7 @@ function scard(e, i){
 const store = { get(){ try{ return localStorage.getItem("evoala-last"); }catch(e){ return null; } },
                 set(v){ try{ localStorage.setItem("evoala-last", v); }catch(e){} window.EvoAuth?.save({ last: v }); } };
 function lastInfo(){
-  const h = store.get(), m = h && h.match(/^s(\d+)t(\d+)$/); if(!m) return null;
+  const h = store.get(), m = h && h.match(/^s(\d+)t(\d+)(?:p\d+)?$/); if(!m) return null;
   const si = +m[1], s = si === 8 ? "Bonus" : GRID[si], tab = sec(s)?.tabs[+m[2]]; if(!tab) return null;
   const entry = [...HOME, BONUS].find(e => e[2] === s); if(!entry) return null;
   const row = entry[3].find(r => r[1] === tab.name);
@@ -302,12 +302,12 @@ function navbar(where){
 }
 
 /* ---------- Pages de phrases ---------- */
-function rowHTML(p){
+function rowHTML(p, crumb){
   const bulb = `<i class="bulb">${ICON.bulb}</i>`, al = ` role="button" aria-label="${t("seePr")}"`;
   const ic = p.num ? `<div class="ic num${p.num.length>2?' long':''}"${al}>${esc(p.num)}${bulb}</div>` : p.icon ? `<div class="ic" style="background-image:url('${p.icon[0]}');--i:${p.icon[1]}"${al}>${bulb}</div>` : `<div class="ic"${al}>${bulb}</div>`;
   const au = p.audio ? `${p.audio[0]}#${p.audio[1]}` : "";
   return `<div class="row${p.who==='staff'?' staff':''}" data-audio="${esc(au)}">
-    ${ic}<div class="ph"><div class="fr">${esc(p.fr)}</div>
+    ${ic}<div class="ph">${crumb ? `<button class="crumb" data-go="${crumb[1]}">${esc(crumb[0])}</button>` : ""}<div class="fr">${esc(p.fr)}</div>
     <div class="es" data-es="${esc(p.es)}" data-pr="${esc(p.pr)}">${esc(p.es)}</div></div>
     <div class="spk">${ICON.spk}</div></div>`;
 }
@@ -324,23 +324,52 @@ function hintHTML(view){
   return `<div class="hint"><div class="ic" style="background-image:url('${p.icon[0]}');--i:${p.icon[1]}"><i class="bulb">${ICON.bulb}</i></div>
     <p><b>${t("hintB")}</b>${t("hint")}</p><button data-hint>${t("ok")}</button></div>`;
 }
+const secOf = si => si === 8 ? sec("Bonus") : sec(GRID[si]);
+const hasPh = v => v.groups.some(g => g.phrases.length);
+const pageHash = (si, ti, sub) => `s${si}t${ti}${sub ? "p" + sub : ""}`;
+// page suivante dans l'ordre du guide : sous-page, puis onglet, puis catégorie (on saute les pages vides)
+function nextPage(si, ti, sub){
+  let s = si, tb = ti, u = sub + 1;
+  while(s <= 8){
+    const tab = secOf(s).tabs[tb];
+    if(!tab){ s++; tb = 0; u = 0; continue; }
+    const vs = tab.subs || [tab];
+    for(; u < vs.length; u++) if(hasPh(vs[u])){
+      const tname = tab.label || tab.name;
+      const name = s !== si ? `${s === 8 ? t("nBonus") : tileLabel(GRID[s])} · ${tname}` : tb !== ti ? tname : vs[u].name;
+      return { hash: pageHash(s, tb, u), name };
+    }
+    tb++; u = 0;
+  }
+  return null;
+}
+const catPicked = () => { try{ return localStorage.getItem("evoala-cat") === "1"; }catch(e){ return true; } };
 function phrases(si, ti, sub=0){
-  const s = si === 8 ? sec("Bonus") : sec(GRID[si]);
+  const s = secOf(si);
   const tab = s.tabs[ti]; if(!tab) return home();
+  if(tab.subs && !tab.subs[sub]) sub = 0;
   const view = tab.subs ? tab.subs[sub] : tab;
-  app.innerHTML = `${topbar(si===8?"bonus":"guide")}
+  const nx = nextPage(si, ti, sub);
+  app.innerHTML = `${topbar(si===8?"bonus":"guide").replace('class="top"','class="top flow"')}
+    <label class="search psearch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" placeholder="${t("search")}" autocomplete="off" aria-label="${t("searchL")}"></label>
     ${si===8 ? `<div class="phead"><b>${t("extra")}</b></div>` :
-      `<div class="tiles">${GRID.map((g,i)=>`<button class="tile${i===si?' on':''}" data-go="s${i}t0">${mi("t-"+g)}${tileLabel(g)}</button>`).join("")}</div>`}
-    <div class="tabs">${s.tabs.map((tb,i)=>`<button class="tab${i===ti?' on':''}" data-go="s${si}t${i}">${esc(tb.label || tb.name)}</button>`).join("")}</div>
-    ${tab.subs?`<div class="subs">${tab.subs.map((x,i)=>`<button class="${i===sub?'on':''}" data-sub="${i}">${esc(x.name)}</button>`).join("")}</div>`:""}
+      `${catPicked() ? "" : `<p class="cathint">${t("pick")}</p>`}
+      <div class="cats">${GRID.map((g,i)=>`<button class="cat${i===si?' on':''}" data-go="s${i}t0" data-cat>${mi("t-"+g)}<span>${tileLabel(g)}</span></button>`).join("")}</div>`}
+    <div id="results"></div>
+    <div id="menu">
+    <div class="ptabs">${s.tabs.map((tb,i)=>`<button class="tab${i===ti?' on':''}" data-go="s${si}t${i}">${esc(tb.label || tb.name)}</button>`).join("")}</div>
+    ${tab.subs?`<div class="psubs">${tab.subs.map((x,i)=>`<button class="${i===sub?'on':''}" data-go="${pageHash(si,ti,i)}">${esc(x.name)}</button>`).join("")}</div>`:""}
     ${view.intro?`<p class="intro">${esc(view.intro)}</p>`:""}
     ${hintHTML(view)}
-    ${!view.groups.some(g=>g.phrases.length) ? `<div class="empty">${t("soon")}</div>` : ""}
-    ${view.groups.filter(g=>g.phrases.length).map(g=>`<div class="card${g.cols===2?' cols2':''}">${g.label?`<div class="label">${esc(g.label)}</div>`:""}${g.phrases.map(rowHTML).join("")}</div>`).join("")}
+    ${!hasPh(view) ? `<div class="empty">${t("soon")}</div>` : ""}
+    ${view.groups.filter(g=>g.phrases.length).map(g=>`<div class="card${g.cols===2?' cols2':''}">${g.label?`<div class="label">${esc(g.label)}</div>`:""}${g.phrases.map(p => rowHTML(p)).join("")}</div>`).join("")}
     ${(view.tips||[]).map(tipHTML).join("")}
-    ${tab.subs && sub < tab.subs.length - 1 ? `<button class="nextsub" data-sub="${sub+1}">${t("next")}: <b>${esc(tab.subs[sub+1].name)}</b> →</button>` : ""}
-    <button class="up" data-up>${t("up")}</button>`;
-  app.querySelectorAll("[data-sub]").forEach(b => b.onclick = () => { phrases(si, ti, +b.dataset.sub); scrollTo(0,0); preload(); });
+    ${nx ? `<button class="nextsub" data-go="${nx.hash}">${t("next")}: <b>${esc(nx.name)}</b> →</button>` : ""}
+    <button class="up" data-up>${t("up")}</button>
+    </div>`;
+  document.getElementById("q").addEventListener("input", e => search(e.target.value));
+  const cats = app.querySelector(".cats"), on = cats?.querySelector(".on");
+  if(on){ const a = cats.getBoundingClientRect(), b = on.getBoundingClientRect(); cats.scrollLeft += (b.left - a.left) - (a.width - b.width) / 2; }
 }
 
 /* ---------- Guía de Paris ---------- */
@@ -406,10 +435,13 @@ function search(q){
   if(!q){ res.innerHTML = ""; menu.style.display = ""; return; }
   menu.style.display = "none";
   const hits = [];
-  C.sections.forEach(s => s.tabs.flatMap(t => t.subs || [t]).forEach(t => t.groups.forEach(g => g.phrases.forEach(p => {
-    if(norm(p.fr).includes(q) || norm(p.es).includes(q)) hits.push(p);
-  }))));
-  res.innerHTML = hits.length ? `<div class="card">${hits.slice(0,60).map(rowHTML).join("")}</div>` : `<div class="empty">${t("none")}</div>`;
+  [...GRID, "Bonus"].forEach((name, si) => { const s = sec(name); if(!s) return;
+    const cat = si === 8 ? t("nBonus") : tileLabel(name);
+    s.tabs.forEach((tb, ti) => (tb.subs || [tb]).forEach((v, u) => v.groups.forEach(g => g.phrases.forEach(p => {
+      if(norm(p.fr).includes(q) || norm(p.es).includes(q)) hits.push([p, [`${cat} › ${tb.label || tb.name}`, pageHash(si, ti, tb.subs ? u : 0)]]);
+    }))));
+  });
+  res.innerHTML = hits.length ? `<p class="intro">${hits.length} ${t("found")}</p><div class="card">${hits.slice(0,60).map(h => rowHTML(h[0], h[1])).join("")}</div>` : `<div class="empty">${t("none")}</div>`;
 }
 
 /* ---------- Clics ---------- */
@@ -417,6 +449,7 @@ app.addEventListener("click", e => {
   const lb = e.target.closest("[data-lang]");
   if(lb){ setLang(lb.dataset.lang); return; }
   const go = e.target.closest("[data-go]");
+  if(go?.hasAttribute("data-cat")){ try{ localStorage.setItem("evoala-cat","1"); }catch(_){} }
   if(go){ if(go.dataset.go || go.classList.contains("home") || go.hasAttribute("data-home")){ location.hash = go.dataset.go; if(!go.dataset.go) route(); } return; }
   if(e.target.closest("[data-start]")){ onboarded.set(); location.hash = "cuenta"; return; }
   if(e.target.closest("[data-later]")){ onboarded.set(); location.hash = ""; route(); return; }
@@ -468,7 +501,7 @@ function route(){
   const h = location.hash.slice(1);
   let m;
   let where = "home";
-  if((m = h.match(/^s(\d+)t(\d+)$/))){ phrases(+m[1], +m[2]); where = +m[1] === 8 ? "bonus" : "guide"; store.set(h); }
+  if((m = h.match(/^s(\d+)t(\d+)(?:p(\d+))?$/))){ phrases(+m[1], +m[2], +(m[3] || 0)); where = +m[1] === 8 ? "bonus" : "guide"; store.set(h); }
   else if((m = h.match(/^p(\d+)$/))){ paris(+m[1]); where = "paris"; }
   else if(h === "creditos"){ credits(); where = "paris"; }
   else if(h === "guia") home();
