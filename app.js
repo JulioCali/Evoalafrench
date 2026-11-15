@@ -48,7 +48,7 @@ const TXT = {
       pHead:"¿Qué ver en Paris ?",pSub:"Descubre aquí tus próximas visitas en Paris",city:"Entender la ciudad",mapT:"Mapa de los distritos",mapAlt:"Mapa de los distritos de París",
       move:"Moverse",safety:"Seguridad",hours:"Horarios y cierres",credits:"Créditos de las fotos",src:"Fuente",lic:"Licencia",
       paid:"De pago",free:"Gratis",metro:"Metro cercano",go:"Cómo llegar",crnote:"Toca una foto para ver su autor y su licencia",
-      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",next:"Página siguiente",pick:"Elige la categoría que quieres estudiar",found:"frases encontradas",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
+      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",next:"Página siguiente",pick:"Elige la categoría que quieres estudiar",swipe:"Desliza",more:"Más categorías",found:"frases encontradas",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
   en:{guide:"FRENCH",guide2:"Survival guide",from:"EN",start:"Start",dep:"DEPARTURE",now:"Now",dest:"DESTINATION",me:"The French me",first:"FIRST CLASS",
       search:"Search a phrase in English or French",searchL:"Search a phrase",resume:"Pick up where you left off",toc:"Table of contents",tap:"Tap a topic",
       paris:"Paris Guide",parisSub:"What to see in Paris? Monuments, museums, walks…",bonusT:"Bonus",bonusS:"Extra content",extra:"Extra content",
@@ -56,7 +56,7 @@ const TXT = {
       pHead:"What to see in Paris?",pSub:"Discover your next visits in Paris",city:"Understanding the city",mapT:"Map of the districts",mapAlt:"Map of the Paris districts",
       move:"Getting around",safety:"Safety",hours:"Opening hours",credits:"Photo credits",src:"Source",lic:"License",
       paid:"Paid",free:"Free",metro:"Nearest metro",go:"Directions",crnote:"Tap a photo to see its author and license",
-      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",next:"Next page",pick:"Choose the category you want to study",found:"phrases found",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
+      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",next:"Next page",pick:"Choose the category you want to study",swipe:"Swipe",more:"More categories",found:"phrases found",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
 };
 const t = k => TXT[LANG][k];
 const homeTitle = (e, i) => LANG === "en" ? (i < 0 ? [t("bonusT"), t("bonusS")] : HOME_EN[i]) : [e[0], e[1]];
@@ -343,6 +343,20 @@ function nextPage(si, ti, sub){
   }
   return null;
 }
+// rangée de catégories qui défile (Guía et Paris) : fixée en haut, flèches ‹ › quand il y en a d'autres hors de l'écran
+function catsBar(list, on, hash, isGuide){
+  return `<div class="catwrap atstart"><div class="cats">${list.map((g,i)=>`<button class="cat${i===on?' on':''}" data-go="${hash(i)}"${isGuide?' data-cat':''}>${mi("t-"+g)}<span>${tileLabel(g)}</span></button>`).join("")}</div>
+    <button class="more l" data-scroll="-1" aria-label="${t("more")}"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button class="more r" data-scroll="1" aria-label="${t("more")}"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button></div>`;
+}
+function initCats(){
+  const wrap = app.querySelector(".catwrap"); if(!wrap) return;
+  const cats = wrap.querySelector(".cats"), on = cats.querySelector(".on");
+  if(on){ const a = cats.getBoundingClientRect(), b = on.getBoundingClientRect(); cats.scrollLeft += (b.left - a.left) - (a.width - b.width) / 2; }
+  const upd = () => { wrap.classList.toggle("atstart", cats.scrollLeft < 6); wrap.classList.toggle("atend", cats.scrollLeft + cats.clientWidth > cats.scrollWidth - 6); };
+  cats.addEventListener("scroll", upd, {passive:true}); upd();
+  wrap.querySelectorAll("[data-scroll]").forEach(b => b.onclick = () => cats.scrollBy({left: b.dataset.scroll * cats.clientWidth * 0.7, behavior:"smooth"}));
+}
 const catPicked = () => { try{ return localStorage.getItem("evoala-cat") === "1"; }catch(e){ return true; } };
 function phrases(si, ti, sub=0){
   const s = secOf(si);
@@ -353,8 +367,8 @@ function phrases(si, ti, sub=0){
   app.innerHTML = `${topbar(si===8?"bonus":"guide").replace('class="top"','class="top flow"')}
     <label class="search psearch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" placeholder="${t("search")}" autocomplete="off" aria-label="${t("searchL")}"></label>
     ${si===8 ? `<div class="phead"><b>${t("extra")}</b></div>` :
-      `${catPicked() ? "" : `<p class="cathint">${t("pick")}</p>`}
-      <div class="cats">${GRID.map((g,i)=>`<button class="cat${i===si?' on':''}" data-go="s${i}t0" data-cat>${mi("t-"+g)}<span>${tileLabel(g)}</span></button>`).join("")}</div>`}
+      `${catPicked() ? "" : `<p class="cathint"><span>${t("pick")}</span><em>${t("swipe")} <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></em></p>`}
+      ${catsBar(GRID, si, i => `s${i}t0`, true)}`}
     <div id="results"></div>
     <div id="menu">
     <div class="ptabs">${s.tabs.map((tb,i)=>`<button class="tab${i===ti?' on':''}" data-go="s${si}t${i}">${esc(tb.label || tb.name)}</button>`).join("")}</div>
@@ -368,15 +382,13 @@ function phrases(si, ti, sub=0){
     <button class="up" data-up>${t("up")}</button>
     </div>`;
   document.getElementById("q").addEventListener("input", e => search(e.target.value));
-  const cats = app.querySelector(".cats"), on = cats?.querySelector(".on");
-  if(on){ const a = cats.getBoundingClientRect(), b = on.getBoundingClientRect(); cats.scrollLeft += (b.left - a.left) - (a.width - b.width) / 2; }
 }
 
 /* ---------- Guía de Paris ---------- */
 function parisHead(ci){
-  return `${topbar("paris")}
-    <div class="phead"><b>${t("pHead")}</b><small>${t("pSub")}</small></div>
-    <div class="tiles">${PARIS_CATS.map((c,i)=>`<button class="tile${i===ci?' on':''}" data-go="p${i}">${mi("t-"+c)}${tileLabel(c)}</button>`).join("")}</div>`;
+  return `${topbar("paris").replace('class="top"','class="top flow"')}
+    <div class="ptitle"><b>${t("pHead")}</b><small>${t("pSub")}</small></div>
+    ${catsBar(PARIS_CATS, ci, i => `p${i}`)}`;
 }
 function sobre(){
   const S = C.sobre;
@@ -424,7 +436,7 @@ function paris(ci, page=0){
       : `<div class="empty">${t("soon")}</div>`}
     <p class="crnote">${t("crnote")} · <button data-go="creditos">${t("credits")}</button></p>
     <button class="up" data-up>${t("up")}</button>`;
-  app.querySelectorAll("[data-pp]").forEach(b => b.onclick = () => { paris(ci, +b.dataset.pp); scrollTo(0,0); });
+  app.querySelectorAll("[data-pp]").forEach(b => b.onclick = () => { paris(ci, +b.dataset.pp); initCats(); scrollTo(0,0); });
 }
 
 /* ---------- Recherche ---------- */
@@ -515,7 +527,7 @@ function route(){
   if(!nav){ nav = document.createElement("div"); nav.id = "navbar"; document.body.appendChild(nav);
     nav.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if(!b) return; location.hash = b.dataset.go; if(!b.dataset.go) route(); }); }
   nav.innerHTML = where === "hub" || where === "onb" ? "" : navbar(where);
-  scrollTo(0,0); preload();
+  initCats(); scrollTo(0,0); preload();
 }
 addEventListener("hashchange", route);
 const contents = {};
