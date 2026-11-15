@@ -48,7 +48,7 @@ const TXT = {
       pHead:"¿Qué ver en Paris ?",pSub:"Descubre aquí tus próximas visitas en Paris",city:"Entender la ciudad",mapT:"Mapa de los distritos",mapAlt:"Mapa de los distritos de París",
       move:"Moverse",safety:"Seguridad",hours:"Horarios y cierres",credits:"Créditos de las fotos",src:"Fuente",lic:"Licencia",
       paid:"De pago",free:"Gratis",metro:"Metro cercano",go:"Cómo llegar",crnote:"Toca una foto para ver su autor y su licencia",
-      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",next:"Página siguiente",pick:"Elige la categoría que quieres estudiar",swipe:"Desliza",more:"Más categorías",found:"frases encontradas",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
+      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",next:"Página siguiente",pick:"Elige la categoría que quieres estudiar",gTitle:"Francés para viajar",gKicker:"Guía de supervivencia",prog:"Tu progreso",pSeen:"Páginas visitadas",pHeard:"Frases escuchadas",cont:"Continúa donde lo dejaste",startAt:"Empieza por aquí",choose:"Elige una categoría",nPh:"frases",swipe:"Desliza",more:"Más categorías",found:"frases encontradas",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
   en:{guide:"FRENCH",guide2:"Survival guide",from:"EN",start:"Start",dep:"DEPARTURE",now:"Now",dest:"DESTINATION",me:"The French me",first:"FIRST CLASS",
       search:"Search a phrase in English or French",searchL:"Search a phrase",resume:"Pick up where you left off",toc:"Table of contents",tap:"Tap a topic",
       paris:"Paris Guide",parisSub:"What to see in Paris? Monuments, museums, walks…",bonusT:"Bonus",bonusS:"Extra content",extra:"Extra content",
@@ -56,7 +56,7 @@ const TXT = {
       pHead:"What to see in Paris?",pSub:"Discover your next visits in Paris",city:"Understanding the city",mapT:"Map of the districts",mapAlt:"Map of the Paris districts",
       move:"Getting around",safety:"Safety",hours:"Opening hours",credits:"Photo credits",src:"Source",lic:"License",
       paid:"Paid",free:"Free",metro:"Nearest metro",go:"Directions",crnote:"Tap a photo to see its author and license",
-      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",next:"Next page",pick:"Choose the category you want to study",swipe:"Swipe",more:"More categories",found:"phrases found",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
+      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",next:"Next page",pick:"Choose the category you want to study",gTitle:"French for travelers",gKicker:"Survival guide",prog:"Your progress",pSeen:"Pages visited",pHeard:"Phrases listened to",cont:"Pick up where you left off",startAt:"Start here",choose:"Choose a category",nPh:"phrases",swipe:"Swipe",more:"More categories",found:"phrases found",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
 };
 const t = k => TXT[LANG][k];
 const homeTitle = (e, i) => LANG === "en" ? (i < 0 ? [t("bonusT"), t("bonusS")] : HOME_EN[i]) : [e[0], e[1]];
@@ -190,6 +190,8 @@ function onAuth(u){
   if(uid && uid !== lastUid){
     window.EvoAuth.load().then(d => {
       if(d && d.last){ try{ localStorage.setItem("evoala-last", d.last); }catch(e){} }
+      ['seen','heard'].forEach(f => { if(d && Array.isArray(d[f])){ const k = 'evoala-' + f, m = [...new Set([...seen.get(k), ...d[f]])]; try{ localStorage.setItem(k, JSON.stringify(m)); }catch(e){} if(m.length > d[f].length) syncProgress(); } else if(seen.get('evoala-' + f).length) syncProgress(); });
+      if(location.hash === '#guia') route();
       if(d && Array.isArray(d.lists)){ lists.put(d.lists, false); refreshHearts(); if(/^#lista/.test(location.hash)) route(); }
       else if(lists.all().length) window.EvoAuth.save({ lists: lists.all() });
       if(d && d.lang && d.lang !== LANG) setLang(d.lang, true);
@@ -268,39 +270,51 @@ function lastInfo(){
   const si = +m[1], s = si === 8 ? "Bonus" : GRID[si], tab = sec(s)?.tabs[+m[2]]; if(!tab) return null;
   const entry = [...HOME, BONUS].find(e => e[2] === s); if(!entry) return null;
   const row = entry[3].find(r => r[1] === tab.name);
-  return { hash: h, title: entry[0], label: row ? rowLabel(row[0]) : (tab.label || tab.name) };
+  return { hash: h, title: entry[0], cat: si === 8 ? t("nBonus") : tileLabel(GRID[si]), label: row ? rowLabel(row[0]) : (tab.label || tab.name) };
+}
+/* Hub du guide : progression + grandes catégories */
+const seen = {
+  get(k){ try{ const v = JSON.parse(localStorage.getItem(k)); return Array.isArray(v) ? v : []; }catch(e){ return []; } },
+  add(k, v){ const a = this.get(k); if(a.includes(v)) return; a.push(v); try{ localStorage.setItem(k, JSON.stringify(a)); }catch(e){} syncProgress(); }
+};
+let syncT;
+function syncProgress(){ clearTimeout(syncT); syncT = setTimeout(() => window.EvoAuth?.save({ seen: seen.get("evoala-seen"), heard: seen.get("evoala-heard") }), 3000); }
+const markHeard = key => key && seen.add("evoala-heard", key);
+function allPages(){
+  const out = [];
+  [...GRID, "Bonus"].forEach((name, si) => sec(name)?.tabs.forEach((tb, ti) => (tb.subs || [tb]).forEach((v, u) => { if(hasPh(v)) out.push(pageHash(si, ti, tb.subs ? u : 0)); })));
+  return out;
 }
 function home(){
-  const last = lastInfo();
-  app.innerHTML = `
-  <button class="tohub" data-go="" data-home>‹ ${t("allGuides")}</button>
-  <div class="ticket">
-    <div class="tk-top"><img class="logo" src="img/ui/logo.webp" alt="evoala">
-      <div class="lang" role="group" aria-label="${t("lang")}"><button class="${LANG==='es'?'on':''}" data-lang="es" aria-pressed="${LANG==='es'}">ES</button><button class="${LANG==='en'?'on':''}" data-lang="en" aria-pressed="${LANG==='en'}">EN</button></div></div>
-    <div class="route"><div class="t1"><small>${t("guide")}</small>${t("guide2")}</div>
-      <div class="esfr">${t("from")} <b><svg viewBox="0 0 24 24"><path d="M2 12h20M14 5l7 7-7 7"/></svg></b> FR</div></div>
-    <button class="start" data-go="s0t0">${t("start")} <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
-    <div class="stub"><div>${t("dep")}<b>${t("now")}</b></div><div>${t("dest")}<b>${t("me")}</b></div><span class="first">${t("first")}</span></div>
-  </div>
-  <label class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" placeholder="${t("search")}" autocomplete="off" aria-label="${t("searchL")}"></label>
-  <div id="results"></div>
-  <div id="menu">
-    ${last ? `<button class="resume" data-go="${last.hash}"><img src="${UI['h:'+last.title]||''}" alt="">
-      <span><small>${t("resume")}</small><b>${esc(last.label)}</b></span><i><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></i></button>` : ""}
-    <div class="tochead"><b>${t("toc")}</b><small>${t("tap")}</small></div>
-    <div class="toc">${HOME.map((e,i) => scard(e,i)).join("")}</div>
-    <div class="extras">
-      ${scard(BONUS,-1).replace('class="scard"','class="scard bonus"')}
-      <button class="pcard" data-go="p1"><img src="${UI['h:Guía de Paris']}" alt=""><span><b>${t("paris")}</b><small>${t("parisSub")}</small></span><em>›</em></button>
-    </div>
-  </div>`;
-  document.getElementById("q").addEventListener("input", e => search(e.target.value));
+  const last = lastInfo(), pages = allPages(), seenP = new Set(seen.get("evoala-seen")), heard = new Set(seen.get("evoala-heard"));
+  const idx = [...index().values()];
+  const nSeen = pages.filter(h => seenP.has(h)).length, nHeard = idx.filter(x => heard.has(x.p.fr)).length;
+  const perCat = si => { const own = idx.filter(x => x.si === si); return [own.filter(x => heard.has(x.p.fr)).length, own.length]; };
+  const bar = (icon, label, n, tot, cls) => `<div class="gbar ${cls}"><div class="gbl">${icon}<span>${label}</span><em><b>${n}</b> / ${tot}</em></div><div class="gtrack"><i style="width:${n ? Math.max(3, n * 100 / tot) : 0}%"></i></div></div>`;
+  const arrow = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  const tile = (e, i) => { const [tt, ts] = homeTitle(e, i), [n, tot] = perCat(i);
+    return `<button class="gtile" data-go="s${i}t0"><span class="gico">${mi("t-" + GRID[i])}</span><b>${esc(tt)}</b><small>${esc(ts)}</small>
+      ${n ? `<span class="gmini"><i style="width:${n * 100 / tot}%"></i></span><em>${n} / ${tot} ${t("nPh")}</em>` : `<em>${tot} ${t("nPh")}</em>`}</button>`; };
+  const [bn, btot] = perCat(8);
+  app.innerHTML = `${topbar("ghub")}
+  <div class="gtitle"><small>${MINIFLAG}${t("gKicker")}</small><b>${t("gTitle")}</b></div>
+  <section class="gprog"><div class="gpt">${t("prog")}</div>
+    ${bar('<svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg>', t("pSeen"), nSeen, pages.length, "pg")}
+    ${bar(ICON.spk, t("pHeard"), nHeard, idx.length, "ph")}
+    <button class="gcont" data-go="${last ? last.hash : "s0t0"}"><span><small>${last ? t("cont") : t("startAt")}</small><b>${esc(last ? `${last.cat} › ${last.label}` : tileLabel(GRID[0]))}</b></span>${arrow}</button>
+  </section>
+  <div class="gch">${t("choose")}</div>
+  <div class="gtiles">${HOME.map((e, i) => tile(e, i)).join("")}</div>
+  <button class="gwide bonus" data-go="s8t0"><span class="gico">${mi("t-bonus")}</span><span class="gw"><b>${t("bonusT")}</b><small>${t("bonusS")} · ${bn ? `${bn} / ` : ""}${btot} ${t("nPh")}</small></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+  <button class="gwide" data-go="p1"><span class="gico pimg"><img src="${UI['h:Guía de Paris']}" alt=""></span><span class="gw"><b>${t("paris")}</b><small>${t("parisSub")}</small></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+  <div class="gend"></div>`;
 }
 
 /* ---------- Barre du haut ---------- */
 function topbar(where){
-  return `<div class="top"><button class="home" data-go="guia" aria-label="${t("home")}">${ICON.home}</button>
-    <img class="logo" src="img/ui/logo.webp" alt="evoala"></div>`;
+  const toHub = where === "ghub";
+  return `<div class="top"><button class="home" data-go="${toHub ? "" : "guia"}"${toHub ? " data-home" : ""} aria-label="${toHub ? t("allGuides") : t("home")}">${ICON.home}</button>
+    <img class="logo" src="img/ui/logo.webp" alt="evoala"><span class="tsp"></span>${langToggle("hl sm")}</div>`;
 }
 // barre du bas : Guía / Paris / Bonus, sur toutes les pages
 function navbar(where){
@@ -378,6 +392,7 @@ function phrases(si, ti, sub=0){
   if(tab.subs && !tab.subs[sub]) sub = 0;
   const view = tab.subs ? tab.subs[sub] : tab;
   const nx = nextPage(si, ti, sub);
+  if(hasPh(view)) seen.add("evoala-seen", pageHash(si, ti, tab.subs ? sub : 0));
   app.innerHTML = `${topbar("guide").replace('class="top"','class="top flow"')}
     <label class="search psearch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" placeholder="${t("search")}" autocomplete="off" aria-label="${t("searchL")}"></label>
     ${`${catPicked() ? "" : `<p class="cathint"><span>${t("pick")}</span></p>`}
@@ -470,7 +485,7 @@ function index(){
   [...GRID, "Bonus"].forEach((name, si) => { const s = sec(name); if(!s) return;
     const cat = si === 8 ? t("nBonus") : tileLabel(name);
     s.tabs.forEach((tb, ti) => (tb.subs || [tb]).forEach((v, u) => v.groups.forEach(g => g.phrases.forEach(p => {
-      if(!IDX.has(p.fr)) IDX.set(p.fr, { p, crumb: [`${cat} › ${tb.label || tb.name}`, pageHash(si, ti, tb.subs ? u : 0)] });
+      if(!IDX.has(p.fr)) IDX.set(p.fr, { p, si, crumb: [`${cat} › ${tb.label || tb.name}`, pageHash(si, ti, tb.subs ? u : 0)] });
     }))));
   });
   return IDX;
@@ -653,7 +668,7 @@ async function playQueue(mix){
     if(QPLAY !== tok) return;
     const [file, id] = r.dataset.audio.split("#");
     r.classList.add("playing"); r.scrollIntoView({ block: "center", behavior: "smooth" });
-    try{ await playUrl(await audioUrl(file, id)); }catch(e){}
+    try{ const u = await audioUrl(file, id); markHeard(r.dataset.key); await playUrl(u); }catch(e){}
     r.classList.remove("playing");
     if(QPLAY !== tok) return;
     await new Promise(ok => setTimeout(ok, 700));
@@ -752,7 +767,7 @@ async function playRow(row){
   const [file, id] = row.dataset.audio.split("#");
   document.querySelectorAll(".row.playing").forEach(r => r.classList.remove("playing"));
   row.classList.add("playing");
-  try{ await playUrl(await audioUrl(file, id)); }catch(e){ toast(t("noPlay")); }
+  try{ const u = await audioUrl(file, id); markHeard(row.dataset.key); await playUrl(u); }catch(e){ toast(t("noPlay")); }
   row.classList.remove("playing");
 }
 // précharge l'audio de la page affichée

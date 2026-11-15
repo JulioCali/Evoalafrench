@@ -486,3 +486,44 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .swipe+.swipe .row:after{content:"";position:absolute;top:0;left:62px;right:14px;border-top:1px solid #EFEDF6}
 .sdel{position:absolute;top:0;right:0;bottom:0;width:96px;background:#E03131;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:13px;font-weight:600;border-radius:0 14px 14px 0}
 .sdel svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- Hub du guide : progression + catégories ---------- */
+.top .tsp{flex:1}
+.lang.sm{padding:2px;border-radius:10px}
+.lang.sm button{min-width:40px;height:32px;font-size:13px;border-radius:8px}
+.gtitle{padding:4px 18px 12px}
+.gtitle small{display:flex;align-items:center;gap:6px;font-size:12px;color:#6E6680}
+.gtitle b{display:block;font-size:24px;font-weight:600;line-height:1.2}
+.gprog{margin:0 12px;border:1.5px solid var(--card-border);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:14px;background:#FBFAFF}
+.gpt{font-size:13px;font-weight:600;color:#5940BF}
+.gbl{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px;color:#3A3550}
+.gbl svg{width:18px;height:18px;flex:none}
+.gbar.pg .gbl svg{fill:none;stroke:var(--violet);stroke-width:2.2;stroke-linejoin:round}
+.gbar.ph .gbl svg{fill:#D6336C}
+.gbl span{flex:1}
+.gbl em{font-style:normal;color:#6E6680}.gbl em b{color:#1A1A1A;font-weight:600;font-size:15px}
+.gtrack{height:10px;border-radius:999px;background:#EEEBFD;overflow:hidden}
+.gtrack i{display:block;height:100%;border-radius:999px;background:var(--violet);transition:width .6s ease}
+.gbar.ph .gtrack i{background:#D6336C}
+.gcont{display:flex;align-items:center;gap:12px;background:var(--violet);color:#fff;border-radius:14px;padding:10px 14px;text-align:left;min-height:56px}
+.gcont span{flex:1}.gcont small{display:block;font-size:12px;color:#E2DCFB}.gcont b{font-size:15px;font-weight:600}
+.gcont svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.gch{padding:18px 18px 10px;font-size:16px;font-weight:600}
+.gtiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 12px}
+.gtile{border:1.5px solid var(--card-border);border-radius:18px;padding:12px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;background:#fff}
+.gtile:active,.gwide:active{background:#F7F5FF}
+.gico{width:44px;height:44px;border-radius:13px;background:#EEEBFD;color:var(--violet);display:grid;place-items:center;margin-bottom:4px;flex:none}
+.gico .mi{width:24px;height:24px}
+.gtile b{font-size:15px;font-weight:600}
+.gtile small{font-size:12px;color:#6E6680;line-height:1.3}
+.gtile em{font-style:normal;font-size:11px;color:#6E6680;margin-top:auto;padding-top:4px}
+.gmini{display:block;width:100%;height:5px;border-radius:999px;background:#EEEBFD;overflow:hidden;margin-top:6px}
+.gmini i{display:block;height:100%;background:var(--violet)}
+.gtile .gmini+em{padding-top:2px;margin-top:0}
+.gwide{display:flex;align-items:center;gap:12px;margin:10px 12px 0;width:calc(100% - 24px);border:1.5px solid var(--card-border);border-radius:18px;padding:12px;text-align:left;background:#fff}
+.gwide .gico{margin:0}
+.gwide.bonus .gico{background:#FFF1E0;color:#C25A00}
+.gico.pimg{background:#fff;overflow:hidden}.gico.pimg img{width:44px;height:44px;object-fit:contain}
+.gw{flex:1;min-width:0}.gw b{display:block;font-size:15px;font-weight:600}.gw small{font-size:12px;color:#6E6680}
+.gend{height:24px}
+@media (min-width:700px){ .gtiles{grid-template-columns:repeat(4,1fr)} .gprog,.gtiles,.gwide{max-width:none} }
