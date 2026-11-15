@@ -39,11 +39,11 @@
 <body>
 <main>
   <header><img src="img/ui/logo.webp" alt="evoala"></header>
-  <h1>Prueba de pronunciación <small style="font-size:12px;color:#8A8398;font-weight:500">v3</small></h1>
+  <h1>Prueba de pronunciación <small style="font-size:12px;color:#8A8398;font-weight:500">v4</small></h1>
   <p class="sub">Toca <b>Decir la frase</b>, di la frase en francés y espera la respuesta. Tu navegador te pedirá permiso para usar el micrófono.</p>
+  <p id="dbg" style="font-family:monospace;font-size:11px;color:#8A8398;min-height:14px;margin:-6px 0 12px"></p>
   <div id="warn"></div>
   <div id="list"></div>
-  <p class="foot" id="dbg" style="font-family:monospace;font-size:11px;color:#8A8398;min-height:14px"></p>
   <p class="foot">Prueba técnica: la app compara lo que entendió el reconocimiento de voz de tu teléfono con la frase esperada. No evalúa el acento, solo si la frase se entiende bien.</p>
 </main>
 <script>
@@ -109,37 +109,30 @@ async function play(i){
 }
 
 // --- reconnaissance ---
-let rec = null, cur = null, active = false, retried = false;
+// v4 : UNE seule écoute pour toute la page, lancée directement au toucher (Safari l'exige), sans pause avant.
+let rec = null, cur = null, active = false;
 const LOG = [];
-function log(m){ LOG.push(m); const el = document.getElementById("dbg"); if(el) el.textContent = LOG.slice(-14).join(" · "); }
-function stopRec(){ if(active){ try{ rec.stop(); }catch(e){} } }
-function newRec(){
-  const r = new SR(); r.lang = "fr-FR"; r.interimResults = true; r.maxAlternatives = 5; r.continuous = false;
-  r.onstart = () => { active = true; log("start"); };
-  r.onaudiostart = () => log("audio");
-  r.onspeechstart = () => log("voz");
-  r.onresult = e => {
+function log(m){ LOG.push(m); const el = document.getElementById("dbg"); if(el) el.textContent = LOG.slice(-16).join(" · "); }
+function stopRec(){ if(active){ try{ rec.abort(); }catch(e){} } }
+function getRec(){
+  if(rec) return rec;
+  rec = new SR(); rec.lang = "fr-FR"; rec.interimResults = false; rec.maxAlternatives = 5; rec.continuous = false;
+  rec.onstart = () => { active = true; log("start"); };
+  rec.onaudiostart = () => log("audio");
+  rec.onspeechstart = () => log("voz");
+  rec.onspeechend = () => log("fin-voz");
+  rec.onresult = e => {
     const res = e.results[e.results.length - 1];
     log("res:" + res[0].transcript);
-    if(!cur) return;
-    cur.alts = [...res].map(x => x.transcript);
-    clearTimeout(cur.quiet); cur.quiet = setTimeout(stopRec, 1200);
-    if(res.isFinal) stopRec();
+    if(cur) cur.alts = [...res].map(x => x.transcript);
   };
-  r.onerror = e => { log("err:" + e.error); if(cur) cur.err = e.error; };
-  r.onend = () => {
-    active = false; log("end");
-    const c = cur; if(!c) return;
-    // Safari interrompt parfois la 2e écoute (« aborted ») : on réessaie une fois avec une écoute neuve
-    if(!c.alts.length && (c.err === "aborted" || c.err === "audio-capture") && !c.retry){
-      c.retry = true; c.err = null; rec = null; log("retry"); setTimeout(() => begin(c), 400); return;
-    }
-    cur = null; finish(c);
-  };
-  return r;
+  rec.onnomatch = () => log("nomatch");
+  rec.onerror = e => { log("err:" + e.error); if(cur) cur.err = e.error; };
+  rec.onend = () => { active = false; log("end"); const c = cur; cur = null; if(c) finish(c); };
+  return rec;
 }
 function finish(c){
-  clearTimeout(c.quiet); clearTimeout(c.max);
+  clearTimeout(c.max);
   c.btn.classList.remove("rec"); c.btn.querySelector("span").textContent = "Decir la frase";
   const out = document.getElementById("r" + c.i);
   if(c.alts.length){
@@ -155,22 +148,18 @@ function finish(c){
   out.innerHTML = e === "not-allowed" || e === "service-not-allowed"
     ? "<b>Micrófono bloqueado</b>Permite el acceso al micrófono en los ajustes del navegador y vuelve a intentarlo."
     : e === "network" ? "<b>Sin conexión</b>El reconocimiento de voz necesita internet."
-    : `<b>No te escuchamos</b>Habla un poco más fuerte, cerca del teléfono.<div class="heard">(${e || "sin resultado"})</div>`;
-}
-function begin(c){
-  if(active){ stopRec(); setTimeout(() => begin(c), 250); return; }      // on attend la fin de l'écoute précédente
-  rec = newRec();                                                          // une écoute neuve à chaque fois
-  try{ rec.start(); }catch(e){ log("throw:" + e.name); c.err = "start"; cur = null; finish(c); }
+    : `<b>No te escuchamos</b>Vuelve a tocar el botón y habla justo después.<div class="heard">(${e || "sin resultado"})</div>`;
 }
 function listen(i, btn){
   if(cur){ stopRec(); return; }
   if(playing) try{ playing.stop(); }catch(e){}
+  const r = getRec();
+  if(active){ log("ocupado"); try{ r.abort(); }catch(e){} return; }      // l'écoute précédente n'est pas finie : on la coupe, l'apprenant retouche
   document.getElementById("r" + i).className = "res";
-  const c = cur = { i, btn, alts: [], err: null, retry: false };
+  const c = cur = { i, btn, alts: [], err: null };
   btn.classList.add("rec"); btn.querySelector("span").textContent = "Te escucho…";
   c.max = setTimeout(stopRec, 8000);
-  const wait = Math.max(0, 500 - (Date.now() - lastPlayEnd));               // petite pause si le modèle vient de finir
-  setTimeout(() => begin(c), wait);
+  try{ r.start(); log("go"); }catch(e){ log("throw:" + e.name); cur = null; c.err = e.name; finish(c); }
 }
 document.addEventListener("click", e => {
   const m = e.target.closest(".mic"); if(m && SR){ listen(+m.dataset.i, m); return; }
