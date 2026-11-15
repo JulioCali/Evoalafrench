@@ -70,6 +70,7 @@ const ICON = {
   heart:'<svg viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
   check:'<svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>',
   play:'<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
+  trash:'<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>',
   stop:'<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>',
   mix:'<svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
   spk:'<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>',
@@ -482,14 +483,14 @@ const LT = {
       newT:"Nueva lista",name:"Nombre de la lista",ideas:"Ideas",color:"Color",create:"Crear y guardar",createEmpty:"Crear la lista",phr:"frases",phr1:"frase",
       nav:"Mis listas",mine:"Mis listas",mineSub:"Tus frases guardadas, para repasar cuando quieras",listen:"Escuchar",all:"Escuchar todo",stop:"Detener",mix:"Mezclar",
       tip:"Toca el corazón de cualquier frase para guardarla.",emptyT:"Aún no tienes listas",emptyS:"Toca el corazón al lado de una frase para guardarla aquí y repasarla cuando quieras.",
-      toGuide:"Ir a la guía",fav:"Mis favoritos",removed:"Quitada de la lista",undo:"Deshacer",rename:"Cambiar el nombre",del:"Borrar la lista",
+      toGuide:"Ir a la guía",fav:"Mis favoritos",removed:"Quitada de la lista",remove:"Quitar",undo:"Deshacer",rename:"Cambiar el nombre",del:"Borrar la lista",
       delQ:"¿Borrar esta lista? Las frases siguen en la guía.",emptyL:"Esta lista está vacía. Toca el corazón de una frase en la guía para añadirla.",opts:"Opciones de la lista",back:"Mis listas",
       ideasL:["Mi viaje a París","Para repasar","En el restaurante","Emergencias"]},
   en:{save:"Save to a list",saved:"Saved to",change:"Change",pick:"Choose one or more lists",newL:"Create a new list",done:"Done",
       newT:"New list",name:"List name",ideas:"Ideas",color:"Color",create:"Create and save",createEmpty:"Create the list",phr:"phrases",phr1:"phrase",
       nav:"My lists",mine:"My lists",mineSub:"Your saved phrases, to review whenever you like",listen:"Listen",all:"Listen to all",stop:"Stop",mix:"Shuffle",
       tip:"Tap the heart on any phrase to save it.",emptyT:"No lists yet",emptyS:"Tap the heart next to a phrase to save it here and review it whenever you like.",
-      toGuide:"Go to the guide",fav:"My favorites",removed:"Removed from the list",undo:"Undo",rename:"Rename",del:"Delete the list",
+      toGuide:"Go to the guide",fav:"My favorites",removed:"Removed from the list",remove:"Remove",undo:"Undo",rename:"Rename",del:"Delete the list",
       delQ:"Delete this list? The phrases stay in the guide.",emptyL:"This list is empty. Tap the heart on a phrase in the guide to add it.",opts:"List options",back:"My lists",
       ideasL:["My trip to Paris","To review","At the restaurant","Emergencies"]}
 };
@@ -619,7 +620,7 @@ function listPage(id){
       <div class="lpop" hidden><button data-lren>${l("rename")}</button>${x.id === "fav" ? "" : `<button data-ldel class="danger">${l("del")}</button>`}</div></div></div>
     <div class="lhead">${lsq(x.color, true)}<div><b>${esc(lname(x))}</b><small>${nPhr(items.length)}</small></div></div>
     ${items.length ? `<div class="lacts"><button class="qall" data-qall>${ICON.play}<span>${l("all")}</span></button><button class="qmix" data-qmix>${ICON.mix}<span>${l("mix")}</span></button></div>
-      <div class="card">${items.map(v => rowHTML(v.p, v.crumb)).join("")}</div>` : `<div class="empty">${l("emptyL")}</div>`}`;
+      <div class="card">${items.map(v => `<div class="swipe"><button class="sdel" data-sdel="${esc(v.p.fr)}" tabindex="-1">${ICON.trash}${l("remove")}</button>${rowHTML(v.p, v.crumb)}</div>`).join("")}</div>` : `<div class="empty">${l("emptyL")}</div>`}`;
   if(PENDING === id){ PENDING = null; setTimeout(() => playQueue(false), 300); }
 }
 function renameList(id){
@@ -657,6 +658,31 @@ async function playQueue(mix){
   if(QPLAY === tok) stopQueue();
 }
 
+/* Glisser une phrase vers la gauche dans une liste fait apparaître « Quitar » (comme Apple Music) */
+const SWIPE = { row: null, x: 0, y: 0, base: 0, dx: 0, dir: null, justDragged: false };
+const SW = 96;
+function swipeTo(row, x){ row.style.transform = x ? `translateX(${x}px)` : ""; row.classList.toggle("open", x < 0); }
+app.addEventListener("pointerdown", e => {
+  const row = e.target.closest(".swipe .row"); if(!row || e.target.closest(".heart, .spk, .ic")) return;
+  app.querySelectorAll(".swipe .row.open").forEach(r => r !== row && swipeTo(r, 0));
+  Object.assign(SWIPE, { row, x: e.clientX, y: e.clientY, base: row.classList.contains("open") ? -SW : 0, dx: 0, dir: null, id: e.pointerId });
+});
+app.addEventListener("pointermove", e => {
+  const S = SWIPE; if(!S.row || e.pointerId !== S.id) return;
+  const dx = e.clientX - S.x, dy = e.clientY - S.y;
+  if(!S.dir){ if(Math.abs(dx) < 8 && Math.abs(dy) < 8) return; S.dir = Math.abs(dx) > Math.abs(dy) ? "h" : "v"; if(S.dir === "h"){ S.row.classList.add("drag"); try{ S.row.setPointerCapture(e.pointerId); }catch(_){} } }
+  if(S.dir !== "h"){ S.row = null; return; }
+  S.dx = dx; const x = Math.max(-SW * 1.3, Math.min(0, S.base + dx));
+  S.row.style.transform = `translateX(${x}px)`;
+});
+const swipeEnd = e => {
+  const S = SWIPE; if(!S.row || e.pointerId !== S.id) return;
+  const row = S.row; S.row = null; row.classList.remove("drag");
+  if(S.dir === "h"){ swipeTo(row, S.base + S.dx < -SW / 2 ? -SW : 0); S.justDragged = true; setTimeout(() => S.justDragged = false, 350); }
+};
+app.addEventListener("pointerup", swipeEnd);
+app.addEventListener("pointercancel", swipeEnd);
+
 /* ---------- Clics ---------- */
 app.addEventListener("click", e => {
   const lb = e.target.closest("[data-lang]");
@@ -673,6 +699,11 @@ app.addEventListener("click", e => {
   if(e.target.closest("[data-notify]")){ toast(HUB[LANG].notifyToast); return; }
   if(e.target.closest("[data-hint]")){ try{ localStorage.setItem("evoala-hint","1"); }catch(_){} app.querySelector(".hint")?.remove(); return; }
   if(e.target.closest("[data-up]")){ scrollTo({top:0,behavior:"smooth"}); return; }
+  if(SWIPE.justDragged){ SWIPE.justDragged = false; return; }
+  const sd = e.target.closest("[data-sdel]");
+  if(sd){ heartClick(sd.dataset.sdel); return; }
+  const openRow = app.querySelector(".swipe .row.open");
+  if(openRow){ swipeTo(openRow, 0); return; }               // un toucher ailleurs referme le bouton « Quitar »
   const hb = e.target.closest(".heart");
   if(hb){ heartClick(hb.closest(".row").dataset.key); return; }
   const pl = e.target.closest("[data-playlist]");

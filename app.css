@@ -479,3 +479,10 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .lacts svg{width:18px;height:18px}
 .qall{background:var(--violet);color:#fff}.qall svg{fill:#fff}
 .qmix{background:#EEEBFD;color:#5940BF}.qmix svg{fill:none;stroke:#5940BF;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+/* glisser pour retirer une phrase d'une liste */
+.swipe{position:relative;overflow:hidden;border-radius:14px}
+.swipe .row{background:#fff;transition:transform .22s ease;touch-action:pan-y}
+.swipe .row.drag{transition:none}
+.swipe+.swipe .row:after{content:"";position:absolute;top:0;left:62px;right:14px;border-top:1px solid #EFEDF6}
+.sdel{position:absolute;top:0;right:0;bottom:0;width:96px;background:#E03131;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:13px;font-weight:600;border-radius:0 14px 14px 0}
+.sdel svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
