@@ -1,0 +1,12 @@
+// Configuration Cloudflare : les fichiers de l'appli + le petit serveur (worker.js) pour la reconnaissance vocale
+{
+  "name": "evoalafrench",
+  "main": "worker.js",
+  "compatibility_date": "2025-10-01",
+  "assets": {
+    "directory": "./",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "ai": { "binding": "AI" }
+}

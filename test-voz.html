@@ -39,7 +39,7 @@
 <body>
 <main>
   <header><img src="img/ui/logo.webp" alt="evoala"></header>
-  <h1>Prueba de pronunciación <small style="font-size:12px;color:#8A8398;font-weight:500">v4</small></h1>
+  <h1>Prueba de pronunciación <small style="font-size:12px;color:#8A8398;font-weight:500">v5</small></h1>
   <p class="sub">Toca <b>Decir la frase</b>, di la frase en francés y espera la respuesta. Tu navegador te pedirá permiso para usar el micrófono.</p>
   <p id="dbg" style="font-family:monospace;font-size:11px;color:#8A8398;min-height:14px;margin:-6px 0 12px"></p>
   <div id="warn"></div>
@@ -55,17 +55,15 @@ const PH = [
 ];
 const MIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
 const SPK = '<svg viewBox="0 0 24 24"><path fill="#5940BF" d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const SR = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
 
 // --- navigateur compatible ? ---
 const ua = navigator.userAgent, iOS = /iPhone|iPad|iPod/.test(ua);
 const inApp = /FBAN|FBAV|Instagram|WhatsApp|Line\//.test(ua);
 const standalone = window.navigator.standalone === true || matchMedia("(display-mode: standalone)").matches;
 let warn = "";
-if(!SR) warn = iOS ? "Tu navegador no permite el reconocimiento de voz. En iPhone, abre esta página en <b>Safari</b>."
-                   : "Tu navegador no permite el reconocimiento de voz. Ábrela en <b>Chrome</b>.";
+if(!SR) warn = "Tu navegador no permite usar el micrófono. Ábrela en <b>Safari</b> (iPhone) o <b>Chrome</b> (Android).";
 else if(inApp) warn = "Estás dentro de otra app (WhatsApp, Instagram…). Ábrela en <b>Safari</b> o <b>Chrome</b> para usar el micrófono.";
-else if(iOS && standalone) warn = "En iPhone, el micrófono no funciona desde el icono de la pantalla de inicio. Ábrela en <b>Safari</b>.";
 document.getElementById("warn").innerHTML = warn ? `<div class="warn">${warn}</div>` : "";
 
 // --- cartes ---
@@ -93,7 +91,7 @@ const score = (said, target) => { const a = norm(said), b = norm(target); if(!a)
 const bundles = {}, decoded = {};
 let actx = null, playing = null, lastPlayEnd = 0;
 async function play(i){
-  if(cur) stopRec();
+  if(mrec && mrec.state === "recording") mrec.stop();
   const [f, id] = PH[i].audio;
   actx ??= new (window.AudioContext || window.webkitAudioContext)();
   if(actx.state === "suspended") await actx.resume();
@@ -108,58 +106,75 @@ async function play(i){
   playing = src; src.start();
 }
 
-// --- reconnaissance ---
-// v4 : UNE seule écoute pour toute la page, lancée directement au toucher (Safari l'exige), sans pause avant.
-let rec = null, cur = null, active = false;
+// --- v5 : on enregistre nous-mêmes (micro du téléphone) puis notre serveur transcrit avec Whisper ---
+let stream = null, mrec = null, cur = null, vad = null;
 const LOG = [];
-function log(m){ LOG.push(m); const el = document.getElementById("dbg"); if(el) el.textContent = LOG.slice(-16).join(" · "); }
-function stopRec(){ if(active){ try{ rec.abort(); }catch(e){} } }
-function getRec(){
-  if(rec) return rec;
-  rec = new SR(); rec.lang = "fr-FR"; rec.interimResults = false; rec.maxAlternatives = 5; rec.continuous = false;
-  rec.onstart = () => { active = true; log("start"); };
-  rec.onaudiostart = () => log("audio");
-  rec.onspeechstart = () => log("voz");
-  rec.onspeechend = () => log("fin-voz");
-  rec.onresult = e => {
-    const res = e.results[e.results.length - 1];
-    log("res:" + res[0].transcript);
-    if(cur) cur.alts = [...res].map(x => x.transcript);
+function log(m){ LOG.push(m); const el = document.getElementById("dbg"); if(el) el.textContent = LOG.slice(-14).join(" · "); }
+const MIME = ["audio/mp4", "audio/webm;codecs=opus", "audio/webm", "audio/ogg"].find(t => window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || "";
+async function getStream(){
+  if(stream && stream.active) return stream;
+  stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+  return stream;
+}
+function setBtn(btn, mode){
+  btn.classList.toggle("rec", mode === "rec");
+  btn.querySelector("span").textContent = mode === "rec" ? "Te escucho… (toca para terminar)" : mode === "wait" ? "Analizando…" : "Decir la frase";
+  btn.disabled = mode === "wait";
+}
+// arrêt automatique : dès qu'on a parlé puis 1 s de silence (ou 6 s au maximum)
+function watchSilence(st){
+  actx ??= new (window.AudioContext || window.webkitAudioContext)();
+  if(actx.state === "suspended") actx.resume();
+  const src = actx.createMediaStreamSource(st), an = actx.createAnalyser(); an.fftSize = 1024; src.connect(an);
+  const data = new Uint8Array(an.fftSize); let spoke = false, lastLoud = Date.now(); const t0 = Date.now();
+  const tick = () => {
+    if(!mrec || mrec.state !== "recording"){ src.disconnect(); return; }
+    an.getByteTimeDomainData(data);
+    let sum = 0; for(const v of data){ const x = (v - 128) / 128; sum += x * x; }
+    const rms = Math.sqrt(sum / data.length);
+    if(rms > 0.04){ spoke = true; lastLoud = Date.now(); }
+    if((spoke && Date.now() - lastLoud > 1000) || Date.now() - t0 > 6000){ mrec.stop(); return; }
+    vad = requestAnimationFrame(tick);
   };
-  rec.onnomatch = () => log("nomatch");
-  rec.onerror = e => { log("err:" + e.error); if(cur) cur.err = e.error; };
-  rec.onend = () => { active = false; log("end"); const c = cur; cur = null; if(c) finish(c); };
-  return rec;
+  tick();
 }
-function finish(c){
-  clearTimeout(c.max);
-  c.btn.classList.remove("rec"); c.btn.querySelector("span").textContent = "Decir la frase";
-  const out = document.getElementById("r" + c.i);
-  if(c.alts.length){
-    const best = c.alts.map(a => [score(a, PH[c.i].fr), a]).sort((x, y) => y[0] - x[0])[0], s = best[0];
-    out.className = "res " + (s >= 0.8 ? "ok" : s >= 0.55 ? "mid" : "ko");
-    out.innerHTML = (s >= 0.8 ? "<b>¡Muy bien! 🎉</b>Se entiende perfectamente."
-      : s >= 0.55 ? "<b>¡Casi!</b>Escucha el modelo y vuelve a intentarlo."
-      : "<b>Inténtalo otra vez</b>Escucha el modelo y repite despacio.") + `<div class="heard">Entendimos: «${best[1]}»</div>`;
-    return;
-  }
-  const e = c.err;
-  out.className = "res ko";
-  out.innerHTML = e === "not-allowed" || e === "service-not-allowed"
-    ? "<b>Micrófono bloqueado</b>Permite el acceso al micrófono en los ajustes del navegador y vuelve a intentarlo."
-    : e === "network" ? "<b>Sin conexión</b>El reconocimiento de voz necesita internet."
-    : `<b>No te escuchamos</b>Vuelve a tocar el botón y habla justo después.<div class="heard">(${e || "sin resultado"})</div>`;
-}
-function listen(i, btn){
-  if(cur){ stopRec(); return; }
+async function listen(i, btn){
+  if(mrec && mrec.state === "recording"){ mrec.stop(); return; }
+  if(cur) return;
   if(playing) try{ playing.stop(); }catch(e){}
-  const r = getRec();
-  if(active){ log("ocupado"); try{ r.abort(); }catch(e){} return; }      // l'écoute précédente n'est pas finie : on la coupe, l'apprenant retouche
-  document.getElementById("r" + i).className = "res";
-  const c = cur = { i, btn, alts: [], err: null };
-  btn.classList.add("rec"); btn.querySelector("span").textContent = "Te escucho…";
-  c.max = setTimeout(stopRec, 8000);
-  try{ r.start(); log("go"); }catch(e){ log("throw:" + e.name); cur = null; c.err = e.name; finish(c); }
+  const out = document.getElementById("r" + i); out.className = "res";
+  let st;
+  try{ st = await getStream(); log("mic"); }
+  catch(e){ log("mic:" + e.name); out.className = "res ko"; out.innerHTML = "<b>Micrófono bloqueado</b>Permite el acceso al micrófono en los ajustes del navegador y vuelve a intentarlo."; return; }
+  cur = { i, btn, chunks: [] };
+  mrec = MIME ? new MediaRecorder(st, { mimeType: MIME }) : new MediaRecorder(st);
+  mrec.ondataavailable = e => { if(e.data && e.data.size) cur.chunks.push(e.data); };
+  mrec.onstop = () => send(cur);
+  mrec.start(); log("rec " + (mrec.mimeType || MIME || "?"));
+  setBtn(btn, "rec"); watchSilence(st);
+}
+async function send(c){
+  cancelAnimationFrame(vad); setBtn(c.btn, "wait");
+  const out = document.getElementById("r" + c.i);
+  const blob = new Blob(c.chunks, { type: (mrec && mrec.mimeType) || MIME || "audio/mp4" });
+  log("envío " + Math.round(blob.size / 1024) + "KB");
+  let said = "";
+  try{
+    const r = await fetch("/api/stt", { method: "POST", headers: { "content-type": blob.type }, body: blob });
+    const d = await r.json(); log((d.model || "") + ":" + (d.text || d.error || "?"));
+    if(!r.ok) throw new Error(d.error || r.status);
+    said = d.text || "";
+  }catch(e){
+    cur = null; setBtn(c.btn, "idle");
+    out.className = "res ko"; out.innerHTML = `<b>No funcionó</b>Revisa tu conexión a internet y vuelve a intentarlo.<div class="heard">(${e.message})</div>`; return;
+  }
+  cur = null; setBtn(c.btn, "idle");
+  if(!said){ out.className = "res ko"; out.innerHTML = "<b>No te escuchamos</b>Habla un poco más fuerte, cerca del teléfono."; return; }
+  const s = score(said, PH[c.i].fr);
+  out.className = "res " + (s >= 0.8 ? "ok" : s >= 0.55 ? "mid" : "ko");
+  out.innerHTML = (s >= 0.8 ? "<b>¡Muy bien! 🎉</b>Se entiende perfectamente."
+    : s >= 0.55 ? "<b>¡Casi!</b>Escucha el modelo y vuelve a intentarlo."
+    : "<b>Inténtalo otra vez</b>Escucha el modelo y repite despacio.") + `<div class="heard">Entendimos: «${said}»</div>`;
 }
 document.addEventListener("click", e => {
   const m = e.target.closest(".mic"); if(m && SR){ listen(+m.dataset.i, m); return; }
