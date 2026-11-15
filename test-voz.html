@@ -39,10 +39,11 @@
 <body>
 <main>
   <header><img src="img/ui/logo.webp" alt="evoala"></header>
-  <h1>Prueba de pronunciación</h1>
+  <h1>Prueba de pronunciación <small style="font-size:12px;color:#8A8398;font-weight:500">v3</small></h1>
   <p class="sub">Toca <b>Decir la frase</b>, di la frase en francés y espera la respuesta. Tu navegador te pedirá permiso para usar el micrófono.</p>
   <div id="warn"></div>
   <div id="list"></div>
+  <p class="foot" id="dbg" style="font-family:monospace;font-size:11px;color:#8A8398;min-height:14px"></p>
   <p class="foot">Prueba técnica: la app compara lo que entendió el reconocimiento de voz de tu teléfono con la frase esperada. No evalúa el acento, solo si la frase se entiende bien.</p>
 </main>
 <script>
@@ -88,37 +89,54 @@ function lev(a, b){
 }
 const score = (said, target) => { const a = norm(said), b = norm(target); if(!a) return 0; return 1 - lev(a, b) / Math.max(a.length, b.length); };
 
-// --- audio modèle (mêmes fichiers que l'appli) ---
-const bundles = {};
-let model = null;
+// --- audio modèle : joué avec Web Audio (évite de garder un lecteur <audio> ouvert, qui coupe le micro sur iPhone) ---
+const bundles = {}, decoded = {};
+let actx = null, playing = null, lastPlayEnd = 0;
 async function play(i){
-  stopRec();
+  if(cur) stopRec();
   const [f, id] = PH[i].audio;
-  const b = await (bundles[f] ??= fetch(f).then(r => r.json()));
-  const bin = Uint8Array.from(atob(b[id]), c => c.charCodeAt(0));
-  if(model) model.pause();
-  model = new Audio(URL.createObjectURL(new Blob([bin], {type: "audio/mpeg"}))); model.play();
+  actx ??= new (window.AudioContext || window.webkitAudioContext)();
+  if(actx.state === "suspended") await actx.resume();
+  if(!decoded[id]){
+    const b = await (bundles[f] ??= fetch(f).then(r => r.json()));
+    const bin = Uint8Array.from(atob(b[id]), c => c.charCodeAt(0));
+    decoded[id] = await new Promise((ok, ko) => actx.decodeAudioData(bin.buffer, ok, ko));
+  }
+  if(playing) try{ playing.stop(); }catch(e){}
+  const src = actx.createBufferSource(); src.buffer = decoded[id]; src.connect(actx.destination);
+  src.onended = () => { lastPlayEnd = Date.now(); playing = null; };
+  playing = src; src.start();
 }
-// sur iPhone, un son encore « ouvert » empêche le micro d'entendre : on le libère avant d'écouter
-function releaseAudio(){ if(model){ model.pause(); model.removeAttribute("src"); model.load(); model = null; } }
 
 // --- reconnaissance ---
-// Safari (iPhone) : une seule instance réutilisée, résultats provisoires gardés, arrêt après un court silence
-let rec = null, cur = null;
-function stopRec(){ if(cur){ try{ rec.stop(); }catch(e){} } }
-function getRec(){
-  if(rec) return rec;
-  rec = new SR(); rec.lang = "fr-FR"; rec.interimResults = true; rec.maxAlternatives = 5; rec.continuous = false;
-  rec.onresult = e => {
+let rec = null, cur = null, active = false, retried = false;
+const LOG = [];
+function log(m){ LOG.push(m); const el = document.getElementById("dbg"); if(el) el.textContent = LOG.slice(-14).join(" · "); }
+function stopRec(){ if(active){ try{ rec.stop(); }catch(e){} } }
+function newRec(){
+  const r = new SR(); r.lang = "fr-FR"; r.interimResults = true; r.maxAlternatives = 5; r.continuous = false;
+  r.onstart = () => { active = true; log("start"); };
+  r.onaudiostart = () => log("audio");
+  r.onspeechstart = () => log("voz");
+  r.onresult = e => {
+    const res = e.results[e.results.length - 1];
+    log("res:" + res[0].transcript);
     if(!cur) return;
-    const r = e.results[e.results.length - 1];
-    cur.alts = [...r].map(a => a.transcript);
-    clearTimeout(cur.quiet); cur.quiet = setTimeout(stopRec, 1200);      // 1,2 s sans nouveau mot -> on s'arrête
-    if(r.isFinal) stopRec();
+    cur.alts = [...res].map(x => x.transcript);
+    clearTimeout(cur.quiet); cur.quiet = setTimeout(stopRec, 1200);
+    if(res.isFinal) stopRec();
   };
-  rec.onerror = e => { if(cur) cur.err = e.error; };
-  rec.onend = () => { const c = cur; cur = null; if(c) finish(c); };
-  return rec;
+  r.onerror = e => { log("err:" + e.error); if(cur) cur.err = e.error; };
+  r.onend = () => {
+    active = false; log("end");
+    const c = cur; if(!c) return;
+    // Safari interrompt parfois la 2e écoute (« aborted ») : on réessaie une fois avec une écoute neuve
+    if(!c.alts.length && (c.err === "aborted" || c.err === "audio-capture") && !c.retry){
+      c.retry = true; c.err = null; rec = null; log("retry"); setTimeout(() => begin(c), 400); return;
+    }
+    cur = null; finish(c);
+  };
+  return r;
 }
 function finish(c){
   clearTimeout(c.quiet); clearTimeout(c.max);
@@ -139,15 +157,20 @@ function finish(c){
     : e === "network" ? "<b>Sin conexión</b>El reconocimiento de voz necesita internet."
     : `<b>No te escuchamos</b>Habla un poco más fuerte, cerca del teléfono.<div class="heard">(${e || "sin resultado"})</div>`;
 }
+function begin(c){
+  if(active){ stopRec(); setTimeout(() => begin(c), 250); return; }      // on attend la fin de l'écoute précédente
+  rec = newRec();                                                          // une écoute neuve à chaque fois
+  try{ rec.start(); }catch(e){ log("throw:" + e.name); c.err = "start"; cur = null; finish(c); }
+}
 function listen(i, btn){
   if(cur){ stopRec(); return; }
-  releaseAudio();
-  const r = getRec();
+  if(playing) try{ playing.stop(); }catch(e){}
   document.getElementById("r" + i).className = "res";
-  cur = { i, btn, alts: [], err: null };
+  const c = cur = { i, btn, alts: [], err: null, retry: false };
   btn.classList.add("rec"); btn.querySelector("span").textContent = "Te escucho…";
-  cur.max = setTimeout(stopRec, 7000);                                   // au plus 7 secondes
-  setTimeout(() => { try{ r.start(); }catch(e){ try{ r.abort(); }catch(_){} setTimeout(() => { try{ r.start(); }catch(_){ const c = cur; cur = null; if(c){ c.err = "start"; finish(c); } } }, 300); } }, 150);
+  c.max = setTimeout(stopRec, 8000);
+  const wait = Math.max(0, 500 - (Date.now() - lastPlayEnd));               // petite pause si le modèle vient de finir
+  setTimeout(() => begin(c), wait);
 }
 document.addEventListener("click", e => {
   const m = e.target.closest(".mic"); if(m && SR){ listen(+m.dataset.i, m); return; }
