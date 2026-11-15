@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prueba de pronunciación · Evoala</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Poppins,system-ui,sans-serif;color:#1A1A1A;background:#fff}
+  main{max-width:480px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 16px 40px}
+  header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  header img{height:30px}
+  h1{font-size:22px;margin:10px 0 4px}
+  .sub{font-size:14px;color:#6E6680;margin:0 0 16px;line-height:1.45}
+  .warn{background:#FFF4E6;border:1.5px solid #F5C58A;border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.45;margin-bottom:16px}
+  .card{border:1.5px solid #E7E4F5;border-radius:22px;padding:16px;margin-bottom:14px}
+  .top{display:flex;align-items:center;gap:12px}
+  .ic{width:56px;height:56px;border-radius:12px;background-size:56px auto;background-repeat:no-repeat;flex:none}
+  .es{font-size:13px;color:#6E6680}
+  .fr{font-size:19px;font-weight:600;line-height:1.25}
+  .pr{display:inline-block;margin-top:4px;background:#EEEBFD;color:#5940BF;border-radius:999px;padding:1px 10px;font-size:13px;font-weight:500}
+  .btns{display:flex;gap:10px;margin-top:14px}
+  button{font:inherit;border:0;cursor:pointer}
+  .mic{flex:1;height:52px;border-radius:14px;background:#6C4FE0;color:#fff;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
+  .mic svg,.lis svg{width:20px;height:20px}
+  .mic.rec{background:#D6336C;animation:pulse 1.2s ease-in-out infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 8px rgba(214,51,108,.18)}}
+  .lis{flex:none;width:52px;height:52px;border-radius:14px;background:#EEEBFD;display:grid;place-items:center}
+  .res{margin-top:12px;border-radius:14px;padding:10px 12px;font-size:14px;line-height:1.4;display:none}
+  .res.ok{display:block;background:#E6F6EE;color:#14532D}
+  .res.mid{display:block;background:#FFF4E6;color:#7A3E00}
+  .res.ko{display:block;background:#FDECEF;color:#8A1538}
+  .res b{display:block;font-size:16px;margin-bottom:2px}
+  .heard{font-size:12px;opacity:.85}
+  .foot{font-size:12px;color:#6E6680;line-height:1.5;margin-top:18px}
+</style>
+</head>
+<body>
+<main>
+  <header><img src="img/ui/logo.webp" alt="evoala"></header>
+  <h1>Prueba de pronunciación</h1>
+  <p class="sub">Toca <b>Decir la frase</b>, di la frase en francés y espera la respuesta. Tu navegador te pedirá permiso para usar el micrófono.</p>
+  <div id="warn"></div>
+  <div id="list"></div>
+  <p class="foot">Prueba técnica: la app compara lo que entendió el reconocimiento de voz de tu teléfono con la frase esperada. No evalúa el acento, solo si la frase se entiende bien.</p>
+</main>
+<script>
+const PH = [
+  { fr:"Bonjour", es:"Buenos días / Buenas tardes", pr:"bon-YÚR", icon:["img/icons/p2.webp",0], audio:["snd/p2.json","426b3e4647"] },
+  { fr:"Merci", es:"Gracias", pr:"mer-SÍ", icon:["img/icons/p2.webp",7], audio:["snd/p2.json","4c431b3930"] },
+  { fr:"Excusez-moi", es:"Disculpe", pr:"ex-kú-se MUÁ", icon:["img/icons/p2.webp",5], audio:["snd/p2.json","f5ed450fbe"] },
+  { fr:"Une baguette, s'il vous plaît", es:"Una baguette, por favor", pr:"ún ba-GUÉT, sil vu PLÉ", icon:["img/icons/p18.webp",4], audio:["snd/p18.json","b9eb8c9ba1"] },
+];
+const MIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+const SPK = '<svg viewBox="0 0 24 24"><path fill="#5940BF" d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+// --- navigateur compatible ? ---
+const ua = navigator.userAgent, iOS = /iPhone|iPad|iPod/.test(ua);
+const inApp = /FBAN|FBAV|Instagram|WhatsApp|Line\//.test(ua);
+const standalone = window.navigator.standalone === true || matchMedia("(display-mode: standalone)").matches;
+let warn = "";
+if(!SR) warn = iOS ? "Tu navegador no permite el reconocimiento de voz. En iPhone, abre esta página en <b>Safari</b>."
+                   : "Tu navegador no permite el reconocimiento de voz. Ábrela en <b>Chrome</b>.";
+else if(inApp) warn = "Estás dentro de otra app (WhatsApp, Instagram…). Ábrela en <b>Safari</b> o <b>Chrome</b> para usar el micrófono.";
+else if(iOS && standalone) warn = "En iPhone, el micrófono no funciona desde el icono de la pantalla de inicio. Ábrela en <b>Safari</b>.";
+document.getElementById("warn").innerHTML = warn ? `<div class="warn">${warn}</div>` : "";
+
+// --- cartes ---
+document.getElementById("list").innerHTML = PH.map((p, i) => `
+  <div class="card">
+    <div class="top"><div class="ic" style="background-image:url('${p.icon[0]}');background-position:0 ${-p.icon[1]*56}px"></div>
+      <div><div class="es">${p.es}</div><div class="fr">${p.fr}</div><span class="pr">${p.pr}</span></div></div>
+    <div class="btns"><button class="mic" data-i="${i}"${SR ? "" : " disabled style='opacity:.5'"}>${MIC}<span>Decir la frase</span></button>
+      <button class="lis" data-a="${i}" aria-label="Escuchar el modelo">${SPK}</button></div>
+    <div class="res" id="r${i}"></div>
+  </div>`).join("");
+
+// --- comparaison : texte simplifié + distance entre les mots ---
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
+function lev(a, b){
+  const m = a.length, n = b.length, d = Array.from({length: m + 1}, (_, i) => [i, ...Array(n).fill(0)]);
+  for(let j = 1; j <= n; j++) d[0][j] = j;
+  for(let i = 1; i <= m; i++) for(let j = 1; j <= n; j++)
+    d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+  return d[m][n];
+}
+const score = (said, target) => { const a = norm(said), b = norm(target); if(!a) return 0; return 1 - lev(a, b) / Math.max(a.length, b.length); };
+
+// --- audio modèle (mêmes fichiers que l'appli) ---
+const bundles = {};
+async function play(i){
+  const [f, id] = PH[i].audio;
+  const b = await (bundles[f] ??= fetch(f).then(r => r.json()));
+  const bin = Uint8Array.from(atob(b[id]), c => c.charCodeAt(0));
+  new Audio(URL.createObjectURL(new Blob([bin], {type: "audio/mpeg"}))).play();
+}
+
+// --- reconnaissance ---
+let rec = null;
+function listen(i, btn){
+  if(rec){ rec.abort(); return; }
+  const out = document.getElementById("r" + i);
+  rec = new SR(); rec.lang = "fr-FR"; rec.interimResults = false; rec.maxAlternatives = 5; rec.continuous = false;
+  btn.classList.add("rec"); btn.querySelector("span").textContent = "Te escucho…";
+  let done = false;
+  rec.onresult = e => {
+    done = true;
+    const alts = [...e.results[0]].map(a => a.transcript);
+    const best = alts.map(a => [score(a, PH[i].fr), a]).sort((x, y) => y[0] - x[0])[0];
+    const s = best[0];
+    out.className = "res " + (s >= 0.8 ? "ok" : s >= 0.55 ? "mid" : "ko");
+    out.innerHTML = (s >= 0.8 ? "<b>¡Muy bien! 🎉</b>Se entiende perfectamente."
+      : s >= 0.55 ? "<b>¡Casi!</b>Escucha el modelo y vuelve a intentarlo."
+      : "<b>Inténtalo otra vez</b>Escucha el modelo y repite despacio.")
+      + `<div class="heard">Entendimos: «${best[1]}»</div>`;
+  };
+  rec.onerror = e => {
+    done = true;
+    out.className = "res ko";
+    out.innerHTML = e.error === "not-allowed" || e.error === "service-not-allowed"
+      ? "<b>Micrófono bloqueado</b>Permite el acceso al micrófono en los ajustes del navegador y vuelve a intentarlo."
+      : e.error === "no-speech" ? "<b>No te escuchamos</b>Habla un poco más fuerte, cerca del teléfono."
+      : e.error === "network" ? "<b>Sin conexión</b>El reconocimiento de voz necesita internet."
+      : `<b>No funcionó</b>Error: ${e.error}`;
+  };
+  rec.onend = () => {
+    if(!done && !out.className.includes("res ")){ out.className = "res ko"; out.innerHTML = "<b>No te escuchamos</b>Vuelve a intentarlo."; }
+    btn.classList.remove("rec"); btn.querySelector("span").textContent = "Decir la frase"; rec = null;
+  };
+  try{ rec.start(); }catch(e){ btn.classList.remove("rec"); rec = null; }
+}
+document.addEventListener("click", e => {
+  const m = e.target.closest(".mic"); if(m && SR){ listen(+m.dataset.i, m); return; }
+  const a = e.target.closest(".lis"); if(a) play(+a.dataset.a);
+});
+</script>
+</body>
+</html>
