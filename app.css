@@ -386,7 +386,7 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .more.r{right:0;background:linear-gradient(90deg,rgba(255,255,255,0),#fff 55%);justify-content:flex-end;padding-right:8px}
 .more.l{left:0;background:linear-gradient(270deg,rgba(255,255,255,0),#fff 55%);justify-content:flex-start;padding-left:8px}
 .more.r svg{animation:nudge 1.4s ease-in-out 3}
-.catwrap.atend .more.r,.catwrap.atstart .more.l{opacity:0;pointer-events:none}
+.catwrap.atend .more.r,.catwrap.atstart .more.l,.catwrap.used .more{opacity:0;pointer-events:none}
 @keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
 .ptitle{padding:4px 18px 0}
 .ptitle b{display:block;font-size:20px;font-weight:600;color:#1A1A1A}

@@ -353,9 +353,13 @@ function initCats(){
   const wrap = app.querySelector(".catwrap"); if(!wrap) return;
   const cats = wrap.querySelector(".cats"), on = cats.querySelector(".on");
   if(on){ const a = cats.getBoundingClientRect(), b = on.getBoundingClientRect(); cats.scrollLeft += (b.left - a.left) - (a.width - b.width) / 2; }
-  const upd = () => { wrap.classList.toggle("atstart", cats.scrollLeft < 6); wrap.classList.toggle("atend", cats.scrollLeft + cats.clientWidth > cats.scrollWidth - 6); };
-  cats.addEventListener("scroll", upd, {passive:true}); upd();
-  wrap.querySelectorAll("[data-scroll]").forEach(b => b.onclick = () => cats.scrollBy({left: b.dataset.scroll * cats.clientWidth * 0.7, behavior:"smooth"}));
+  // la flèche n'apparaît qu'à l'ouverture de la page ; dès qu'on fait défiler, elle disparaît
+  const atEnd = cats.scrollLeft + cats.clientWidth > cats.scrollWidth - 6;
+  wrap.classList.toggle("atend", atEnd);
+  wrap.classList.toggle("atstart", !atEnd || cats.scrollLeft < 6);
+  const hide = () => wrap.classList.add("used");
+  ["touchstart","wheel","pointerdown"].forEach(ev => cats.addEventListener(ev, hide, {passive:true, once:true}));
+  wrap.querySelectorAll("[data-scroll]").forEach(b => b.onclick = () => { cats.scrollBy({left: b.dataset.scroll * cats.clientWidth * 0.7, behavior:"smooth"}); hide(); });
 }
 const catPicked = () => { try{ return localStorage.getItem("evoala-cat") === "1"; }catch(e){ return true; } };
 function phrases(si, ti, sub=0){
@@ -367,7 +371,7 @@ function phrases(si, ti, sub=0){
   app.innerHTML = `${topbar(si===8?"bonus":"guide").replace('class="top"','class="top flow"')}
     <label class="search psearch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" placeholder="${t("search")}" autocomplete="off" aria-label="${t("searchL")}"></label>
     ${si===8 ? `<div class="phead"><b>${t("extra")}</b></div>` :
-      `${catPicked() ? "" : `<p class="cathint"><span>${t("pick")}</span><em>${t("swipe")} <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></em></p>`}
+      `${catPicked() ? "" : `<p class="cathint"><span>${t("pick")}</span></p>`}
       ${catsBar(GRID, si, i => `s${i}t0`, true)}`}
     <div id="results"></div>
     <div id="menu">
