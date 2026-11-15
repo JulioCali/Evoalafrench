@@ -209,7 +209,7 @@ const HUB = {
   es:{t1:"Una guía para",t2:"cada objetivo",sub:"Cada guía te acompaña hacia una meta concreta. Empieza por la que más te sirve hoy.",
       subWide:" Viajar, empezar desde cero o aprobar el DELF: tú decides.",badge:"Versión de prueba",kicker:"Guía de supervivencia",title:"Francés para viajar",
       mission:"Misión:",goal:"entender y hacerte entender en Francia durante tu viaje.",chips:["757 frases útiles","Audio y pronunciación","Guía de Paris","Todos los niveles"],
-      cta:"Empezar a aprender",others:"Otras guías",othersSub:"Cada una con su objetivo",level:"Nivel",soon:"Muy pronto",more:"Más guías en camino",
+      cta:"Empezar a aprender",cta2:"Seguir aprendiendo",heardOf:"frases escuchadas",others:"Otras guías",othersSub:"Cada una con su objetivo",level:"Nivel",soon:"Muy pronto",more:"Más guías en camino",
       notify:"Avísame cuando salga una guía",notifyToast:"Muy pronto podrás dejar tu correo aquí.",how:"¿Cómo aprendes?",
       steps:[["Elige tu objetivo","Viajar, empezar desde cero o preparar el DELF."],["Escucha y repite","Cada frase tiene su audio y su pronunciación escrita."],["Úsalo en la vida real","En tu teléfono, cuando lo necesites, incluso en Francia."]],
       guides:[["Francés A1","desde cero","Descubrir el francés y dar tus primeros pasos"],["DELF A1","examen oficial","Hablar de ti, tu casa y tus gustos, y obtener tu primer diploma"],
@@ -217,7 +217,7 @@ const HUB = {
   en:{t1:"A guide for",t2:"every goal",sub:"Each guide takes you toward a concrete goal. Start with the one that helps you most today.",
       subWide:" Travel, start from scratch or pass the DELF: you decide.",badge:"Trial version",kicker:"Survival guide",title:"French for traveling",
       mission:"Mission:",goal:"understand and make yourself understood in France during your trip.",chips:["757 useful phrases","Audio and pronunciation","Paris Guide","All levels"],
-      cta:"Start learning",others:"Other guides",othersSub:"Each with its own goal",level:"Level",soon:"Coming soon",more:"More guides on the way",
+      cta:"Start learning",cta2:"Keep learning",heardOf:"phrases listened to",others:"Other guides",othersSub:"Each with its own goal",level:"Level",soon:"Coming soon",more:"More guides on the way",
       notify:"Let me know when a new guide is out",notifyToast:"Soon you'll be able to leave your email here.",how:"How do you learn?",
       steps:[["Choose your goal","Travel, start from scratch or prepare for the DELF."],["Listen and repeat","Each phrase has its audio and its written pronunciation."],["Use it in real life","On your phone, whenever you need it, even in France."]],
       guides:[["French A1","from scratch","Discover French and take your first steps"],["DELF A1","official exam","Talk about yourself, your home and your tastes, and earn your first diploma"],
@@ -225,6 +225,10 @@ const HUB = {
 };
 const HUB_LOOK = [["a1","A1","#0F7C72","#E3F4F1"],["delfa1","A1","#C2410C","#FDEBDD"],["delfa2","A2","#BE185D","#FCE4EF"],["delfb1","B1","#1D4ED8","#E2EAFD"],["delfb2","B2","#6D28D9","#EDE7FC"]];
 function hub(){
+  // après une première utilisation : barre de progression (phrases écoutées) au lieu des étiquettes
+  const heardSet = new Set(seen.get("evoala-heard")), started = heardSet.size > 0 || seen.get("evoala-seen").length > 0;
+  const allIdx = C ? [...index().values()] : [], total = allIdx.length || 757, nHeard = allIdx.filter(x => heardSet.has(x.p.fr)).length;
+  const pct = nHeard ? Math.max(1, Math.round(nHeard * 100 / total)) : 0;
   const H = HUB[LANG], arrow = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   const card = (g, i) => { const [img, lvl, fg, bg] = HUB_LOOK[i];
     return `<div class="gcard" style="--fg:${fg};--bg:${bg}"><div class="gcover"><img src="img/hub/${img}.webp" alt=""><span>${H.level} ${lvl}</span></div>
@@ -238,8 +242,9 @@ function hub(){
         <div class="fhead"><span class="fimg"><img src="img/hub/voyage.webp" alt=""></span>
           <div><span class="fbadge">${H.badge}</span><small>${MINIFLAG}${H.kicker}</small><b>${H.title}</b></div></div>
         <div class="fbody"><p><strong>${H.mission}</strong> ${H.goal}</p>
-          <div class="fchips">${H.chips.map(c => `<span>${c}</span>`).join("")}</div>
-          <button class="fcta" data-go="guia">${H.cta} ${arrow}</button></div>
+          ${started ? `<div class="fprog"><div class="fpl"><b>${pct}%</b><span>${nHeard} / ${total} ${H.heardOf}</span></div><div class="gtrack ph"><i style="width:${nHeard ? Math.max(2, nHeard * 100 / total) : 0}%"></i></div></div>`
+            : `<div class="fchips">${H.chips.map(c => `<span>${c}</span>`).join("")}</div>`}
+          <button class="fcta" data-go="guia">${started ? H.cta2 : H.cta} ${arrow}</button></div>
       </section></div>
     <div class="ghead"><b>${H.others}</b><span>${H.othersSub}</span></div>
     <div class="ggrid">${H.guides.map(card).join("")}<div class="gmore"><span>+</span>${H.more}</div></div>
