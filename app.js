@@ -497,7 +497,10 @@ const l = k => LT[LANG][k];
 const LCOLORS = ["#D6336C","#6C4FE0","#E07A00","#1F8A70","#2E6FD8"];
 let SAVED = new Set();
 const lists = {
-  all(){ try{ const v = JSON.parse(localStorage.getItem("evoala-lists")); return Array.isArray(v) ? v : []; }catch(e){ return []; } },
+  all(){ let v; try{ v = JSON.parse(localStorage.getItem("evoala-lists")); }catch(e){}
+    if(!Array.isArray(v)) v = [];
+    if(!v.some(x => x.id === "fav")) v.unshift({ id: "fav", name: "", color: LCOLORS[0], items: [] });  // « Mis favoritos » existe toujours
+    return v; },
   put(v, sync = true){
     try{ localStorage.setItem("evoala-lists", JSON.stringify(v)); }catch(e){}
     SAVED = new Set(v.flatMap(x => x.items));
@@ -505,6 +508,7 @@ const lists = {
   }
 };
 SAVED = new Set(lists.all().flatMap(x => x.items));
+const lname = x => x.name || l("fav");
 const nPhr = n => `${n} ${n === 1 ? l("phr1") : l("phr")}`;
 const lsq = (color, big) => `<span class="lsq${big?' big':''}" style="background:${color}">${ICON.heart}</span>`;
 function icHTML(p, cls = "ic"){
@@ -530,12 +534,6 @@ function heartClick(key){
     snack(l("removed"), l("undo"), () => { const L2 = lists.all(), y = L2.find(v => v.id === x.id); if(!y) return; y.items.splice(at, 0, key); lists.put(L2); listPage(y.id); });
     return;
   }
-  if(!L.length){                                          // tout premier cœur : liste « Mis favoritos » créée d'office
-    L.push({ id: Date.now().toString(36), name: l("fav"), color: LCOLORS[0], items: [key] });
-    lists.put(L); refreshHearts();
-    snack(`${l("saved")} <b>${esc(l("fav"))}</b>`, l("change"), () => openSheet(key));
-    return;
-  }
   openSheet(key);
 }
 
@@ -543,7 +541,7 @@ function heartClick(key){
 let SHEET = { key: null, view: "pick", color: LCOLORS[1], name: "" };
 function closeSheet(){ document.getElementById("sheet")?.classList.remove("open"); }
 function openSheet(key, view = "pick"){
-  SHEET = { key, view, color: LCOLORS[lists.all().length % LCOLORS.length], name: "" };
+  SHEET = { key, view, color: LCOLORS[lists.all().length % LCOLORS.length], name: "" };  // le rose est celui de Mis favoritos
   let el = document.getElementById("sheet");
   if(!el){
     el = document.createElement("div"); el.id = "sheet"; el.className = "sheet"; document.body.appendChild(el);
@@ -560,7 +558,7 @@ function renderSheet(){
   let body;
   if(SHEET.view === "pick"){
     body = `${head}<h3>${l("save")}</h3><p class="shsub">${l("pick")}</p>
-      <div class="lrows">${lists.all().map(x => `<button class="lrow" data-tog="${x.id}" aria-pressed="${x.items.includes(key)}">${lsq(x.color)}<span class="lnm"><b>${esc(x.name)}</b><small>${nPhr(x.items.length)}</small></span><span class="chk${x.items.includes(key)?' on':''}">${ICON.check}</span></button>`).join("")}
+      <div class="lrows">${lists.all().map(x => `<button class="lrow" data-tog="${x.id}" aria-pressed="${x.items.includes(key)}">${lsq(x.color)}<span class="lnm"><b>${esc(lname(x))}</b><small>${nPhr(x.items.length)}</small></span><span class="chk${x.items.includes(key)?' on':''}">${ICON.check}</span></button>`).join("")}
       <button class="lrow lnew" data-new><span class="lsq dash">+</span><span class="lnm"><b>${l("newL")}</b></span></button></div>
       <button class="shbtn" data-close>${l("done")}</button>`;
   } else {
@@ -603,7 +601,7 @@ function myLists(){
   app.innerHTML = `${topbar("listas")}
     <div class="ltitle"><b>${l("mine")}</b><small>${l("mineSub")}</small></div>
     ${L.length ? `<div class="lcards">${L.map(x => `<div class="lcard">
-        <a class="lchead" href="#lista-${x.id}">${lsq(x.color)}<span class="lnm"><b>${esc(x.name)}</b><small>${nPhr(x.items.length)}</small></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
+        <a class="lchead" href="#lista-${x.id}">${lsq(x.color)}<span class="lnm"><b>${esc(lname(x))}</b><small>${nPhr(x.items.length)}</small></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
         ${x.items.length ? `<div class="lcfoot"><span class="thumbs">${thumbs(x)}</span><button class="lplay" data-playlist="${x.id}">${ICON.play}${l("listen")}</button></div>` : ""}
       </div>`).join("")}
       <button class="lnewbig" data-newlist><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>${l("newL")}</button>
@@ -618,19 +616,19 @@ function listPage(id){
   const items = x.items.map(k => index().get(k)).filter(Boolean);
   app.innerHTML = `<div class="lbar"><button class="round" data-go="listas" aria-label="${l("back")}"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><span></span>
       <div class="lopts"><button class="round" data-lopts aria-label="${l("opts")}" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
-      <div class="lpop" hidden><button data-lren>${l("rename")}</button><button data-ldel class="danger">${l("del")}</button></div></div></div>
-    <div class="lhead">${lsq(x.color, true)}<div><b>${esc(x.name)}</b><small>${nPhr(items.length)}</small></div></div>
+      <div class="lpop" hidden><button data-lren>${l("rename")}</button>${x.id === "fav" ? "" : `<button data-ldel class="danger">${l("del")}</button>`}</div></div></div>
+    <div class="lhead">${lsq(x.color, true)}<div><b>${esc(lname(x))}</b><small>${nPhr(items.length)}</small></div></div>
     ${items.length ? `<div class="lacts"><button class="qall" data-qall>${ICON.play}<span>${l("all")}</span></button><button class="qmix" data-qmix>${ICON.mix}<span>${l("mix")}</span></button></div>
       <div class="card">${items.map(v => rowHTML(v.p, v.crumb)).join("")}</div>` : `<div class="empty">${l("emptyL")}</div>`}`;
   if(PENDING === id){ PENDING = null; setTimeout(() => playQueue(false), 300); }
 }
 function renameList(id){
   const L = lists.all(), x = L.find(v => v.id === id); if(!x) return;
-  const n = prompt(l("rename"), x.name); if(n == null || !n.trim()) return;
+  const n = prompt(l("rename"), lname(x)); if(n == null || !n.trim()) return;
   x.name = n.trim().slice(0, 40); lists.put(L); listPage(id);
 }
 function deleteList(id){
-  if(!confirm(l("delQ"))) return;
+  if(id === "fav" || !confirm(l("delQ"))) return;
   lists.put(lists.all().filter(v => v.id !== id)); location.hash = "listas";
 }
 
