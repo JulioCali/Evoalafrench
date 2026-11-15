@@ -67,6 +67,11 @@ const tileLabel = g => LANG === "en" ? (TILE_EN[g] || g) : (TILE_ES[g] || g);
 const ICON = {
   home:'<svg viewBox="0 0 24 24"><path d="M12 3 2 11.5h3V21h5.5v-6h3v6H19v-9.5h3z"/></svg>',
   bulb:'<svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>',
+  heart:'<svg viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
+  check:'<svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>',
+  play:'<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
+  stop:'<svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>',
+  mix:'<svg viewBox="0 0 24 24"><path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
   spk:'<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>',
 };
 
@@ -184,6 +189,8 @@ function onAuth(u){
   if(uid && uid !== lastUid){
     window.EvoAuth.load().then(d => {
       if(d && d.last){ try{ localStorage.setItem("evoala-last", d.last); }catch(e){} }
+      if(d && Array.isArray(d.lists)){ lists.put(d.lists, false); refreshHearts(); if(/^#lista/.test(location.hash)) route(); }
+      else if(lists.all().length) window.EvoAuth.save({ lists: lists.all() });
       if(d && d.lang && d.lang !== LANG) setLang(d.lang, true);
       else if(!location.hash) route();
       if(!d) window.EvoAuth.save({ lang: LANG, last: store.get() || null });
@@ -297,8 +304,9 @@ function topbar(where){
 // barre du bas : Guía / Paris / Bonus, sur toutes les pages
 function navbar(where){
   const eiffel = '<svg class="nico" viewBox="0 0 24 24"><path d="M12 2v3M10.5 5h3l1 6h-5zM9.5 11h5l3.5 10h-3.8a2.2 2.2 0 0 0-4.4 0H6z"/><path d="M8 15h8"/></svg>';
-  const it = (go, icon, label, on) => `<button class="${on?'on':''}" data-go="${go}">${icon ? mi(icon) : eiffel}<span>${label}</span></button>`;
-  return `<nav class="nav">${it("guia", "p-Guía", t("nGuide"), where==="guide"||where==="home")}${it("s8t0", "p-Bonus", t("nBonus"), where==="bonus")}${it("p1", "", t("nParis"), where==="paris")}</nav>`;
+  const it = (go, icon, label, on) => `<button class="${on?'on':''}" data-go="${go}">${icon}<span>${label}</span></button>`;
+  const hrt = `<i class="nico nheart">${ICON.heart}</i>`;
+  return `<nav class="nav">${it("guia", mi("p-Guía"), t("nGuide"), where==="guide"||where==="home")}${it("listas", hrt, l("nav"), where==="listas")}${it("p1", eiffel, t("nParis"), where==="paris")}</nav>`;
 }
 
 /* ---------- Pages de phrases ---------- */
@@ -306,10 +314,11 @@ function rowHTML(p, crumb){
   const bulb = `<i class="bulb">${ICON.bulb}</i>`, al = ` role="button" aria-label="${t("seePr")}"`;
   const ic = p.num ? `<div class="ic num${p.num.length>2?' long':''}"${al}>${esc(p.num)}${bulb}</div>` : p.icon ? `<div class="ic" style="background-image:url('${p.icon[0]}');--i:${p.icon[1]}"${al}>${bulb}</div>` : `<div class="ic"${al}>${bulb}</div>`;
   const au = p.audio ? `${p.audio[0]}#${p.audio[1]}` : "";
-  return `<div class="row${p.who==='staff'?' staff':''}" data-audio="${esc(au)}">
+  return `<div class="row${p.who==='staff'?' staff':''}" data-audio="${esc(au)}" data-key="${esc(p.fr)}">
     ${ic}<div class="ph">${crumb ? `<button class="crumb" data-go="${crumb[1]}">${esc(crumb[0])}</button>` : ""}<div class="fr">${esc(p.fr)}</div>
     <div class="es" data-es="${esc(p.es)}" data-pr="${esc(p.pr)}">${esc(p.es)}</div></div>
-    <div class="spk">${ICON.spk}</div></div>`;
+    <div class="spk">${ICON.spk}</div>
+    <button class="heart${SAVED.has(p.fr)?' on':''}" aria-label="${l("save")}">${ICON.heart}</button></div>`;
 }
 function tipHTML(t){
   if(t.table) return `<div class="dato"><b>💡 ${esc(t.title)}:</b><table class="dtab"><tr>${t.table.head.map(h=>`<th>${h?`<span>${esc(h)}</span>`:""}</th>`).join("")}</tr>
@@ -368,11 +377,10 @@ function phrases(si, ti, sub=0){
   if(tab.subs && !tab.subs[sub]) sub = 0;
   const view = tab.subs ? tab.subs[sub] : tab;
   const nx = nextPage(si, ti, sub);
-  app.innerHTML = `${topbar(si===8?"bonus":"guide").replace('class="top"','class="top flow"')}
+  app.innerHTML = `${topbar("guide").replace('class="top"','class="top flow"')}
     <label class="search psearch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" placeholder="${t("search")}" autocomplete="off" aria-label="${t("searchL")}"></label>
-    ${si===8 ? `<div class="phead"><b>${t("extra")}</b></div>` :
-      `${catPicked() ? "" : `<p class="cathint"><span>${t("pick")}</span></p>`}
-      ${catsBar(GRID, si, i => `s${i}t0`, true)}`}
+    ${`${catPicked() ? "" : `<p class="cathint"><span>${t("pick")}</span></p>`}
+      ${catsBar([...GRID, "Bonus"], si, i => `s${i}t0`, true)}`}
     <div id="results"></div>
     <div id="menu">
     <div class="ptabs">${s.tabs.map((tb,i)=>`<button class="tab${i===ti?' on':''}" data-go="s${si}t${i}">${esc(tb.label || tb.name)}</button>`).join("")}</div>
@@ -450,14 +458,205 @@ function search(q){
   const res = document.getElementById("results"), menu = document.getElementById("menu");
   if(!q){ res.innerHTML = ""; menu.style.display = ""; return; }
   menu.style.display = "none";
-  const hits = [];
+  const hits = [...index().values()].filter(x => norm(x.p.fr).includes(q) || norm(x.p.es).includes(q));
+  res.innerHTML = hits.length ? `<p class="intro">${hits.length} ${t("found")}</p><div class="card">${hits.slice(0,60).map(x => rowHTML(x.p, x.crumb)).join("")}</div>` : `<div class="empty">${t("none")}</div>`;
+}
+// toutes les phrases du guide : clé (texte français) -> phrase + d'où elle vient
+let IDX = null, IDXC = null;
+function index(){
+  if(IDXC === C) return IDX;
+  IDX = new Map(); IDXC = C;
   [...GRID, "Bonus"].forEach((name, si) => { const s = sec(name); if(!s) return;
     const cat = si === 8 ? t("nBonus") : tileLabel(name);
     s.tabs.forEach((tb, ti) => (tb.subs || [tb]).forEach((v, u) => v.groups.forEach(g => g.phrases.forEach(p => {
-      if(norm(p.fr).includes(q) || norm(p.es).includes(q)) hits.push([p, [`${cat} › ${tb.label || tb.name}`, pageHash(si, ti, tb.subs ? u : 0)]]);
+      if(!IDX.has(p.fr)) IDX.set(p.fr, { p, crumb: [`${cat} › ${tb.label || tb.name}`, pageHash(si, ti, tb.subs ? u : 0)] });
     }))));
   });
-  res.innerHTML = hits.length ? `<p class="intro">${hits.length} ${t("found")}</p><div class="card">${hits.slice(0,60).map(h => rowHTML(h[0], h[1])).join("")}</div>` : `<div class="empty">${t("none")}</div>`;
+  return IDX;
+}
+
+/* ---------- Mis listas : le cœur à côté de chaque phrase ----------
+   Les listes sont gardées sur le téléphone (localStorage) et dans le compte (Firestore) quand on est connecté. */
+const LT = {
+  es:{save:"Guardar en una lista",saved:"Guardada en",change:"Cambiar",pick:"Elige una o varias listas",newL:"Crear una lista nueva",done:"Listo",
+      newT:"Nueva lista",name:"Nombre de la lista",ideas:"Ideas",color:"Color",create:"Crear y guardar",createEmpty:"Crear la lista",phr:"frases",phr1:"frase",
+      nav:"Mis listas",mine:"Mis listas",mineSub:"Tus frases guardadas, para repasar cuando quieras",listen:"Escuchar",all:"Escuchar todo",stop:"Detener",mix:"Mezclar",
+      tip:"Toca el corazón de cualquier frase para guardarla.",emptyT:"Aún no tienes listas",emptyS:"Toca el corazón al lado de una frase para guardarla aquí y repasarla cuando quieras.",
+      toGuide:"Ir a la guía",fav:"Mis favoritos",removed:"Quitada de la lista",undo:"Deshacer",rename:"Cambiar el nombre",del:"Borrar la lista",
+      delQ:"¿Borrar esta lista? Las frases siguen en la guía.",emptyL:"Esta lista está vacía. Toca el corazón de una frase en la guía para añadirla.",opts:"Opciones de la lista",back:"Mis listas",
+      ideasL:["Mi viaje a París","Para repasar","En el restaurante","Emergencias"]},
+  en:{save:"Save to a list",saved:"Saved to",change:"Change",pick:"Choose one or more lists",newL:"Create a new list",done:"Done",
+      newT:"New list",name:"List name",ideas:"Ideas",color:"Color",create:"Create and save",createEmpty:"Create the list",phr:"phrases",phr1:"phrase",
+      nav:"My lists",mine:"My lists",mineSub:"Your saved phrases, to review whenever you like",listen:"Listen",all:"Listen to all",stop:"Stop",mix:"Shuffle",
+      tip:"Tap the heart on any phrase to save it.",emptyT:"No lists yet",emptyS:"Tap the heart next to a phrase to save it here and review it whenever you like.",
+      toGuide:"Go to the guide",fav:"My favorites",removed:"Removed from the list",undo:"Undo",rename:"Rename",del:"Delete the list",
+      delQ:"Delete this list? The phrases stay in the guide.",emptyL:"This list is empty. Tap the heart on a phrase in the guide to add it.",opts:"List options",back:"My lists",
+      ideasL:["My trip to Paris","To review","At the restaurant","Emergencies"]}
+};
+const l = k => LT[LANG][k];
+const LCOLORS = ["#D6336C","#6C4FE0","#E07A00","#1F8A70","#2E6FD8"];
+let SAVED = new Set();
+const lists = {
+  all(){ try{ const v = JSON.parse(localStorage.getItem("evoala-lists")); return Array.isArray(v) ? v : []; }catch(e){ return []; } },
+  put(v, sync = true){
+    try{ localStorage.setItem("evoala-lists", JSON.stringify(v)); }catch(e){}
+    SAVED = new Set(v.flatMap(x => x.items));
+    if(sync) window.EvoAuth?.save({ lists: v });
+  }
+};
+SAVED = new Set(lists.all().flatMap(x => x.items));
+const nPhr = n => `${n} ${n === 1 ? l("phr1") : l("phr")}`;
+const lsq = (color, big) => `<span class="lsq${big?' big':''}" style="background:${color}">${ICON.heart}</span>`;
+function icHTML(p, cls = "ic"){
+  return p.num ? `<div class="${cls} num">${esc(p.num)}</div>` : p.icon ? `<div class="${cls}" style="background-image:url('${p.icon[0]}');--i:${p.icon[1]}"></div>` : `<div class="${cls}"></div>`;
+}
+function refreshHearts(){ document.querySelectorAll(".row[data-key]").forEach(r => r.querySelector(".heart")?.classList.toggle("on", SAVED.has(r.dataset.key))); }
+
+// petite barre en bas avec une action (Cambiar, Deshacer)
+function snack(html, action, fn){
+  let el = document.getElementById("snack");
+  if(!el){ el = document.createElement("div"); el.id = "snack"; el.className = "snack"; el.setAttribute("role", "status"); document.body.appendChild(el); }
+  el.innerHTML = `<i>${ICON.heart}</i><span>${html}</span>${action ? `<button>${action}</button>` : ""}`;
+  if(action) el.querySelector("button").onclick = () => { el.classList.remove("show"); fn(); };
+  el.classList.add("show"); clearTimeout(el._h); el._h = setTimeout(() => el.classList.remove("show"), 4500);
+}
+
+function heartClick(key){
+  const L = lists.all();
+  if(app.dataset.list){                                   // dans une liste ouverte : on retire la phrase
+    const x = L.find(v => v.id === app.dataset.list); if(!x) return;
+    const at = x.items.indexOf(key); if(at < 0) return;
+    x.items.splice(at, 1); lists.put(L); listPage(x.id);
+    snack(l("removed"), l("undo"), () => { const L2 = lists.all(), y = L2.find(v => v.id === x.id); if(!y) return; y.items.splice(at, 0, key); lists.put(L2); listPage(y.id); });
+    return;
+  }
+  if(!L.length){                                          // tout premier cœur : liste « Mis favoritos » créée d'office
+    L.push({ id: Date.now().toString(36), name: l("fav"), color: LCOLORS[0], items: [key] });
+    lists.put(L); refreshHearts();
+    snack(`${l("saved")} <b>${esc(l("fav"))}</b>`, l("change"), () => openSheet(key));
+    return;
+  }
+  openSheet(key);
+}
+
+/* Panneau qui monte du bas : choisir une liste, ou en créer une */
+let SHEET = { key: null, view: "pick", color: LCOLORS[1], name: "" };
+function closeSheet(){ document.getElementById("sheet")?.classList.remove("open"); }
+function openSheet(key, view = "pick"){
+  SHEET = { key, view, color: LCOLORS[lists.all().length % LCOLORS.length], name: "" };
+  let el = document.getElementById("sheet");
+  if(!el){
+    el = document.createElement("div"); el.id = "sheet"; el.className = "sheet"; document.body.appendChild(el);
+    el.addEventListener("click", sheetClick);
+    el.addEventListener("input", e => { if(e.target.id === "lname") SHEET.name = e.target.value; });
+    el.addEventListener("keydown", e => { if(e.key === "Escape") closeSheet(); if(e.key === "Enter" && e.target.id === "lname") createList(); });
+  }
+  renderSheet(); requestAnimationFrame(() => el.classList.add("open"));
+  if(view === "new") setTimeout(() => document.getElementById("lname")?.focus(), 250);
+}
+function renderSheet(){
+  const el = document.getElementById("sheet"), key = SHEET.key, it = key && index().get(key);
+  const head = it ? `<div class="shph">${icHTML(it.p)}<div><b>${esc(it.p.fr)}</b><small>${esc(it.p.es)}</small></div></div>` : "";
+  let body;
+  if(SHEET.view === "pick"){
+    body = `${head}<h3>${l("save")}</h3><p class="shsub">${l("pick")}</p>
+      <div class="lrows">${lists.all().map(x => `<button class="lrow" data-tog="${x.id}" aria-pressed="${x.items.includes(key)}">${lsq(x.color)}<span class="lnm"><b>${esc(x.name)}</b><small>${nPhr(x.items.length)}</small></span><span class="chk${x.items.includes(key)?' on':''}">${ICON.check}</span></button>`).join("")}
+      <button class="lrow lnew" data-new><span class="lsq dash">+</span><span class="lnm"><b>${l("newL")}</b></span></button></div>
+      <button class="shbtn" data-close>${l("done")}</button>`;
+  } else {
+    body = `<div class="shtop">${key ? `<button class="shback" data-pick aria-label="${l("back")}"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>` : ""}<h3>${l("newT")}</h3></div>
+      <label class="shlab" for="lname">${l("name")}</label><input id="lname" class="shin" maxlength="40" value="${esc(SHEET.name)}" placeholder="${esc(l("ideasL")[0])}" autocomplete="off">
+      <p class="shsub">${l("ideas")}</p><div class="ideas">${l("ideasL").map(n => `<button data-idea="${esc(n)}" class="${n===SHEET.name?'on':''}">${esc(n)}</button>`).join("")}</div>
+      <p class="shsub">${l("color")}</p><div class="dots">${LCOLORS.map(c => `<button data-col="${c}" class="${c===SHEET.color?'on':''}" style="--c:${c}" aria-label="${l("color")} ${c}"></button>`).join("")}</div>
+      <button class="shbtn" data-create>${key ? `${l("create")} «${esc(it ? it.p.fr : "")}»` : l("createEmpty")}</button>`;
+  }
+  el.innerHTML = `<div class="shov" data-close></div><div class="shp" role="dialog" aria-modal="true" aria-label="${l("save")}"><i class="grab"></i>${body}</div>`;
+}
+function sheetClick(e){
+  const b = e.target.closest("button, .shov"); if(!b) return;
+  if(b.hasAttribute("data-close")){ closeSheet(); return; }
+  if(b.hasAttribute("data-new")){ SHEET.view = "new"; renderSheet(); setTimeout(() => document.getElementById("lname")?.focus(), 50); return; }
+  if(b.hasAttribute("data-pick")){ SHEET.view = "pick"; renderSheet(); return; }
+  if(b.dataset.idea){ SHEET.name = b.dataset.idea; renderSheet(); return; }
+  if(b.dataset.col){ SHEET.color = b.dataset.col; const v = document.getElementById("lname")?.value; if(v != null) SHEET.name = v; renderSheet(); return; }
+  if(b.hasAttribute("data-create")){ createList(); return; }
+  if(b.dataset.tog){
+    const L = lists.all(), x = L.find(v => v.id === b.dataset.tog); if(!x) return;
+    const i = x.items.indexOf(SHEET.key); i < 0 ? x.items.push(SHEET.key) : x.items.splice(i, 1);
+    lists.put(L); renderSheet(); refreshHearts();
+  }
+}
+function createList(){
+  const name = (document.getElementById("lname")?.value || SHEET.name).trim() || l("ideasL")[0];
+  const L = lists.all(), x = { id: Date.now().toString(36), name, color: SHEET.color, items: SHEET.key ? [SHEET.key] : [] };
+  L.push(x); lists.put(L); closeSheet(); refreshHearts();
+  if(SHEET.key) snack(`${l("saved")} <b>${esc(name)}</b>`);
+  if(location.hash === "#listas") myLists();
+}
+
+/* Pages « Mis listas » */
+function thumbs(x){
+  return x.items.slice(0, 4).map(k => index().get(k)).filter(Boolean).map(v => icHTML(v.p, "ic th")).join("");
+}
+function myLists(){
+  const L = lists.all();
+  app.innerHTML = `${topbar("listas")}
+    <div class="ltitle"><b>${l("mine")}</b><small>${l("mineSub")}</small></div>
+    ${L.length ? `<div class="lcards">${L.map(x => `<div class="lcard">
+        <a class="lchead" href="#lista-${x.id}">${lsq(x.color)}<span class="lnm"><b>${esc(x.name)}</b><small>${nPhr(x.items.length)}</small></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
+        ${x.items.length ? `<div class="lcfoot"><span class="thumbs">${thumbs(x)}</span><button class="lplay" data-playlist="${x.id}">${ICON.play}${l("listen")}</button></div>` : ""}
+      </div>`).join("")}
+      <button class="lnewbig" data-newlist><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>${l("newL")}</button>
+      <p class="ltip">${ICON.heart}${l("tip")}</p></div>`
+    : `<div class="lempty"><span>${ICON.heart}</span><b>${l("emptyT")}</b><p>${l("emptyS")}</p><button class="shbtn" data-go="s0t0">${l("toGuide")}</button></div>`}`;
+}
+let PENDING = null;
+function listPage(id){
+  const x = lists.all().find(v => v.id === id);
+  if(!x){ location.hash = "listas"; return; }
+  app.dataset.list = id;
+  const items = x.items.map(k => index().get(k)).filter(Boolean);
+  app.innerHTML = `<div class="lbar"><button class="round" data-go="listas" aria-label="${l("back")}"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><span></span>
+      <div class="lopts"><button class="round" data-lopts aria-label="${l("opts")}" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+      <div class="lpop" hidden><button data-lren>${l("rename")}</button><button data-ldel class="danger">${l("del")}</button></div></div></div>
+    <div class="lhead">${lsq(x.color, true)}<div><b>${esc(x.name)}</b><small>${nPhr(items.length)}</small></div></div>
+    ${items.length ? `<div class="lacts"><button class="qall" data-qall>${ICON.play}<span>${l("all")}</span></button><button class="qmix" data-qmix>${ICON.mix}<span>${l("mix")}</span></button></div>
+      <div class="card">${items.map(v => rowHTML(v.p, v.crumb)).join("")}</div>` : `<div class="empty">${l("emptyL")}</div>`}`;
+  if(PENDING === id){ PENDING = null; setTimeout(() => playQueue(false), 300); }
+}
+function renameList(id){
+  const L = lists.all(), x = L.find(v => v.id === id); if(!x) return;
+  const n = prompt(l("rename"), x.name); if(n == null || !n.trim()) return;
+  x.name = n.trim().slice(0, 40); lists.put(L); listPage(id);
+}
+function deleteList(id){
+  if(!confirm(l("delQ"))) return;
+  lists.put(lists.all().filter(v => v.id !== id)); location.hash = "listas";
+}
+
+/* Écouter toute une liste, à la suite (ou mélangée) */
+let QPLAY = 0;
+function stopQueue(){
+  QPLAY = 0; if(player) player.pause();
+  document.querySelectorAll(".row.playing").forEach(r => r.classList.remove("playing"));
+  const b = app.querySelector("[data-qall]"); if(b) b.innerHTML = `${ICON.play}<span>${l("all")}</span>`;
+}
+async function playQueue(mix){
+  if(QPLAY) stopQueue();
+  const tok = QPLAY = Date.now();
+  let rows = [...app.querySelectorAll(".row[data-audio^='snd']")];
+  if(mix) rows = rows.map(r => [Math.random(), r]).sort((a, b) => a[0] - b[0]).map(v => v[1]);
+  const b = app.querySelector("[data-qall]"); if(b) b.innerHTML = `${ICON.stop}<span>${l("stop")}</span>`;
+  for(const r of rows){
+    if(QPLAY !== tok) return;
+    const [file, id] = r.dataset.audio.split("#");
+    r.classList.add("playing"); r.scrollIntoView({ block: "center", behavior: "smooth" });
+    try{ await playUrl(await audioUrl(file, id)); }catch(e){}
+    r.classList.remove("playing");
+    if(QPLAY !== tok) return;
+    await new Promise(ok => setTimeout(ok, 700));
+  }
+  if(QPLAY === tok) stopQueue();
 }
 
 /* ---------- Clics ---------- */
@@ -476,6 +675,17 @@ app.addEventListener("click", e => {
   if(e.target.closest("[data-notify]")){ toast(HUB[LANG].notifyToast); return; }
   if(e.target.closest("[data-hint]")){ try{ localStorage.setItem("evoala-hint","1"); }catch(_){} app.querySelector(".hint")?.remove(); return; }
   if(e.target.closest("[data-up]")){ scrollTo({top:0,behavior:"smooth"}); return; }
+  const hb = e.target.closest(".heart");
+  if(hb){ heartClick(hb.closest(".row").dataset.key); return; }
+  const pl = e.target.closest("[data-playlist]");
+  if(pl){ PENDING = pl.dataset.playlist; location.hash = "lista-" + PENDING; return; }
+  if(e.target.closest("[data-newlist]")){ openSheet(null, "new"); return; }
+  if(e.target.closest("[data-qall]")){ QPLAY ? stopQueue() : playQueue(false); return; }
+  if(e.target.closest("[data-qmix]")){ playQueue(true); return; }
+  const lo = e.target.closest("[data-lopts]");
+  if(lo){ const pop = app.querySelector(".lpop"); pop.hidden = !pop.hidden; lo.setAttribute("aria-expanded", String(!pop.hidden)); return; }
+  if(e.target.closest("[data-lren]")){ renameList(app.dataset.list); return; }
+  if(e.target.closest("[data-ldel]")){ deleteList(app.dataset.list); return; }
   const row = e.target.closest(".row"); if(!row) return;
   if(e.target.closest(".ic")){                       // l'illustration = prononciation
     const es = row.querySelector(".es");
@@ -494,30 +704,36 @@ const bundles = {}, urls = {};
 function bundle(file){
   return bundles[file] ??= fetch(file).then(r => r.json());
 }
+async function audioUrl(file, id){
+  if(!urls[id]){
+    const b = await bundle(file);
+    const bin = Uint8Array.from(atob(b[id]), c => c.charCodeAt(0));
+    urls[id] = URL.createObjectURL(new Blob([bin], {type:"audio/mpeg"}));
+  }
+  return urls[id];
+}
+function playUrl(u){
+  return new Promise((ok, ko) => { if(player) player.pause(); player = new Audio(u); player.onended = ok; player.onerror = ko; player.play().catch(ko); });
+}
 async function playRow(row){
+  if(QPLAY) stopQueue();
   const [file, id] = row.dataset.audio.split("#");
-  if(player) player.pause();
   document.querySelectorAll(".row.playing").forEach(r => r.classList.remove("playing"));
   row.classList.add("playing");
-  try{
-    if(!urls[id]){
-      const b = await bundle(file);
-      const bin = Uint8Array.from(atob(b[id]), c => c.charCodeAt(0));
-      urls[id] = URL.createObjectURL(new Blob([bin], {type:"audio/mpeg"}));
-    }
-    player = new Audio(urls[id]);
-    player.onended = () => row.classList.remove("playing");
-    await player.play();
-  }catch(e){ row.classList.remove("playing"); toast(t("noPlay")); }
+  try{ await playUrl(await audioUrl(file, id)); }catch(e){ toast(t("noPlay")); }
+  row.classList.remove("playing");
 }
 // précharge l'audio de la page affichée
 function preload(){ const r = app.querySelector(".row[data-audio^='snd']"); if(r) bundle(r.dataset.audio.split("#")[0]); }
 
 function route(){
   const h = location.hash.slice(1);
+  delete app.dataset.list; if(QPLAY) stopQueue(); closeSheet();
   let m;
   let where = "home";
-  if((m = h.match(/^s(\d+)t(\d+)(?:p(\d+))?$/))){ phrases(+m[1], +m[2], +(m[3] || 0)); where = +m[1] === 8 ? "bonus" : "guide"; store.set(h); }
+  if((m = h.match(/^s(\d+)t(\d+)(?:p(\d+))?$/))){ phrases(+m[1], +m[2], +(m[3] || 0)); where = "guide"; store.set(h); }
+  else if(h === "listas"){ myLists(); where = "listas"; }
+  else if((m = h.match(/^lista-([\w-]+)$/))){ listPage(m[1]); where = "listas"; }
   else if((m = h.match(/^p(\d+)$/))){ paris(+m[1]); where = "paris"; }
   else if(h === "creditos"){ credits(); where = "paris"; }
   else if(h === "guia") home();

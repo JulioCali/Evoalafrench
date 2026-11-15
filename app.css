@@ -391,3 +391,91 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .ptitle{padding:4px 18px 0}
 .ptitle b{display:block;font-size:20px;font-weight:600;color:#1A1A1A}
 .ptitle small{font-size:13px;color:#6E6680}
+
+/* ---------- Mis listas : cœur, panneau, pages ---------- */
+.heart{flex:none;width:36px;height:36px;margin-left:-6px;border-radius:50%;display:grid;place-items:center;padding:0;transition:background .15s}
+.heart svg{width:20px;height:20px;fill:none;stroke:#8A8398;stroke-width:2;stroke-linejoin:round}
+.heart.on{background:#FCE4EE}
+.heart.on svg{fill:#D6336C;stroke:#D6336C;animation:pop .3s ease}
+@keyframes pop{50%{transform:scale(1.25)}}
+.card.cols2 .heart{width:28px;height:28px;margin-left:-4px}
+.card.cols2 .heart svg{width:16px;height:16px}
+.nheart{display:grid;place-items:center;width:24px;height:24px}
+.nheart svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+.nav button.on .nheart svg{fill:currentColor}
+.snack{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));max-width:496px;margin:0 auto;z-index:30;background:#1F1A33;color:#fff;border-radius:14px;padding:10px 10px 10px 14px;display:flex;align-items:center;gap:10px;font-size:14px;opacity:0;transform:translateY(16px);transition:.25s;pointer-events:none}
+.snack.show{opacity:1;transform:none;pointer-events:auto}
+.snack i svg{width:18px;height:18px;fill:#F06595;display:block}
+.snack span{flex:1}.snack b{font-weight:600}
+.snack button{color:#C9BDFF;font-weight:600;font-size:14px;padding:8px 6px;min-height:40px}
+.sheet{position:fixed;inset:0;z-index:40;pointer-events:none}
+.sheet .shov{position:absolute;inset:0;background:rgba(20,14,40,.45);opacity:0;transition:opacity .25s}
+.sheet .shp{position:absolute;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;max-height:88vh;overflow:auto;background:#fff;border-radius:24px 24px 0 0;padding:10px 20px calc(24px + env(safe-area-inset-bottom));box-sizing:border-box;transform:translateY(100%);transition:transform .28s ease;box-shadow:0 -10px 30px rgba(20,14,40,.2)}
+.sheet.open{pointer-events:auto}.sheet.open .shov{opacity:1}.sheet.open .shp{transform:none}
+.grab{display:block;width:40px;height:5px;border-radius:3px;background:#DDD8EE;margin:0 auto 14px}
+.shph{display:flex;align-items:center;gap:12px;background:#F6F4FC;border-radius:16px;padding:10px 12px;margin-bottom:16px}
+.shph b{display:block;font-size:15px;font-weight:500}.shph small{font-size:13px;color:#6E6680;font-style:italic}
+.sheet h3{margin:0 0 2px;font-size:18px;font-weight:600}
+.shsub{margin:0 0 8px;font-size:13px;color:#6E6680}
+.lrows{margin-bottom:14px}
+.lrow{display:flex;align-items:center;gap:12px;width:100%;min-height:60px;padding:0 4px;border-top:1px solid #EFEDF6;text-align:left}
+.lsq{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center}
+.lsq svg{width:20px;height:20px;fill:#fff}
+.lsq.big{width:56px;height:56px;border-radius:16px}.lsq.big svg{width:28px;height:28px}
+.lsq.dash{border:2px dashed #B9ADF0;box-sizing:border-box;color:var(--violet);font-size:22px;font-weight:500}
+.lnm{flex:1;min-width:0}.lnm b{display:block;font-size:15px;font-weight:500;color:#1A1A1A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lnm small{font-size:13px;color:#6E6680}
+.lnew .lnm b{color:#5940BF;font-weight:600}
+.chk{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid #CFC8EA;box-sizing:border-box;display:grid;place-items:center}
+.chk svg{width:15px;height:15px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.chk.on{background:var(--violet);border-color:var(--violet)}.chk.on svg{opacity:1}
+.shbtn{display:block;width:100%;height:52px;border-radius:14px;background:var(--violet);color:#fff;font-size:16px;font-weight:600;text-align:center;margin-top:8px}
+.shtop{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.shback{width:36px;height:36px;border-radius:50%;background:#F3F1FA;display:grid;place-items:center}
+.shback svg,.round svg,.lbar svg{width:18px;height:18px;fill:none;stroke:#5940BF;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.shlab{display:block;font-size:13px;font-weight:600;color:#5940BF;margin-bottom:6px}
+.shin{width:100%;height:52px;border-radius:14px;border:1.5px solid var(--card-border);padding:0 14px;font:inherit;font-size:16px;box-sizing:border-box;outline:0;margin-bottom:14px}
+.shin:focus{border-color:var(--violet)}
+.ideas{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.ideas button{min-height:36px;padding:0 14px;border-radius:999px;background:#F3F1FA;color:#5940BF;font-size:13px;font-weight:500;border:1.5px solid transparent}
+.ideas button.on{background:#EEEBFD;border-color:var(--violet)}
+.dots{display:flex;gap:14px;margin-bottom:18px}
+.dots button{width:34px;height:34px;border-radius:50%;background:var(--c)}
+.dots button.on{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--c)}
+.ltitle{padding:6px 18px 14px}.ltitle b{display:block;font-size:24px;font-weight:600}.ltitle small{font-size:14px;color:#6E6680}
+.lcards{display:flex;flex-direction:column;gap:12px;padding:0 12px 24px}
+.lcard{border:1.5px solid var(--card-border);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.lchead{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+.lchead .lsq{width:44px;height:44px;border-radius:13px}
+.lchead .lnm b{font-size:16px;font-weight:600}
+.chev{width:18px;height:18px;fill:none;stroke:#8A8398;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.lcfoot{display:flex;align-items:center;gap:10px}
+.thumbs{flex:1;display:flex}
+.ic.th{--s:34px;border:2px solid #fff;border-radius:9px;background-color:#fff;margin-left:-10px}
+.ic.th:first-child{margin-left:0}
+.ic.th.num{display:grid;place-items:center;background:#EEEBFD;color:#5940BF;font-size:12px;font-weight:600}
+.lplay{flex:none;height:40px;padding:0 14px 0 10px;border-radius:999px;background:#EEEBFD;color:#5940BF;font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px}
+.lplay svg{width:16px;height:16px;fill:#5940BF}
+.lnewbig{height:60px;border-radius:20px;border:2px dashed #CFC8EA;color:#5940BF;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
+.lnewbig svg{width:18px;height:18px;fill:none;stroke:var(--violet);stroke-width:2.6;stroke-linecap:round}
+.ltip{margin:2px 6px 0;font-size:13px;color:#6E6680;display:flex;align-items:center;gap:8px}
+.ltip svg{width:16px;height:16px;fill:none;stroke:#D6336C;stroke-width:2.2;stroke-linejoin:round;flex:none}
+.lempty{text-align:center;padding:30px 28px}
+.lempty span{display:grid;place-items:center;width:84px;height:84px;margin:0 auto 16px;border-radius:50%;background:#FCE4EE}
+.lempty span svg{width:40px;height:40px;fill:#D6336C}
+.lempty b{display:block;font-size:18px;font-weight:600;margin-bottom:6px}
+.lempty p{font-size:14px;color:#6E6680;margin:0 0 18px;line-height:1.45}
+.lbar{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 16px 8px}
+.lbar>span{flex:1}
+.round{width:40px;height:40px;border-radius:50%;background:#F3F1FA;display:grid;place-items:center}
+.lbar .lopts .round svg{fill:#5940BF;stroke:none}
+.lopts{position:relative}
+.lpop{position:absolute;right:0;top:46px;z-index:8;background:#fff;border:1px solid var(--card-border);border-radius:14px;box-shadow:0 10px 24px rgba(20,14,40,.15);padding:6px;min-width:200px}
+.lpop button{display:block;width:100%;text-align:left;padding:12px;border-radius:10px;font-size:15px}
+.lpop button:hover{background:#F6F4FC}.lpop .danger{color:#C2255C}
+.lhead{display:flex;align-items:center;gap:14px;padding:0 18px 16px}
+.lhead b{display:block;font-size:22px;font-weight:600}.lhead small{font-size:14px;color:#6E6680}
+.lacts{display:flex;gap:10px;padding:0 12px 14px}
+.lacts button{flex:1;height:50px;border-radius:14px;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
+.lacts svg{width:18px;height:18px}
+.qall{background:var(--violet);color:#fff}.qall svg{fill:#fff}
+.qmix{background:#EEEBFD;color:#5940BF}.qmix svg{fill:none;stroke:#5940BF;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
