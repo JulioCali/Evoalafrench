@@ -90,46 +90,64 @@ const score = (said, target) => { const a = norm(said), b = norm(target); if(!a)
 
 // --- audio modèle (mêmes fichiers que l'appli) ---
 const bundles = {};
+let model = null;
 async function play(i){
+  stopRec();
   const [f, id] = PH[i].audio;
   const b = await (bundles[f] ??= fetch(f).then(r => r.json()));
   const bin = Uint8Array.from(atob(b[id]), c => c.charCodeAt(0));
-  new Audio(URL.createObjectURL(new Blob([bin], {type: "audio/mpeg"}))).play();
+  if(model) model.pause();
+  model = new Audio(URL.createObjectURL(new Blob([bin], {type: "audio/mpeg"}))); model.play();
 }
+// sur iPhone, un son encore « ouvert » empêche le micro d'entendre : on le libère avant d'écouter
+function releaseAudio(){ if(model){ model.pause(); model.removeAttribute("src"); model.load(); model = null; } }
 
 // --- reconnaissance ---
-let rec = null;
-function listen(i, btn){
-  if(rec){ rec.abort(); return; }
-  const out = document.getElementById("r" + i);
-  rec = new SR(); rec.lang = "fr-FR"; rec.interimResults = false; rec.maxAlternatives = 5; rec.continuous = false;
-  btn.classList.add("rec"); btn.querySelector("span").textContent = "Te escucho…";
-  let done = false;
+// Safari (iPhone) : une seule instance réutilisée, résultats provisoires gardés, arrêt après un court silence
+let rec = null, cur = null;
+function stopRec(){ if(cur){ try{ rec.stop(); }catch(e){} } }
+function getRec(){
+  if(rec) return rec;
+  rec = new SR(); rec.lang = "fr-FR"; rec.interimResults = true; rec.maxAlternatives = 5; rec.continuous = false;
   rec.onresult = e => {
-    done = true;
-    const alts = [...e.results[0]].map(a => a.transcript);
-    const best = alts.map(a => [score(a, PH[i].fr), a]).sort((x, y) => y[0] - x[0])[0];
-    const s = best[0];
+    if(!cur) return;
+    const r = e.results[e.results.length - 1];
+    cur.alts = [...r].map(a => a.transcript);
+    clearTimeout(cur.quiet); cur.quiet = setTimeout(stopRec, 1200);      // 1,2 s sans nouveau mot -> on s'arrête
+    if(r.isFinal) stopRec();
+  };
+  rec.onerror = e => { if(cur) cur.err = e.error; };
+  rec.onend = () => { const c = cur; cur = null; if(c) finish(c); };
+  return rec;
+}
+function finish(c){
+  clearTimeout(c.quiet); clearTimeout(c.max);
+  c.btn.classList.remove("rec"); c.btn.querySelector("span").textContent = "Decir la frase";
+  const out = document.getElementById("r" + c.i);
+  if(c.alts.length){
+    const best = c.alts.map(a => [score(a, PH[c.i].fr), a]).sort((x, y) => y[0] - x[0])[0], s = best[0];
     out.className = "res " + (s >= 0.8 ? "ok" : s >= 0.55 ? "mid" : "ko");
     out.innerHTML = (s >= 0.8 ? "<b>¡Muy bien! 🎉</b>Se entiende perfectamente."
       : s >= 0.55 ? "<b>¡Casi!</b>Escucha el modelo y vuelve a intentarlo."
-      : "<b>Inténtalo otra vez</b>Escucha el modelo y repite despacio.")
-      + `<div class="heard">Entendimos: «${best[1]}»</div>`;
-  };
-  rec.onerror = e => {
-    done = true;
-    out.className = "res ko";
-    out.innerHTML = e.error === "not-allowed" || e.error === "service-not-allowed"
-      ? "<b>Micrófono bloqueado</b>Permite el acceso al micrófono en los ajustes del navegador y vuelve a intentarlo."
-      : e.error === "no-speech" ? "<b>No te escuchamos</b>Habla un poco más fuerte, cerca del teléfono."
-      : e.error === "network" ? "<b>Sin conexión</b>El reconocimiento de voz necesita internet."
-      : `<b>No funcionó</b>Error: ${e.error}`;
-  };
-  rec.onend = () => {
-    if(!done && !out.className.includes("res ")){ out.className = "res ko"; out.innerHTML = "<b>No te escuchamos</b>Vuelve a intentarlo."; }
-    btn.classList.remove("rec"); btn.querySelector("span").textContent = "Decir la frase"; rec = null;
-  };
-  try{ rec.start(); }catch(e){ btn.classList.remove("rec"); rec = null; }
+      : "<b>Inténtalo otra vez</b>Escucha el modelo y repite despacio.") + `<div class="heard">Entendimos: «${best[1]}»</div>`;
+    return;
+  }
+  const e = c.err;
+  out.className = "res ko";
+  out.innerHTML = e === "not-allowed" || e === "service-not-allowed"
+    ? "<b>Micrófono bloqueado</b>Permite el acceso al micrófono en los ajustes del navegador y vuelve a intentarlo."
+    : e === "network" ? "<b>Sin conexión</b>El reconocimiento de voz necesita internet."
+    : `<b>No te escuchamos</b>Habla un poco más fuerte, cerca del teléfono.<div class="heard">(${e || "sin resultado"})</div>`;
+}
+function listen(i, btn){
+  if(cur){ stopRec(); return; }
+  releaseAudio();
+  const r = getRec();
+  document.getElementById("r" + i).className = "res";
+  cur = { i, btn, alts: [], err: null };
+  btn.classList.add("rec"); btn.querySelector("span").textContent = "Te escucho…";
+  cur.max = setTimeout(stopRec, 7000);                                   // au plus 7 secondes
+  setTimeout(() => { try{ r.start(); }catch(e){ try{ r.abort(); }catch(_){} setTimeout(() => { try{ r.start(); }catch(_){ const c = cur; cur = null; if(c){ c.err = "start"; finish(c); } } }, 300); } }, 150);
 }
 document.addEventListener("click", e => {
   const m = e.target.closest(".mic"); if(m && SR){ listen(+m.dataset.i, m); return; }
