@@ -501,6 +501,9 @@ const lists = {
   all(){ let v; try{ v = JSON.parse(localStorage.getItem("evoala-lists")); }catch(e){}
     if(!Array.isArray(v)) v = [];
     if(!v.some(x => x.id === "fav")) v.unshift({ id: "fav", name: "", color: LCOLORS[0], items: [] });  // « Mis favoritos » existe toujours
+    // ancienne version : un « Mis favoritos » créé au premier cœur -> fusionné dans la liste par défaut
+    const fav = v.find(x => x.id === "fav"), old = v.filter(x => x.id !== "fav" && /^(mis favoritos|my favorites)$/i.test((x.name || "").trim()));
+    if(old.length){ old.forEach(o => o.items.forEach(k => fav.items.includes(k) || fav.items.push(k))); v = v.filter(x => !old.includes(x)); try{ localStorage.setItem("evoala-lists", JSON.stringify(v)); }catch(e){} }
     return v; },
   put(v, sync = true){
     try{ localStorage.setItem("evoala-lists", JSON.stringify(v)); }catch(e){}
