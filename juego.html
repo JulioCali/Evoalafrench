@@ -15,7 +15,8 @@
   .hud .back{pointer-events:auto;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.9);display:grid;place-items:center;border:0}
   .hud .back svg{width:18px;height:18px;fill:none;stroke:#5940BF;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
   .dots{flex:1;display:flex;gap:6px;justify-content:center}
-  .dots i{width:28px;height:8px;border-radius:999px;background:rgba(255,255,255,.75)}
+  .dots{min-width:0;padding:0 4px}
+  .dots i{flex:0 1 28px;min-width:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.75)}
   .dots i.ok{background:#6C4FE0}.dots i.help{background:#F5C58A}.dots i.now{background:#fff;box-shadow:0 0 0 2px #6C4FE0}
   .stars{min-width:40px;text-align:right;font-weight:700;color:#E08A00;font-size:16px}
   /* carte du mur */
@@ -68,6 +69,7 @@
   .res li{display:flex;gap:8px;padding:6px 0;border-top:1px solid #EFEDF6}
   .res li b{font-weight:600}.res li span{color:#6E6680;margin-left:auto;white-space:nowrap}
   .note{font-size:12px;color:#8A8398;margin-top:12px}
+  .back2{display:block;margin-top:12px;font-size:15px;font-weight:600;color:#5940BF;text-decoration:none;padding:8px}
 </style>
 </head>
 <body>
@@ -105,6 +107,7 @@
   <div class="big" id="endS"></div>
   <ul class="res" id="endL"></ul>
   <button class="go" id="again">Jugar otra vez</button>
+  <a class="back2" id="back2" href="/">Volver a la guía</a>
 </div></div>
 
 <script>
@@ -116,6 +119,18 @@ const PH = [
   { fr:"S'il vous plaît", es:"Por favor", pr:"sil vu PLÉ", audio:["snd/p2.json","7c51a4172b"] },
   { fr:"Je ne comprends pas", es:"No entiendo", pr:"ye ne kom-pran PÁ", audio:["snd/p2.json","ea825df785"] },
 ];
+// phrases envoyées par l'appli (bouton « Practicar »), sinon le parcours de démonstration
+let SET = null; try{ SET = JSON.parse(sessionStorage.getItem("evoala-game")); }catch(e){}
+if(SET && Array.isArray(SET.items) && SET.items.length) PH.splice(0, PH.length, ...SET.items);
+const EN = (SET && SET.lang || (()=>{ try{ return localStorage.getItem("evoala-lang"); }catch(e){ return ""; } })()) === "en";
+const T = EN ? { help:"Say it in French so Evo jumps the wall", mic:"Tap to say it in French", rec:"Listening… (tap to finish)", wait:"Checking…", wall:"Wall", of:"of",
+    ok:"Great job!", almost:"Almost!", almostS:"Listen and try again.", no:"Evo couldn't jump.", noS:"Try again.", heard:"We heard", silent:"We couldn't hear you.", silentS:"Speak a little louder, close to the phone.",
+    unclear:"We didn't understand.", unclearS:"Listen to the model and repeat slowly.", skip:"Jump with help", first:"first try", help2:"with help", practice:"with practice",
+    perfect:"Perfect!", bravo:"Bravo!", made:"You made it!", again:"Play again", back:"Back to the guide", start:"Help Evo cross Paris", startP:"Evo runs across the rooftops of Paris. In front of each wall, <b>say the phrase in French</b> and Evo will jump.", go:"Let's go!", phr:"phrases" }
+  : { help:"Dilo en francés para que Evo salte el muro", mic:"Dale clic para decirlo en francés", rec:"Te escucho… (toca para terminar)", wait:"Escuchando…", wall:"Muro", of:"de",
+    ok:"¡Muy bien!", almost:"¡Casi!", almostS:"Escucha y vuelve a intentarlo.", no:"Evo no pudo saltar.", noS:"Inténtalo otra vez.", heard:"Entendimos", silent:"No te escuchamos.", silentS:"Habla un poco más fuerte, cerca del teléfono.",
+    unclear:"No te entendimos.", unclearS:"Escucha el modelo y repite despacio.", skip:"Saltar con ayuda", first:"a la primera", help2:"con ayuda", practice:"con práctica",
+    perfect:"¡Perfecto!", bravo:"¡Bravo!", made:"¡Llegaste!", again:"Jugar otra vez", back:"Volver a la guía", start:"Ayuda a Evo a cruzar París", startP:"Evo corre por los techos de París. Delante de cada muro, <b>di la frase en francés</b> y Evo saltará.", go:"¡Vamos!", phr:"frases" };
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 
@@ -223,22 +238,23 @@ function renderDots(){ $("dots").innerHTML = PH.map((_, i) => { const r = G.resu
 function showCard(){
   G.cardTok++;
   const p = PH[G.i]; G.tries = 0; G.hintUsed = false;
-  $("kick").textContent = `Muro ${G.i + 1} de ${PH.length}`; $("es").textContent = p.es;
-  $("help").innerHTML = "Dilo en francés para que Evo salte el muro";
+  $("kick").textContent = `${T.wall} ${G.i + 1} ${T.of} ${PH.length}`; $("es").textContent = p.es;
+  $("help").innerHTML = T.help;
   $("fb").className = "fb"; $("skip").style.display = "none"; setMic("idle");
   $("card").classList.remove("hide");
 }
 function hideCard(){ $("card").classList.add("hide"); }
 function setMic(m){ const b = $("mic"); b.className = "mic" + (m === "rec" ? " rec" : m === "wait" ? " wait" : ""); b.disabled = m === "wait";
-  const lab = $("miclab"); lab.textContent = m === "rec" ? "Te escucho… (toca para terminar)" : m === "wait" ? "Escuchando…" : "Dale clic para decirlo en francés";
+  const lab = $("miclab"); lab.textContent = m === "rec" ? T.rec : m === "wait" ? T.wait : T.mic;
   lab.style.color = m === "rec" ? "#C2255C" : "#5940BF"; }
-$("hintb").onclick = () => { const p = PH[G.i]; if(!p || G.state !== "wall") return; G.hintUsed = true; $("help").innerHTML = `<span class="hint">${p.fr} · ${p.pr}</span>`; };
+$("hintb").onclick = () => { const p = PH[G.i]; if(!p || G.state !== "wall") return; G.hintUsed = true; $("help").innerHTML = `<span class="hint">${esc(p.fr)}${p.pr ? " · " + esc(p.pr) : ""}</span>`; };
 $("lis").onclick = () => { const p = PH[G.i]; if(p) playModel(p); };
 $("skip").onclick = () => win(true);
 
 function win(help){
   const p = PH[G.i];
   G.results[G.i] = { fr: p.fr, help: help || G.hintUsed, first: G.tries <= 1 && !help && !G.hintUsed };
+  if(!help){ try{ const k = "evoala-said", a = JSON.parse(localStorage.getItem(k) || "[]"); if(!a.includes(p.fr)){ a.push(p.fr); localStorage.setItem(k, JSON.stringify(a)); } }catch(e){} }
   if(G.results[G.i].first) G.stars++; $("stars").textContent = G.stars ? "★ " + G.stars : "";
   const n = ++G.cardTok; $("mic").disabled = true;
   setTimeout(() => { if(G.cardTok === n && G.state !== "wall") hideCard(); }, help ? 300 : 1500);   // le message vert reste pendant le saut
@@ -247,10 +263,10 @@ function win(help){
 function fail(said, s, why){
   G.state = "fail"; G.failT = 0; G.wallShake = 1; sfx("bump");
   const fb = $("fb"); fb.className = "fb " + (s >= 0.55 ? "mid" : "ko");
-  fb.innerHTML = why === "silent" ? "<b>No te escuchamos.</b> Habla un poco más fuerte, cerca del teléfono."
-    : why === "unclear" ? "<b>No te entendimos.</b> Escucha el modelo y repite despacio."
-    : (s >= 0.55 ? "<b>¡Casi!</b> Escucha y vuelve a intentarlo." : "<b>Evo no pudo saltar.</b> Inténtalo otra vez.") + (said ? `<small>Entendimos: «${esc(said)}»</small>` : "");
-  if(G.tries >= 3){ $("skip").style.display = "block"; $("help").innerHTML = `<span class="hint">${PH[G.i].fr} · ${PH[G.i].pr}</span>`; }
+  fb.innerHTML = why === "silent" ? `<b>${T.silent}</b> ${T.silentS}`
+    : why === "unclear" ? `<b>${T.unclear}</b> ${T.unclearS}`
+    : (s >= 0.55 ? `<b>${T.almost}</b> ${T.almostS}` : `<b>${T.no}</b> ${T.noS}`) + (said ? `<small>${T.heard}: «${esc(said)}»</small>` : "");
+  if(G.tries >= 3){ $("skip").style.display = "block"; $("help").innerHTML = `<span class="hint">${esc(PH[G.i].fr)}${PH[G.i].pr ? " · " + esc(PH[G.i].pr) : ""}</span>`; }
 }
 
 /* ---------- Sons ---------- */
@@ -316,20 +332,25 @@ async function check(){
   setMic("idle"); G.tries++;
   if(junk(said, PH[G.i].fr)) return fail("", 0, heardVoice ? "unclear" : "silent");
   const s = score(said, PH[G.i].fr);
-  if(s >= 0.8){ const fb = $("fb"); fb.className = "fb ok"; fb.innerHTML = `<b>¡Muy bien! 🎉</b><small>Entendimos: «${esc(said)}»</small>`; setTimeout(() => win(false), 450); }
+  if(s >= 0.8){ const fb = $("fb"); fb.className = "fb ok"; fb.innerHTML = `<b>${T.ok} 🎉</b><small>${T.heard}: «${esc(said)}»</small>`; setTimeout(() => win(false), 450); }
   else fail(said, s);
 }
 
 /* ---------- Début / fin ---------- */
 function endGame(){
-  const n = G.results.filter(r => r.first).length, stars = n >= 5 ? 3 : n >= 3 ? 2 : n >= 1 ? 1 : 0;
-  $("endT").textContent = stars === 3 ? "¡Perfecto!" : stars >= 2 ? "¡Bravo!" : "¡Llegaste!";
+  const n = G.results.filter(r => r.first).length, k = n / PH.length, stars = k >= .99 ? 3 : k >= .6 ? 2 : n >= 1 ? 1 : 0;
+  $("endT").textContent = stars === 3 ? T.perfect : stars >= 2 ? T.bravo : T.made;
   $("endS").textContent = "★".repeat(stars) + "☆".repeat(3 - stars);
-  $("endL").innerHTML = G.results.map((r, i) => `<li><b>${r.fr}</b><span>${r.first ? "a la primera" : r.help ? "con ayuda" : "con práctica"}</span></li>`).join("");
+  $("endL").innerHTML = G.results.map((r, i) => `<li><b>${r.fr}</b><span>${r.first ? T.first : r.help ? T.help2 : T.practice}</span></li>`).join("");
   $("end").hidden = false;
 }
 $("go").onclick = () => { ac(); unlockSfx(); $("start").hidden = true; newGame(); };
 $("again").onclick = () => { unlockSfx(); $("end").hidden = true; newGame(); };
+const backUrl = SET && SET.back ? "/#" + SET.back : "/";
+document.querySelector(".hud .back").href = backUrl; $("back2").href = backUrl; $("back2").textContent = T.back; $("again").textContent = T.again;
+document.querySelector("#start h1").textContent = T.start; document.querySelector("#start p").innerHTML = T.startP; $("go").textContent = T.go;
+document.querySelector("#start .note").textContent = SET ? `${SET.title} · ${PH.length} ${T.phr}` : "Prototipo · 5 muros · frases de Esenciales";
+$("skip").textContent = T.skip; $("miclab").textContent = T.mic;
 newGame(); G.state = "intro"; resize(); requestAnimationFrame(loop);
 </script>
 </body>

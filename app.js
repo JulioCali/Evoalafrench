@@ -48,7 +48,7 @@ const TXT = {
       pHead:"¿Qué ver en Paris ?",pSub:"Descubre aquí tus próximas visitas en Paris",city:"Entender la ciudad",mapT:"Mapa de los distritos",mapAlt:"Mapa de los distritos de París",
       move:"Moverse",safety:"Seguridad",hours:"Horarios y cierres",credits:"Créditos de las fotos",src:"Fuente",lic:"Licencia",
       paid:"De pago",free:"Gratis",metro:"Metro cercano",go:"Cómo llegar",crnote:"Toca una foto para ver su autor y su licencia",
-      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",next:"Página siguiente",pick:"Elige la categoría que quieres estudiar",gTitle:"Francés para viajar",gKicker:"Guía de supervivencia",prog:"Tu progreso",pSeen:"Páginas visitadas",pHeard:"Frases escuchadas",cont:"Continúa donde lo dejaste",startAt:"Empieza por aquí",choose:"Elige una categoría",nPh:"frases",swipe:"Desliza",more:"Más categorías",found:"frases encontradas",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
+      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",next:"Página siguiente",pick:"Elige la categoría que quieres estudiar",gTitle:"Francés para viajar",gKicker:"Guía de supervivencia",prog:"Tu progreso",pSeen:"Páginas visitadas",pHeard:"Frases escuchadas",cont:"Continúa donde lo dejaste",startAt:"Empieza por aquí",choose:"Elige una categoría",nPh:"frases",swipe:"Desliza",practice:"Practicar",practicePage:"Practicar esta página",practiceSub:"¡Escuchaste todo! Ayuda a Evo a saltar los muros",more:"Más categorías",found:"frases encontradas",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
   en:{guide:"FRENCH",guide2:"Survival guide",from:"EN",start:"Start",dep:"DEPARTURE",now:"Now",dest:"DESTINATION",me:"The French me",first:"FIRST CLASS",
       search:"Search a phrase in English or French",searchL:"Search a phrase",resume:"Pick up where you left off",toc:"Table of contents",tap:"Tap a topic",
       paris:"Paris Guide",parisSub:"What to see in Paris? Monuments, museums, walks…",bonusT:"Bonus",bonusS:"Extra content",extra:"Extra content",
@@ -56,7 +56,7 @@ const TXT = {
       pHead:"What to see in Paris?",pSub:"Discover your next visits in Paris",city:"Understanding the city",mapT:"Map of the districts",mapAlt:"Map of the Paris districts",
       move:"Getting around",safety:"Safety",hours:"Opening hours",credits:"Photo credits",src:"Source",lic:"License",
       paid:"Paid",free:"Free",metro:"Nearest metro",go:"Directions",crnote:"Tap a photo to see its author and license",
-      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",next:"Next page",pick:"Choose the category you want to study",gTitle:"French for travelers",gKicker:"Survival guide",prog:"Your progress",pSeen:"Pages visited",pHeard:"Phrases listened to",cont:"Pick up where you left off",startAt:"Start here",choose:"Choose a category",nPh:"phrases",swipe:"Swipe",more:"More categories",found:"phrases found",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
+      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",next:"Next page",pick:"Choose the category you want to study",gTitle:"French for travelers",gKicker:"Survival guide",prog:"Your progress",pSeen:"Pages visited",pHeard:"Phrases listened to",cont:"Pick up where you left off",startAt:"Start here",choose:"Choose a category",nPh:"phrases",swipe:"Swipe",practice:"Practice",practicePage:"Practice this page",practiceSub:"You listened to everything! Help Evo jump the walls",more:"More categories",found:"phrases found",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
 };
 const t = k => TXT[LANG][k];
 const homeTitle = (e, i) => LANG === "en" ? (i < 0 ? [t("bonusT"), t("bonusS")] : HOME_EN[i]) : [e[0], e[1]];
@@ -284,7 +284,7 @@ const seen = {
 };
 let syncT;
 function syncProgress(){ clearTimeout(syncT); syncT = setTimeout(() => window.EvoAuth?.save({ seen: seen.get("evoala-seen"), heard: seen.get("evoala-heard") }), 3000); }
-const markHeard = key => key && seen.add("evoala-heard", key);
+const markHeard = key => { if(!key) return; seen.add("evoala-heard", key); refreshPractice(true); };
 function allPages(){
   const out = [];
   [...GRID, "Bonus"].forEach((name, si) => sec(name)?.tabs.forEach((tb, ti) => (tb.subs || [tb]).forEach((v, u) => { if(hasPh(v)) out.push(pageHash(si, ti, tb.subs ? u : 0)); })));
@@ -398,6 +398,7 @@ function phrases(si, ti, sub=0){
   const view = tab.subs ? tab.subs[sub] : tab;
   const nx = nextPage(si, ti, sub);
   if(hasPh(view)) seen.add("evoala-seen", pageHash(si, ti, tab.subs ? sub : 0));
+  PVIEW = { view, title: view.name || tab.label || tab.name, back: pageHash(si, ti, tab.subs ? sub : 0) };
   app.innerHTML = `${topbar("guide").replace('class="top"','class="top flow"')}
     <label class="search psearch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" placeholder="${t("search")}" autocomplete="off" aria-label="${t("searchL")}"></label>
     ${`${catPicked() ? "" : `<p class="cathint"><span>${t("pick")}</span></p>`}
@@ -407,14 +408,16 @@ function phrases(si, ti, sub=0){
     <div class="ptabs">${s.tabs.map((tb,i)=>`<button class="tab${i===ti?' on':''}" data-go="s${si}t${i}">${esc(tb.label || tb.name)}</button>`).join("")}</div>
     ${tab.subs?`<div class="psubs">${tab.subs.map((x,i)=>`<button class="${i===sub?'on':''}" data-go="${pageHash(si,ti,i)}">${esc(x.name)}</button>`).join("")}</div>`:""}
     ${view.intro?`<p class="intro">${esc(view.intro)}</p>`:""}
+    <div class="ppage"></div>
     ${hintHTML(view)}
     ${!hasPh(view) ? `<div class="empty">${t("soon")}</div>` : ""}
-    ${view.groups.filter(g=>g.phrases.length).map(g=>`<div class="card${g.cols===2?' cols2':''}">${g.label?`<div class="label">${esc(g.label)}</div>`:""}${g.phrases.map(p => rowHTML(p)).join("")}</div>`).join("")}
+    ${view.groups.map((g, gi) => g.phrases.length ? `<div class="card${g.cols===2?' cols2':''}" data-g="${gi}"><div class="ghd">${g.label?`<div class="label">${esc(g.label)}</div>`:"<span></span>"}<span class="pslot"></span></div>${g.phrases.map(p => rowHTML(p)).join("")}</div>` : "").join("")}
     ${(view.tips||[]).map(tipHTML).join("")}
     ${nx ? `<button class="nextsub" data-go="${nx.hash}">${t("next")}: <b>${esc(nx.name)}</b> →</button>` : ""}
     <button class="up" data-up>${t("up")}</button>
     </div>`;
   document.getElementById("q").addEventListener("input", e => search(e.target.value));
+  refreshPractice(false);
 }
 
 /* ---------- Guía de Paris ---------- */
@@ -706,6 +709,39 @@ const swipeEnd = e => {
 app.addEventListener("pointerup", swipeEnd);
 app.addEventListener("pointercancel", swipeEnd);
 
+/* ---------- Practicar : le jeu « Evo cruza París » se débloque quand on a tout écouté ----------
+   - une section (carte) entièrement écoutée -> bouton « Practicar » sur la carte : 5 phrases au hasard
+   - toute la page écoutée -> bouton « Practicar esta página » en haut : 10 phrases au hasard */
+let PVIEW = null;
+const withAudio = ps => ps.filter(p => p.audio && p.audio[0]);
+const allHeard = ps => { const h = new Set(seen.get("evoala-heard")); const a = withAudio(ps); return a.length > 0 && a.every(p => h.has(p.fr)); };
+function refreshPractice(animate){
+  if(!PVIEW || app.dataset.list) return;
+  const v = PVIEW.view;
+  app.querySelectorAll(".card[data-g]").forEach(c => {
+    const g = v.groups[+c.dataset.g], slot = c.querySelector(".pslot"); if(!g || !slot) return;
+    if(allHeard(g.phrases) && !slot.firstChild) slot.innerHTML = `<button class="pbtn${animate ? " pop" : ""}" data-practice="${c.dataset.g}">${PICON}${t("practice")}</button>`;
+  });
+  const top = app.querySelector(".ppage");
+  if(top && !top.firstChild && allHeard(v.groups.flatMap(g => g.phrases)))
+    top.innerHTML = `<button class="pbig${animate ? " pop" : ""}" data-practice="page"><img src="img/ui/evo.png" alt=""><span><b>${t("practicePage")}</b><small>${t("practiceSub")}</small></span>${PICON}</button>`;
+}
+const PICON = '<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+function startPractice(which){
+  if(!PVIEW) return;
+  const v = PVIEW.view, page = which === "page";
+  let pool = page ? v.groups.flatMap(g => g.phrases) : (v.groups[+which] || {}).phrases || [];
+  pool = withAudio(pool);
+  const own = pool.filter(p => p.who !== "staff");              // on fait dire de préférence les phrases du voyageur
+  if(own.length >= Math.min(page ? 10 : 5, pool.length)) pool = own;
+  const n = Math.min(page ? 10 : 5, pool.length);
+  const pick = pool.map(p => [Math.random(), p]).sort((a, b) => a[0] - b[0]).slice(0, n).map(x => x[1])
+                   .sort((a, b) => a.fr.length - b.fr.length);   // des plus courtes aux plus longues
+  const title = page ? PVIEW.title : (v.groups[+which].label || PVIEW.title);
+  try{ sessionStorage.setItem("evoala-game", JSON.stringify({ title, back: PVIEW.back, lang: LANG, items: pick.map(p => ({ fr: p.fr, es: p.es, pr: p.pr || "", audio: p.audio })) })); }catch(e){}
+  location.href = "juego.html";
+}
+
 /* ---------- Clics ---------- */
 app.addEventListener("click", e => {
   const lb = e.target.closest("[data-lang]");
@@ -727,6 +763,8 @@ app.addEventListener("click", e => {
   if(sd){ heartClick(sd.dataset.sdel); return; }
   const openRow = app.querySelector(".swipe .row.open");
   if(openRow){ swipeTo(openRow, 0); return; }               // un toucher ailleurs referme le bouton « Quitar »
+  const pr = e.target.closest("[data-practice]");
+  if(pr){ startPractice(pr.dataset.practice); return; }
   const hb = e.target.closest(".heart");
   if(hb){ heartClick(hb.closest(".row").dataset.key); return; }
   const pl = e.target.closest("[data-playlist]");
@@ -780,7 +818,7 @@ function preload(){ const r = app.querySelector(".row[data-audio^='snd']"); if(r
 
 function route(){
   const h = location.hash.slice(1);
-  delete app.dataset.list; if(QPLAY) stopQueue(); closeSheet();
+  delete app.dataset.list; PVIEW = null; if(QPLAY) stopQueue(); closeSheet();
   let m;
   let where = "home";
   if((m = h.match(/^s(\d+)t(\d+)(?:p(\d+))?$/))){ phrases(+m[1], +m[2], +(m[3] || 0)); where = "guide"; store.set(h); }

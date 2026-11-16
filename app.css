@@ -534,3 +534,17 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .fpl span{font-size:13px;color:#6E6680}
 .gtrack.ph i{background:#D6336C}
 .fprog .gtrack{flex:none;height:10px;min-height:10px}
+
+/* ---------- Practicar (jeu débloqué quand tout est écouté) ---------- */
+.ghd{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-right:8px;margin-bottom:2px}
+.ghd .label{padding-bottom:0}
+.pslot{flex:none;min-height:0}
+.pbtn{display:flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 10px;border-radius:999px;background:var(--violet);color:#fff;font-size:13px;font-weight:600;box-shadow:0 3px 10px rgba(108,79,224,.3)}
+.pbtn svg,.pbig>svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.pbig{display:flex;align-items:center;gap:12px;width:calc(100% - 24px);margin:12px 12px 4px;padding:10px 14px 10px 10px;border-radius:18px;background:var(--violet);color:#fff;text-align:left;box-shadow:0 6px 18px rgba(108,79,224,.3)}
+.pbig img{width:46px;height:auto;flex:none;animation:evobob 1.6s ease-in-out infinite}
+.pbig span{flex:1}.pbig b{display:block;font-size:15px;font-weight:600}.pbig small{font-size:12px;color:#E2DCFB;line-height:1.3;display:block}
+.pbig>svg{width:22px;height:22px;flex:none}
+@keyframes evobob{50%{transform:translateY(-4px) rotate(-5deg)}}
+.pop{animation:ppop .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes ppop{0%{transform:scale(.4);opacity:0}100%{transform:none;opacity:1}}
