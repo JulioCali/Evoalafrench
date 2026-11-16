@@ -548,3 +548,4 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 @keyframes evobob{50%{transform:translateY(-4px) rotate(-5deg)}}
 .pop{animation:ppop .5s cubic-bezier(.2,1.6,.4,1)}
 @keyframes ppop{0%{transform:scale(.4);opacity:0}100%{transform:none;opacity:1}}
+.ppage:not(:empty) + .nextsub{background:#fff;color:#5940BF;border:1.5px solid var(--violet)}
