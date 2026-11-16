@@ -342,7 +342,7 @@ function watchSilence(st){
   const tick = () => { if(!mrec || mrec.state !== "recording"){ src.disconnect(); return; }
     an.getByteTimeDomainData(data); let sum = 0; for(const v of data){ const x = (v - 128) / 128; sum += x * x; }
     if(Math.sqrt(sum / data.length) > 0.04){ spoke = heardVoice = true; lastLoud = Date.now(); }
-    if((spoke && Date.now() - lastLoud > 1000) || Date.now() - t0 > 6000){ mrec.stop(); return; }
+    if((spoke && Date.now() - lastLoud > 750) || Date.now() - t0 > 6000){ mrec.stop(); return; }
     vad = requestAnimationFrame(tick); };
   tick();
 }
@@ -351,7 +351,8 @@ $("mic").onclick = async () => {
   if(mrec && mrec.state === "recording"){ mrec.stop(); return; }
   if(playing) try{ playing.pause(); }catch(e){}
   let st; try{ st = await getStream(); }catch(e){ const fb = $("fb"); fb.className = "fb ko"; fb.innerHTML = "<b>Micrófono bloqueado</b> Permite el acceso al micrófono en los ajustes del navegador."; return; }
-  chunks = []; mrec = MIME ? new MediaRecorder(st, { mimeType: MIME }) : new MediaRecorder(st);
+  chunks = []; const opt = { audioBitsPerSecond: 32000 }; if(MIME) opt.mimeType = MIME;   // son léger (voix) = envoi plus rapide
+  try{ mrec = new MediaRecorder(st, opt); }catch(e){ mrec = MIME ? new MediaRecorder(st, { mimeType: MIME }) : new MediaRecorder(st); }
   mrec.ondataavailable = e => { if(e.data && e.data.size) chunks.push(e.data); };
   mrec.onstop = check; heardVoice = false; mrec.start(); setMic("rec"); $("fb").className = "fb"; watchSilence(st);
 };
