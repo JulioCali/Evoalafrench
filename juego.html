@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Evo cruza París · Evoala</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;overflow:hidden;font-family:Poppins,system-ui,sans-serif;color:#1A1A1A;background:#EFEBFF}
+  #game{position:fixed;inset:0;display:flex;flex-direction:column}
+  #scene{position:relative;flex:1;min-height:0}
+  canvas{display:block;width:100%;height:100%}
+  .hud{position:absolute;top:calc(10px + env(safe-area-inset-top));left:12px;right:12px;display:flex;align-items:center;gap:10px;pointer-events:none}
+  .hud .back{pointer-events:auto;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.9);display:grid;place-items:center;border:0}
+  .hud .back svg{width:18px;height:18px;fill:none;stroke:#5940BF;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+  .dots{flex:1;display:flex;gap:6px;justify-content:center}
+  .dots i{width:28px;height:8px;border-radius:999px;background:rgba(255,255,255,.75)}
+  .dots i.ok{background:#6C4FE0}.dots i.help{background:#F5C58A}.dots i.now{background:#fff;box-shadow:0 0 0 2px #6C4FE0}
+  .stars{min-width:40px;text-align:right;font-weight:700;color:#E08A00;font-size:16px}
+  /* carte du mur */
+  #card{flex:none;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -8px 24px rgba(40,20,120,.12);padding:16px 16px calc(16px + env(safe-area-inset-bottom));min-height:230px;transition:transform .3s ease}
+  #card.hide{transform:translateY(105%)}
+  .kick{font-size:12px;font-weight:600;color:#5940BF;letter-spacing:.03em;text-transform:uppercase}
+  .es{font-size:22px;font-weight:600;line-height:1.25;margin:2px 0 4px}
+  .help{font-size:13px;color:#6E6680;min-height:20px}
+  .hint{display:inline-block;margin-top:4px;background:#EEEBFD;color:#5940BF;border-radius:999px;padding:2px 12px;font-size:14px;font-weight:500}
+  .row{display:flex;gap:10px;margin-top:12px}
+  button{font:inherit;border:0;cursor:pointer;color:inherit}
+  .mic{flex:1;height:58px;border-radius:16px;background:#6C4FE0;color:#fff;font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px}
+  .mic svg{width:22px;height:22px}
+  .mic.rec{background:#D6336C;animation:pulse 1.1s ease-in-out infinite}
+  .mic.wait{background:#8A7BD8}
+  @keyframes pulse{50%{box-shadow:0 0 0 9px rgba(214,51,108,.18)}}
+  .sq{flex:none;width:58px;height:58px;border-radius:16px;background:#EEEBFD;display:grid;place-items:center}
+  .sq svg{width:22px;height:22px}
+  .sq.hintb svg{fill:none;stroke:#C25A00;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .sq.hintb{background:#FFF1E0}
+  .fb{margin-top:10px;border-radius:12px;padding:8px 12px;font-size:14px;line-height:1.35;display:none}
+  .fb.ok{display:block;background:#E6F6EE;color:#14532D}
+  .fb.mid{display:block;background:#FFF4E6;color:#7A3E00}
+  .fb.ko{display:block;background:#FDECEF;color:#8A1538}
+  .fb small{display:block;opacity:.8;font-size:12px}
+  .skip{display:none;width:100%;height:46px;margin-top:8px;border-radius:14px;background:#FFF1E0;color:#A34A00;font-weight:600}
+  /* écrans début / fin */
+  .over{position:fixed;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(239,235,255,.86);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+  .over[hidden]{display:none}
+  .panel{background:#fff;border-radius:28px;padding:24px 22px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(40,20,120,.18)}
+  .panel img{width:120px;height:auto;animation:bob 1.4s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-8px) rotate(-4deg)}}
+  .panel h1{font-size:23px;margin:8px 0 6px;line-height:1.2}
+  .panel p{font-size:14px;color:#5A5370;line-height:1.5;margin:0 0 18px}
+  .go{width:100%;height:56px;border-radius:16px;background:#6C4FE0;color:#fff;font-size:17px;font-weight:600}
+  .big{font-size:38px;letter-spacing:4px;margin:4px 0;color:#F5A623}
+  .res{list-style:none;padding:0;margin:0 0 18px;text-align:left;font-size:14px}
+  .res li{display:flex;gap:8px;padding:6px 0;border-top:1px solid #EFEDF6}
+  .res li b{font-weight:600}.res li span{color:#6E6680;margin-left:auto;white-space:nowrap}
+  .note{font-size:12px;color:#8A8398;margin-top:12px}
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="scene"><canvas id="cv"></canvas>
+    <div class="hud"><a class="back" href="/" aria-label="Volver a la app"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></a><div class="dots" id="dots"></div><div class="stars" id="stars"></div></div>
+  </div>
+  <div id="card" class="hide">
+    <div class="kick" id="kick"></div>
+    <div class="es" id="es"></div>
+    <div class="help" id="help">Dilo en francés para que Evo salte el muro</div>
+    <div class="row">
+      <button class="mic" id="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Decirlo en francés</span></button>
+      <button class="sq hintb" id="hintb" aria-label="Pista"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg></button>
+      <button class="sq" id="lis" aria-label="Escuchar"><svg viewBox="0 0 24 24"><path fill="#5940BF" d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg></button>
+    </div>
+    <div class="fb" id="fb"></div>
+    <button class="skip" id="skip">Saltar con ayuda</button>
+  </div>
+</div>
+
+<div class="over" id="start"><div class="panel">
+  <img src="img/ui/evo.png" alt="">
+  <h1>Ayuda a Evo a cruzar París</h1>
+  <p>Evo corre por los techos de París. Delante de cada muro, <b>di la frase en francés</b> y Evo saltará.</p>
+  <button class="go" id="go">¡Vamos!</button>
+  <div class="note">Prototipo · 5 muros · frases de Esenciales</div>
+</div></div>
+
+<div class="over" id="end" hidden><div class="panel">
+  <img src="img/ui/evo.png" alt="">
+  <h1 id="endT">¡Bravo!</h1>
+  <div class="big" id="endS"></div>
+  <ul class="res" id="endL"></ul>
+  <button class="go" id="again">Jugar otra vez</button>
+</div></div>
+
+<script>
+/* ---------- Les phrases du parcours (du plus court au plus long) ---------- */
+const PH = [
+  { fr:"Merci", es:"Gracias", pr:"mer-SÍ", audio:["snd/p2.json","4c431b3930"] },
+  { fr:"Bonjour", es:"Buenos días", pr:"bon-YÚR", audio:["snd/p2.json","426b3e4647"] },
+  { fr:"Au revoir", es:"Hasta luego", pr:"o re-VUÁR", audio:["snd/p2.json","307939d20f"] },
+  { fr:"S'il vous plaît", es:"Por favor", pr:"sil vu PLÉ", audio:["snd/p2.json","7c51a4172b"] },
+  { fr:"Je ne comprends pas", es:"No entiendo", pr:"ye ne kom-pran PÁ", audio:["snd/p2.json","ea825df785"] },
+];
+const $ = id => document.getElementById(id);
+
+/* ---------- Dessin de la scène ---------- */
+const cv = $("cv"), ctx = cv.getContext("2d");
+const evo = new Image(); evo.src = "img/ui/evo.png";
+let W = 0, H = 0, DPR = 1;
+function resize(){ const r = cv.getBoundingClientRect(); DPR = Math.min(2, window.devicePixelRatio || 1); W = r.width; H = r.height; cv.width = W * DPR; cv.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0); }
+addEventListener("resize", resize);
+
+const GAP = 560, SPEED = 170;             // distance entre les murs, vitesse de course (px/s)
+let G;                                    // état de la partie
+function newGame(){
+  G = { x: 0, i: 0, state: "run", t: 0, jumpT: 0, failT: 0, wallShake: 0, results: [], tries: 0, hintUsed: false, stars: 0, parts: [] };
+  renderDots(); $("stars").textContent = "";
+}
+const wallX = i => (i + 1) * GAP;          // position des murs dans le monde
+const groundY = () => H * 0.78;
+const evoX = () => Math.min(W * 0.28, 140);
+
+function roundRect(x, y, w, h, r){ ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+
+function drawSky(){
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#CFC4FF"); g.addColorStop(.7, "#F3EEFF"); g.addColorStop(1, "#FFF5EC");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "rgba(255,255,255,.85)";                         // nuages
+  for(let k = 0; k < 4; k++){ const cx = ((k * 260 - G.x * 0.08) % (W + 300) + W + 300) % (W + 300) - 150, cy = 70 + (k % 2) * 46 + 20;
+    ctx.beginPath(); ctx.ellipse(cx, cy, 46, 16, 0, 0, 7); ctx.ellipse(cx + 30, cy - 10, 30, 16, 0, 0, 7); ctx.ellipse(cx - 28, cy - 4, 24, 12, 0, 0, 7); ctx.fill(); }
+}
+function drawSkyline(){
+  const base = groundY() - 6, off = G.x * 0.3;
+  ctx.fillStyle = "#B7AAEA";                                       // immeubles lointains
+  for(let k = -1; k < W / 70 + 2; k++){ const wx = k * 70 - (off % 70), hh = 60 + ((Math.abs(Math.floor((k * 70 + off) / 70)) * 37) % 70);
+    ctx.fillRect(wx, base - hh, 60, hh); ctx.beginPath(); ctx.moveTo(wx - 4, base - hh); ctx.lineTo(wx + 30, base - hh - 18); ctx.lineTo(wx + 64, base - hh); ctx.fill(); }
+  const ex = ((900 - off * 0.6) % (W + 600) + W + 600) % (W + 600) - 200, eb = base;   // tour Eiffel (simple)
+  ctx.strokeStyle = "#9A8AE0"; ctx.lineWidth = 3; ctx.beginPath();
+  ctx.moveTo(ex - 40, eb); ctx.quadraticCurveTo(ex - 10, eb - 70, ex - 4, eb - 170); ctx.lineTo(ex, eb - 200); ctx.lineTo(ex + 4, eb - 170); ctx.quadraticCurveTo(ex + 10, eb - 70, ex + 40, eb);
+  ctx.moveTo(ex - 26, eb - 40); ctx.lineTo(ex + 26, eb - 40); ctx.moveTo(ex - 14, eb - 100); ctx.lineTo(ex + 14, eb - 100); ctx.stroke();
+}
+function drawRoof(){
+  const y = groundY();
+  ctx.fillStyle = "#7E879C"; ctx.fillRect(0, y, W, H - y);           // toit en zinc
+  ctx.fillStyle = "#6E778C"; for(let k = -1; k < W / 40 + 2; k++){ const sx = k * 40 - (G.x % 40); ctx.fillRect(sx, y + 6, 3, H - y); }
+  ctx.fillStyle = "#99A2B5"; ctx.fillRect(0, y, W, 6);
+  for(let k = -1; k < W / 300 + 2; k++){ const cx = k * 300 + 170 - (G.x % 300);   // cheminées
+    ctx.fillStyle = "#C98A6B"; ctx.fillRect(cx, y - 34, 22, 34); ctx.fillStyle = "#A96F55"; ctx.fillRect(cx - 3, y - 38, 28, 6); }
+}
+function drawWalls(){
+  const y = groundY();
+  PH.forEach((p, i) => {
+    const sx = wallX(i) - G.x + evoX() + 70; if(sx < -80 || sx > W + 80) return;
+    const done = i < G.i, shake = i === G.i ? Math.sin(G.wallShake * 40) * G.wallShake * 8 : 0;
+    const w = 46, h = 96, x = sx + shake;
+    roundRect(x, y - h, w, h, 8); ctx.fillStyle = done ? "#C9BFF5" : "#6C4FE0"; ctx.fill();
+    ctx.strokeStyle = done ? "rgba(255,255,255,.5)" : "rgba(255,255,255,.28)"; ctx.lineWidth = 2;
+    for(let r = 1; r < 4; r++){ ctx.beginPath(); ctx.moveTo(x + 4, y - h + r * 24); ctx.lineTo(x + w - 4, y - h + r * 24); ctx.stroke();
+      const o = r % 2 ? w / 2 : w / 4; ctx.beginPath(); ctx.moveTo(x + o, y - h + (r - 1) * 24 + 2); ctx.lineTo(x + o, y - h + r * 24 - 2); ctx.stroke(); }
+    ctx.fillStyle = "#fff"; ctx.font = "600 14px Poppins"; ctx.textAlign = "center"; ctx.fillText(done ? "✓" : String(i + 1), x + w / 2, y - h - 10);
+  });
+  // drapeau d'arrivée
+  const fx = wallX(PH.length - 1) + 360 - G.x + evoX(); if(fx < W + 60){
+    ctx.fillStyle = "#555"; ctx.fillRect(fx, y - 120, 4, 120);
+    [["#1E4FB5",0],["#fff",1],["#EF3340",2]].forEach(([c, k]) => { ctx.fillStyle = c; ctx.fillRect(fx + 4 + k * 18, y - 120, 18, 36); });
+  }
+}
+function drawEvo(dt){
+  const y0 = groundY(), size = 78; let x = evoX(), y = y0 - size, rot = 0, sq = 1;
+  if(G.state === "run" || G.state === "finish"){ y += Math.abs(Math.sin(G.t * 11)) * -10; rot = Math.sin(G.t * 11) * 0.06; }
+  if(G.state === "wall"){ y += Math.sin(G.t * 3) * 2; }
+  if(G.state === "jump"){ const k = G.jumpT; y -= Math.sin(Math.PI * k) * 150; rot = k * Math.PI * 2; x += 0; }
+  if(G.state === "fail"){ const k = G.failT; x -= Math.sin(Math.PI * Math.min(1, k * 2)) * 18; rot = Math.sin(k * 30) * 0.15 * (1 - k); }
+  ctx.save(); ctx.fillStyle = "rgba(40,30,80,.18)";                  // ombre
+  const air = G.state === "jump" ? Math.sin(Math.PI * G.jumpT) : 0;
+  ctx.beginPath(); ctx.ellipse(evoX() + size / 2, y0 + 2, size * 0.36 * (1 - air * 0.5), 6, 0, 0, 7); ctx.fill();
+  ctx.translate(x + size / 2, y + size / 2); ctx.rotate(rot);
+  if(evo.complete) ctx.drawImage(evo, -size / 2, -size * 0.58, size, size * 360 / 310);
+  ctx.restore();
+}
+function drawParts(dt){
+  G.parts = G.parts.filter(p => (p.life -= dt) > 0);
+  G.parts.forEach(p => { p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 500 * dt; ctx.globalAlpha = Math.max(0, p.life); ctx.fillStyle = p.c; ctx.fillRect(p.x, p.y, 7, 7); });
+  ctx.globalAlpha = 1;
+}
+function burst(){ const x = evoX() + 39, y = groundY() - 80; for(let k = 0; k < 26; k++) G.parts.push({ x, y, vx: (Math.random() - .5) * 420, vy: -Math.random() * 380, life: 1, c: ["#6C4FE0","#F5A623","#D6336C","#1F8A70"][k % 4] }); }
+
+/* ---------- Boucle de jeu ---------- */
+let last = 0;
+function loop(ts){
+  const dt = Math.min(0.05, (ts - last) / 1000 || 0); last = ts; G.t += dt;
+  if(G.state === "run" || G.state === "finish"){
+    G.x += SPEED * dt;
+    if(G.state === "run" && G.i < PH.length && G.x >= wallX(G.i) - 20){ G.x = wallX(G.i) - 20; G.state = "wall"; showCard(); }
+    if(G.state === "finish" && G.x >= wallX(PH.length - 1) + 340){ G.state = "done"; endGame(); }
+  }
+  if(G.state === "jump"){ G.jumpT += dt / 0.95; G.x += (170 / 0.95) * dt;
+    if(G.jumpT >= 1){ G.jumpT = 0; G.i++; renderDots(); G.state = G.i < PH.length ? "run" : "finish"; } }
+  if(G.state === "fail"){ G.failT += dt / 0.7; if(G.failT >= 1){ G.failT = 0; G.state = "wall"; } }
+  G.wallShake = Math.max(0, G.wallShake - dt * 1.6);
+  drawSky(); drawSkyline(); drawRoof(); drawWalls(); drawEvo(dt); drawParts(dt);
+  requestAnimationFrame(loop);
+}
+
+/* ---------- Carte du mur ---------- */
+function renderDots(){ $("dots").innerHTML = PH.map((_, i) => { const r = G.results[i]; return `<i class="${r ? (r.help ? "help" : "ok") : i === G.i ? "now" : ""}"></i>`; }).join(""); }
+function showCard(){
+  const p = PH[G.i]; G.tries = 0; G.hintUsed = false;
+  $("kick").textContent = `Muro ${G.i + 1} de ${PH.length}`; $("es").textContent = p.es;
+  $("help").innerHTML = "Dilo en francés para que Evo salte el muro";
+  $("fb").className = "fb"; $("skip").style.display = "none"; setMic("idle");
+  $("card").classList.remove("hide");
+}
+function hideCard(){ $("card").classList.add("hide"); }
+function setMic(m){ const b = $("mic"); b.className = "mic" + (m === "rec" ? " rec" : m === "wait" ? " wait" : ""); b.disabled = m === "wait";
+  b.querySelector("span").textContent = m === "rec" ? "Te escucho… (toca para terminar)" : m === "wait" ? "Escuchando…" : "Decirlo en francés"; }
+$("hintb").onclick = () => { const p = PH[G.i]; if(!p || G.state !== "wall") return; G.hintUsed = true; $("help").innerHTML = `<span class="hint">${p.fr} · ${p.pr}</span>`; };
+$("lis").onclick = () => { const p = PH[G.i]; if(p) playModel(p); };
+$("skip").onclick = () => win(true);
+
+function win(help){
+  const p = PH[G.i];
+  G.results[G.i] = { fr: p.fr, help: help || G.hintUsed, first: G.tries <= 1 && !help && !G.hintUsed };
+  if(G.results[G.i].first) G.stars++; $("stars").textContent = G.stars ? "★ " + G.stars : "";
+  hideCard(); burst(); sfx("jump"); G.state = "jump"; G.jumpT = 0;
+}
+function fail(said, s){
+  G.state = "fail"; G.failT = 0; G.wallShake = 1; sfx("bump");
+  const fb = $("fb"); fb.className = "fb " + (s >= 0.55 ? "mid" : "ko");
+  fb.innerHTML = (s >= 0.55 ? "<b>¡Casi!</b> Escucha y vuelve a intentarlo." : "<b>Evo no pudo saltar.</b> Inténtalo otra vez.") + (said ? `<small>Entendimos: «${said}»</small>` : "");
+  if(G.tries >= 3){ $("skip").style.display = "block"; $("help").innerHTML = `<span class="hint">${PH[G.i].fr} · ${PH[G.i].pr}</span>`; }
+}
+
+/* ---------- Sons ---------- */
+let actx = null, playing = null;
+const bundles = {}, decoded = {};
+function ac(){ actx ??= new (window.AudioContext || window.webkitAudioContext)(); if(actx.state === "suspended") actx.resume(); return actx; }
+function sfx(kind){
+  const a = ac(), o = a.createOscillator(), g = a.createGain(), t = a.currentTime; o.connect(g); g.connect(a.destination);
+  if(kind === "jump"){ o.type = "triangle"; o.frequency.setValueAtTime(420, t); o.frequency.exponentialRampToValueAtTime(980, t + .25); g.gain.setValueAtTime(.18, t); g.gain.exponentialRampToValueAtTime(.001, t + .35); o.start(t); o.stop(t + .36); }
+  else { o.type = "square"; o.frequency.setValueAtTime(160, t); o.frequency.exponentialRampToValueAtTime(90, t + .2); g.gain.setValueAtTime(.08, t); g.gain.exponentialRampToValueAtTime(.001, t + .25); o.start(t); o.stop(t + .26); }
+}
+async function playModel(p){
+  const a = ac(), [f, id] = p.audio;
+  if(!decoded[id]){ const b = await (bundles[f] ??= fetch(f).then(r => r.json())); const bin = Uint8Array.from(atob(b[id]), c => c.charCodeAt(0)); decoded[id] = await new Promise((ok, ko) => a.decodeAudioData(bin.buffer, ok, ko)); }
+  if(playing) try{ playing.stop(); }catch(e){}
+  const s = a.createBufferSource(); s.buffer = decoded[id]; s.connect(a.destination); s.onended = () => playing = null; playing = s; s.start();
+}
+
+/* ---------- Micro + reconnaissance (serveur Cloudflare, Whisper) ---------- */
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
+function lev(a, b){ const m = a.length, n = b.length, d = Array.from({length: m + 1}, (_, i) => [i, ...Array(n).fill(0)]); for(let j = 1; j <= n; j++) d[0][j] = j;
+  for(let i = 1; i <= m; i++) for(let j = 1; j <= n; j++) d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1)); return d[m][n]; }
+const score = (said, target) => { const a = norm(said), b = norm(target); if(!a) return 0; return 1 - lev(a, b) / Math.max(a.length, b.length); };
+const MIME = ["audio/mp4", "audio/webm;codecs=opus", "audio/webm", "audio/ogg"].find(t => window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || "";
+let stream = null, mrec = null, chunks = [], vad = null;
+async function getStream(){ if(stream && stream.active) return stream; stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); return stream; }
+function watchSilence(st){
+  const a = ac(), src = a.createMediaStreamSource(st), an = a.createAnalyser(); an.fftSize = 1024; src.connect(an);
+  const data = new Uint8Array(an.fftSize); let spoke = false, lastLoud = Date.now(); const t0 = Date.now();
+  const tick = () => { if(!mrec || mrec.state !== "recording"){ src.disconnect(); return; }
+    an.getByteTimeDomainData(data); let sum = 0; for(const v of data){ const x = (v - 128) / 128; sum += x * x; }
+    if(Math.sqrt(sum / data.length) > 0.04){ spoke = true; lastLoud = Date.now(); }
+    if((spoke && Date.now() - lastLoud > 1000) || Date.now() - t0 > 6000){ mrec.stop(); return; }
+    vad = requestAnimationFrame(tick); };
+  tick();
+}
+$("mic").onclick = async () => {
+  if(G.state !== "wall" && G.state !== "fail") return;
+  if(mrec && mrec.state === "recording"){ mrec.stop(); return; }
+  if(playing) try{ playing.stop(); }catch(e){}
+  let st; try{ st = await getStream(); }catch(e){ const fb = $("fb"); fb.className = "fb ko"; fb.innerHTML = "<b>Micrófono bloqueado</b> Permite el acceso al micrófono en los ajustes del navegador."; return; }
+  chunks = []; mrec = MIME ? new MediaRecorder(st, { mimeType: MIME }) : new MediaRecorder(st);
+  mrec.ondataavailable = e => { if(e.data && e.data.size) chunks.push(e.data); };
+  mrec.onstop = check; mrec.start(); setMic("rec"); $("fb").className = "fb"; watchSilence(st);
+};
+async function check(){
+  cancelAnimationFrame(vad); setMic("wait");
+  const blob = new Blob(chunks, { type: (mrec && mrec.mimeType) || MIME || "audio/mp4" });
+  let said = "";
+  try{ const r = await fetch("/api/stt", { method: "POST", headers: { "content-type": blob.type }, body: blob }); const d = await r.json(); if(!r.ok) throw new Error(d.error || r.status); said = d.text || ""; }
+  catch(e){ setMic("idle"); const fb = $("fb"); fb.className = "fb ko"; fb.innerHTML = `<b>Sin conexión</b> Revisa internet y vuelve a intentarlo.<small>(${e.message})</small>`; return; }
+  setMic("idle"); G.tries++;
+  const s = score(said, PH[G.i].fr);
+  if(s >= 0.8){ const fb = $("fb"); fb.className = "fb ok"; fb.innerHTML = `<b>¡Muy bien! 🎉</b><small>Entendimos: «${said}»</small>`; setTimeout(() => win(false), 450); }
+  else fail(said, s);
+}
+
+/* ---------- Début / fin ---------- */
+function endGame(){
+  const n = G.results.filter(r => r.first).length, stars = n >= 5 ? 3 : n >= 3 ? 2 : n >= 1 ? 1 : 0;
+  $("endT").textContent = stars === 3 ? "¡Perfecto!" : stars >= 2 ? "¡Bravo!" : "¡Llegaste!";
+  $("endS").textContent = "★".repeat(stars) + "☆".repeat(3 - stars);
+  $("endL").innerHTML = G.results.map((r, i) => `<li><b>${r.fr}</b><span>${r.first ? "a la primera" : r.help ? "con ayuda" : "con práctica"}</span></li>`).join("");
+  $("end").hidden = false;
+}
+$("go").onclick = () => { ac(); $("start").hidden = true; newGame(); };
+$("again").onclick = () => { $("end").hidden = true; newGame(); };
+newGame(); G.state = "intro"; resize(); requestAnimationFrame(loop);
+</script>
+</body>
+</html>
