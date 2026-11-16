@@ -408,11 +408,11 @@ function phrases(si, ti, sub=0){
     <div class="ptabs">${s.tabs.map((tb,i)=>`<button class="tab${i===ti?' on':''}" data-go="s${si}t${i}">${esc(tb.label || tb.name)}</button>`).join("")}</div>
     ${tab.subs?`<div class="psubs">${tab.subs.map((x,i)=>`<button class="${i===sub?'on':''}" data-go="${pageHash(si,ti,i)}">${esc(x.name)}</button>`).join("")}</div>`:""}
     ${view.intro?`<p class="intro">${esc(view.intro)}</p>`:""}
-    <div class="ppage"></div>
     ${hintHTML(view)}
     ${!hasPh(view) ? `<div class="empty">${t("soon")}</div>` : ""}
-    ${view.groups.map((g, gi) => g.phrases.length ? `<div class="card${g.cols===2?' cols2':''}" data-g="${gi}"><div class="ghd">${g.label?`<div class="label">${esc(g.label)}</div>`:"<span></span>"}<span class="pslot"></span></div>${g.phrases.map(p => rowHTML(p)).join("")}</div>` : "").join("")}
+    ${view.groups.map((g, gi) => g.phrases.length ? `<div class="card${g.cols===2?' cols2':''}" data-g="${gi}">${g.label?`<div class="label">${esc(g.label)}</div>`:""}${g.phrases.map(p => rowHTML(p)).join("")}<div class="pslot"></div></div>` : "").join("")}
     ${(view.tips||[]).map(tipHTML).join("")}
+    <div class="ppage"></div>
     ${nx ? `<button class="nextsub" data-go="${nx.hash}">${t("next")}: <b>${esc(nx.name)}</b> →</button>` : ""}
     <button class="up" data-up>${t("up")}</button>
     </div>`;
