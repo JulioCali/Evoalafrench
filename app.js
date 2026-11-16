@@ -381,7 +381,7 @@ function catsBar(list, on, hash, isGuide){
 function initCats(){
   const wrap = app.querySelector(".catwrap"); if(!wrap) return;
   const cats = wrap.querySelector(".cats"), on = cats.querySelector(".on");
-  if(on){ const a = cats.getBoundingClientRect(), b = on.getBoundingClientRect(); cats.scrollLeft += (b.left - a.left) - (a.width - b.width) / 2; }
+  if(on){ const a = cats.getBoundingClientRect(), b = on.getBoundingClientRect(); cats.style.scrollBehavior = "auto"; cats.scrollLeft += (b.left - a.left) - (a.width - b.width) / 2; cats.style.scrollBehavior = ""; }
   // la flèche n'apparaît qu'à l'ouverture de la page ; dès qu'on fait défiler, elle disparaît
   const atEnd = cats.scrollLeft + cats.clientWidth > cats.scrollWidth - 6;
   wrap.classList.toggle("atend", atEnd);

@@ -27,7 +27,7 @@
   .hint{display:inline-block;margin-top:4px;background:#EEEBFD;color:#5940BF;border-radius:999px;padding:2px 12px;font-size:14px;font-weight:500}
   .row{display:flex;gap:10px;margin-top:12px}
   button{font:inherit;border:0;cursor:pointer;color:inherit}
-  .mic{flex:1;height:58px;border-radius:16px;background:#6C4FE0;color:#fff;font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px}
+  .mic{flex:1;height:58px;border-radius:16px;background:#6C4FE0;color:#fff;font-size:15px;line-height:1.2;padding:0 10px;text-align:left;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px}
   .mic svg{width:22px;height:22px}
   .mic.rec{background:#D6336C;animation:pulse 1.1s ease-in-out infinite}
   .mic.wait{background:#8A7BD8}
@@ -68,7 +68,7 @@
     <div class="es" id="es"></div>
     <div class="help" id="help">Dilo en francés para que Evo salte el muro</div>
     <div class="row">
-      <button class="mic" id="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Decirlo en francés</span></button>
+      <button class="mic" id="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Dale clic para decirlo en francés</span></button>
       <button class="sq hintb" id="hintb" aria-label="Pista"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg></button>
       <button class="sq" id="lis" aria-label="Escuchar"><svg viewBox="0 0 24 24"><path fill="#5940BF" d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg></button>
     </div>
@@ -214,7 +214,7 @@ function showCard(){
 }
 function hideCard(){ $("card").classList.add("hide"); }
 function setMic(m){ const b = $("mic"); b.className = "mic" + (m === "rec" ? " rec" : m === "wait" ? " wait" : ""); b.disabled = m === "wait";
-  b.querySelector("span").textContent = m === "rec" ? "Te escucho… (toca para terminar)" : m === "wait" ? "Escuchando…" : "Decirlo en francés"; }
+  b.querySelector("span").textContent = m === "rec" ? "Te escucho… (toca para terminar)" : m === "wait" ? "Escuchando…" : "Dale clic para decirlo en francés"; }
 $("hintb").onclick = () => { const p = PH[G.i]; if(!p || G.state !== "wall") return; G.hintUsed = true; $("help").innerHTML = `<span class="hint">${p.fr} · ${p.pr}</span>`; };
 $("lis").onclick = () => { const p = PH[G.i]; if(p) playModel(p); };
 $("skip").onclick = () => win(true);
