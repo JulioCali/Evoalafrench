@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tutorial · Evoala</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+  /* ---------- Tutoriel : un projecteur sur une zone, le reste assombri ---------- */
+  body{background:#fff}
+  #app{padding-bottom:90px}
+  .tblock{position:fixed;inset:0;z-index:50}
+  .spot{position:fixed;z-index:51;border-radius:18px;pointer-events:none;box-shadow:0 0 0 9999px rgba(22,14,48,.68);transition:top .45s ease,left .45s ease,width .45s ease,height .45s ease,border-radius .45s ease}
+  .spot.tap::after{content:"";position:absolute;inset:-6px;border-radius:inherit;border:3px solid #FFD27A;animation:tring 1.3s ease-out infinite}
+  @keyframes tring{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.12)}}
+  .spot.none{box-shadow:0 0 0 9999px rgba(22,14,48,.68);width:0!important;height:0!important}
+  .bub{position:fixed;z-index:52;left:14px;right:14px;max-width:420px;margin:0 auto;background:#fff;border-radius:22px;padding:14px 16px 14px 14px;box-shadow:0 14px 40px rgba(0,0,0,.25);display:flex;gap:12px;align-items:flex-start;transition:top .45s ease,bottom .45s ease,opacity .25s}
+  .bub img{width:54px;height:auto;flex:none;animation:evob 1.6s ease-in-out infinite}
+  @keyframes evob{50%{transform:translateY(-4px) rotate(-5deg)}}
+  .bub .bt{flex:1;min-width:0}
+  .bub b{display:block;font-size:16px;font-weight:600;margin-bottom:2px;color:#1A1A1A}
+  .bub p{margin:0;font-size:14px;line-height:1.45;color:#3A3550}
+  .bub .bf{display:flex;align-items:center;gap:10px;margin-top:12px}
+  .bub .cnt{font-size:12px;color:#8A8398;flex:1}
+  .bub .nx{height:42px;padding:0 18px;border-radius:12px;background:#6C4FE0;color:#fff;font-weight:600;font-size:14px}
+  .bub .sk{height:42px;padding:0 10px;color:#6E6680;font-size:13px}
+  .bub .wait{font-size:13px;font-weight:600;color:#C25A00}
+  .center{top:50%!important;transform:translateY(-50%)}
+  .row .pr{display:inline-block}
+  .tjump{display:none}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="tblock" id="blk"></div>
+<div class="spot none" id="spot"></div>
+<div class="bub" id="bub"></div>
+
+<script>
+/* ---------- La page « guide » simulée : 3 phrases simples ---------- */
+const PH = [
+  { fr:"Bonjour", es:"Buenos días", pr:"bon-YÚR", icon:["img/icons/p2.webp",0], audio:["snd/p2.json","426b3e4647"] },
+  { fr:"Merci", es:"Gracias", pr:"mer-SÍ", icon:["img/icons/p2.webp",7], audio:["snd/p2.json","4c431b3930"] },
+  { fr:"Au revoir", es:"Hasta luego", pr:"o re-VUÁR", icon:["img/icons/p2.webp",3], audio:["snd/p2.json","307939d20f"] },
+];
+const SPK = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+const HEART = '<svg viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>';
+const MIC = '<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+const mi = n => `<i class="mi" style="-webkit-mask-image:url('img/ui/${n}.png');mask-image:url('img/ui/${n}.png')"></i>`;
+const CATS = [["t-esenciales","Esenciales"],["t-compras","Compras"],["t-transporte","Transporte"],["t-visitas","Exploración"],["t-comida","Comida"]];
+const heard = new Set();
+document.getElementById("app").innerHTML = `
+  <div class="top flow"><button class="home" aria-label="Inicio"><svg viewBox="0 0 24 24"><path d="M12 3 2 11.5h3V21h5.5v-6h3v6H19v-9.5h3z"/></svg></button><img class="logo" src="img/ui/logo.webp" alt="evoala"></div>
+  <label class="search psearch" id="t-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input placeholder="Buscar una frase en español o francés" disabled></label>
+  <div class="catwrap atstart atend" id="t-cats"><div class="cats">${CATS.map((c, i) => `<button class="cat${i ? "" : " on"}">${mi(c[0])}<span>${c[1]}</span></button>`).join("")}</div></div>
+  <div class="ptabs" id="t-tabs"><button class="tab on">Indispensables</button><button class="tab">Parisinas</button><button class="tab">Salvavidas</button></div>
+  <p class="intro">Expresiones que tienes que conocer</p>
+  <div class="card" id="t-card"><div class="label">Saludos</div>
+    ${PH.map((p, i) => `<div class="row" data-i="${i}"><div class="ic" style="background-image:url('${p.icon[0]}');--i:${p.icon[1]}"></div>
+      <div class="ph"><div class="fr">${p.fr}</div><div class="es">${p.es}</div></div>
+      <div class="spk">${SPK}</div><button class="heart" aria-label="Guardar">${HEART}</button></div>`).join("")}
+    <div class="pslot" id="t-pslot"></div></div>
+  <nav class="nav" id="t-nav"><button class="on"><svg class="nico" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:2"><path d="M3 5c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 1-3-2-6-2-9-1z"/><path d="M12 6v14"/></svg><span>Guía</span></button>
+    <button id="t-lists"><i class="nico nheart">${HEART}</i><span>Mis listas</span></button>
+    <button id="t-paris"><svg class="nico" viewBox="0 0 24 24"><path d="M12 2v3M10.5 5h3l1 6h-5zM9.5 11h5l3.5 10h-3.8a2.2 2.2 0 0 0-4.4 0H6z"/><path d="M8 15h8"/></svg><span>Paris</span></button></nav>`;
+const row = i => document.querySelector(`.row[data-i="${i}"]`);
+
+/* ---------- audio (comme dans l'appli) ---------- */
+const bundles = {}, urls = {}; let player = null;
+async function play(i){
+  const [f, id] = PH[i].audio;
+  if(!urls[id]){ const b = await (bundles[f] ??= fetch(f).then(r => r.json())); const bin = Uint8Array.from(atob(b[id]), c => c.charCodeAt(0)); urls[id] = URL.createObjectURL(new Blob([bin], { type: "audio/mpeg" })); }
+  if(player) player.pause();
+  const r = row(i); r.classList.add("playing");
+  await new Promise(ok => { player = new Audio(urls[id]); player.onended = ok; player.onerror = ok; player.play().catch(ok); });
+  r.classList.remove("playing"); r.classList.add("heard"); heard.add(i);
+}
+function showPron(i){ const es = row(i).querySelector(".es"); es.innerHTML = `<span class="pr">${PH[i].pr}</span>`; row(i).classList.add("pron"); }
+
+/* ---------- Les étapes ---------- */
+// target : élément à éclairer ; tap : ce que l'apprenant doit toucher (sinon bouton « Siguiente »)
+const STEPS = [
+  { title:"¡Hola! Soy Evo 👋", text:"Te enseño a usar la guía en un minuto, con tres palabras fáciles.", next:"Empezar", skip:true },
+  { target:"#t-cats", title:"Las categorías", text:"Aquí eliges lo que quieres aprender: saludos, compras, transporte… Desliza para ver más." },
+  { target:"#t-tabs", title:"Los temas", text:"Cada categoría tiene varios temas. Toca uno para cambiar de página." },
+  { target:".row[data-i='0'] .spk", round:true, title:"Escucha", text:"Toca el altavoz para escuchar la frase en francés.", tap:t => t.closest(".row[data-i='0'] .spk"), act:() => play(0), wait:"Toca el altavoz 👆" },
+  { target:".row[data-i='0']", title:"¡Muy bien!", text:"El círculo claro alrededor del altavoz te recuerda que ya escuchaste esta frase." },
+  { target:".row[data-i='0'] .ic", title:"La pronunciación", text:"Toca la imagen para ver cómo se pronuncia la frase.", tap:t => t.closest(".row[data-i='0'] .ic"), act:() => showPron(0), wait:"Toca la imagen 👆" },
+  { target:".row[data-i='0']", title:"Así se dice", text:"«bon-YÚR»: la sílaba en mayúsculas es la que se marca más. Toca otra vez la imagen cuando quieras volver a la traducción." },
+  { target:".row[data-i='0'] .heart", round:true, title:"Guarda tus frases", text:"Toca el corazón para guardar la frase en «Mis listas» y repasarla después.", tap:t => t.closest(".row[data-i='0'] .heart"), act:() => row(0).querySelector(".heart").classList.add("on"), wait:"Toca el corazón 👆" },
+  { target:"#t-card", title:"Tu turno", text:"Escucha las otras dos frases: «Merci» y «Au revoir».", tap:t => t.closest(".row[data-i='1'] .spk, .row[data-i='2'] .spk"),
+    act:async t => { const i = +t.closest(".row").dataset.i; await play(i); return heard.has(1) && heard.has(2); }, wait:"Escucha las 2 frases 👆" },
+  { target:"#t-pslot", before:() => { document.getElementById("t-pslot").innerHTML = `<button class="pbtn pop">${MIC}Practicar</button>`; },
+    title:"¡Escuchaste todo! 🎉", text:"Cuando escuchas todas las frases, aparece «Practicar»: ayuda a Evo a saltar los muros diciendo las frases en francés.",
+    tap:t => t.closest("#t-pslot .pbtn"), act:() => { goGame(); return false; }, wait:"Toca Practicar 👆" },
+  // retour du jeu ↓
+  { id:"fin", target:"#t-nav", title:"¡Lo lograste!", text:"Ya sabes escuchar, ver la pronunciación, guardar y practicar. Abajo tienes la guía, tus listas y la Guía de París." },
+  { target:"#t-lists", round:true, title:"Mis listas", text:"Aquí encuentras las frases que guardaste con el corazón." },
+  { title:"¡Listo para viajar! 🇫🇷", text:"Ahora explora la guía a tu ritmo. ¡Bon voyage!", next:"Ir a la guía", end:true },
+];
+let k = 0;
+const spot = document.getElementById("spot"), bub = document.getElementById("bub"), blk = document.getElementById("blk");
+function rectOf(sel){ const el = document.querySelector(sel); if(!el) return null; return el.getBoundingClientRect(); }
+function show(){
+  const s = STEPS[k];
+  if(s.before) s.before();
+  const el = s.target && document.querySelector(s.target);
+  if(el){ el.scrollIntoView({ block: "center", behavior: "smooth" }); }
+  setTimeout(() => place(s), el ? 380 : 0);
+  bub.innerHTML = `<img src="img/ui/evo.png" alt=""><div class="bt"><b>${s.title}</b><p>${s.text}</p>
+    <div class="bf"><span class="cnt">${k >= 1 && k <= 9 ? `${k} / 9` : ""}</span>${s.skip ? `<button class="sk" data-skip>Saltar</button>` : ""}
+    ${s.tap ? `<span class="wait">${s.wait}</span>` : `<button class="nx" data-next>${s.next || "Siguiente"}</button>`}</div></div>`;
+}
+function place(s){
+  const r = s.target && rectOf(s.target), pad = s.round ? 8 : 6;
+  if(!r){ spot.className = "spot none"; spot.style.cssText = `top:50%;left:50%`; bub.style.top = ""; bub.style.bottom = ""; bub.classList.add("center"); return; }
+  bub.classList.remove("center");
+  const w = r.width + pad * 2, h = r.height + pad * 2;
+  spot.className = "spot" + (s.tap ? " tap" : "");
+  spot.style.cssText = `top:${r.top - pad}px;left:${r.left - pad}px;width:${w}px;height:${h}px;border-radius:${s.round ? Math.max(w, h) / 2 : 18}px`;
+  const below = r.bottom + pad + 14, bh = bub.offsetHeight || 160;
+  if(below + bh < innerHeight - 10){ bub.style.top = below + "px"; bub.style.bottom = ""; }
+  else { bub.style.top = Math.max(10, r.top - pad - 14 - bh) + "px"; bub.style.bottom = ""; }
+}
+addEventListener("resize", () => place(STEPS[k]));
+addEventListener("scroll", () => place(STEPS[k]), { passive: true });
+// les touches : bouton de la bulle, ou zone éclairée quand l'étape demande de toucher
+bub.addEventListener("click", e => {
+  if(e.target.closest("[data-skip]")) return finish();
+  if(e.target.closest("[data-next]")){ if(STEPS[k].end) return finish(); k++; show(); }
+});
+let busy = false;
+blk.addEventListener("click", async e => {
+  const s = STEPS[k]; if(!s.tap || busy) return;
+  blk.style.pointerEvents = "none"; const t = document.elementFromPoint(e.clientX, e.clientY); blk.style.pointerEvents = "";
+  const r = rectOf(s.target); if(!t || !r || e.clientX < r.left - 10 || e.clientX > r.right + 10 || e.clientY < r.top - 10 || e.clientY > r.bottom + 10) return;
+  const hit = s.tap(t); if(!hit) return;
+  busy = true; const done = await s.act(hit); busy = false;
+  if(done !== false){ k++; show(); }
+});
+function goGame(){
+  try{ sessionStorage.setItem("evoala-game", JSON.stringify({ title: "Tutorial", backUrl: "tuto.html#fin", lang: "es", items: PH.map(p => ({ fr: p.fr, es: p.es, pr: p.pr, audio: p.audio })) })); }catch(e){}
+  location.href = "juego.html";
+}
+function finish(){ try{ localStorage.setItem("evoala-tuto", "1"); }catch(e){} location.href = "/#s0t0"; }
+// retour du jeu : on reprend à l'étape « fin », la page dans l'état « tout écouté »
+if(location.hash === "#fin"){
+  PH.forEach((_, i) => { row(i).classList.add("heard"); heard.add(i); }); showPron(0); row(0).querySelector(".heart").classList.add("on");
+  document.getElementById("t-pslot").innerHTML = `<button class="pbtn">${MIC}Practicar</button>`;
+  k = STEPS.findIndex(s => s.id === "fin");
+}
+show();
+</script>
+</body>
+</html>

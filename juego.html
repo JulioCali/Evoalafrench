@@ -351,7 +351,7 @@ function endGame(){
 }
 $("go").onclick = () => { ac(); unlockSfx(); $("start").hidden = true; newGame(); };
 $("again").onclick = () => { unlockSfx(); $("end").hidden = true; newGame(); };
-const backUrl = SET && SET.back ? "/#" + SET.back : "/";
+const backUrl = SET && SET.backUrl ? SET.backUrl : SET && SET.back ? "/#" + SET.back : "/";
 document.querySelector(".hud .back").href = backUrl; $("back2").href = backUrl; $("back2").textContent = T.back; $("again").textContent = T.again;
 document.querySelector("#start h1").textContent = T.start; document.querySelector("#start p").innerHTML = T.startP; $("go").textContent = T.go;
 document.querySelector("#start .note").textContent = SET ? `${SET.title} · ${PH.length} ${T.phr}` : "Prototipo · 5 muros · frases de Esenciales";
