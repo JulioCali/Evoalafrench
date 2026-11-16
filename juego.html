@@ -128,7 +128,7 @@ addEventListener("resize", resize);
 const GAP = 560, SPEED = 170;             // distance entre les murs, vitesse de course (px/s)
 let G;                                    // état de la partie
 function newGame(){
-  G = { x: 0, i: 0, state: "run", t: 0, jumpT: 0, failT: 0, wallShake: 0, results: [], tries: 0, hintUsed: false, stars: 0, parts: [] };
+  G = { cardTok: 0, x: 0, i: 0, state: "run", t: 0, jumpT: 0, failT: 0, wallShake: 0, results: [], tries: 0, hintUsed: false, stars: 0, parts: [] };
   renderDots(); $("stars").textContent = "";
 }
 const wallX = i => (i + 1) * GAP;          // position des murs dans le monde
@@ -207,7 +207,7 @@ function loop(ts){
   if(G.state === "run" || G.state === "finish"){
     G.x += SPEED * dt;
     if(G.state === "run" && G.i < PH.length && G.x >= wallX(G.i) - 20){ G.x = wallX(G.i) - 20; G.state = "wall"; showCard(); }
-    if(G.state === "finish" && G.x >= wallX(PH.length - 1) + 340){ G.state = "done"; endGame(); }
+    if(G.state === "finish" && G.x >= wallX(PH.length - 1) + 340){ G.state = "done"; sfx("win"); burst(); setTimeout(endGame, 900); }
   }
   if(G.state === "jump"){ G.jumpT += dt / 0.95; G.x += (170 / 0.95) * dt;
     if(G.jumpT >= 1){ G.jumpT = 0; G.i++; renderDots(); G.state = G.i < PH.length ? "run" : "finish"; } }
@@ -220,6 +220,7 @@ function loop(ts){
 /* ---------- Carte du mur ---------- */
 function renderDots(){ $("dots").innerHTML = PH.map((_, i) => { const r = G.results[i]; return `<i class="${r ? (r.help ? "help" : "ok") : i === G.i ? "now" : ""}"></i>`; }).join(""); }
 function showCard(){
+  G.cardTok++;
   const p = PH[G.i]; G.tries = 0; G.hintUsed = false;
   $("kick").textContent = `Muro ${G.i + 1} de ${PH.length}`; $("es").textContent = p.es;
   $("help").innerHTML = "Dilo en francés para que Evo salte el muro";
@@ -238,7 +239,9 @@ function win(help){
   const p = PH[G.i];
   G.results[G.i] = { fr: p.fr, help: help || G.hintUsed, first: G.tries <= 1 && !help && !G.hintUsed };
   if(G.results[G.i].first) G.stars++; $("stars").textContent = G.stars ? "★ " + G.stars : "";
-  hideCard(); burst(); sfx("jump"); G.state = "jump"; G.jumpT = 0;
+  const n = ++G.cardTok; $("mic").disabled = true;
+  setTimeout(() => { if(G.cardTok === n && G.state !== "wall") hideCard(); }, help ? 300 : 1500);   // le message vert reste pendant le saut
+  burst(); sfx("jump"); G.state = "jump"; G.jumpT = 0;
 }
 function fail(said, s){
   G.state = "fail"; G.failT = 0; G.wallShake = 1; sfx("bump");
@@ -251,11 +254,11 @@ function fail(said, s){
 let actx = null, playing = null;
 const bundles = {}, decoded = {};
 function ac(){ actx ??= new (window.AudioContext || window.webkitAudioContext)(); if(actx.state === "suspended") actx.resume(); return actx; }
-function sfx(kind){
-  const a = ac(), o = a.createOscillator(), g = a.createGain(), t = a.currentTime; o.connect(g); g.connect(a.destination);
-  if(kind === "jump"){ o.type = "triangle"; o.frequency.setValueAtTime(420, t); o.frequency.exponentialRampToValueAtTime(980, t + .25); g.gain.setValueAtTime(.18, t); g.gain.exponentialRampToValueAtTime(.001, t + .35); o.start(t); o.stop(t + .36); }
-  else { o.type = "square"; o.frequency.setValueAtTime(160, t); o.frequency.exponentialRampToValueAtTime(90, t + .2); g.gain.setValueAtTime(.08, t); g.gain.exponentialRampToValueAtTime(.001, t + .25); o.start(t); o.stop(t + .26); }
-}
+// bruitages (fichiers créés pour Evoala, libres de droits) joués avec <audio> : ils marchent aussi en mode silencieux
+const SFX = { jump: new Audio("snd/jump.wav"), bump: new Audio("snd/bump.wav"), win: new Audio("snd/win.wav") };
+SFX.jump.volume = .7; SFX.bump.volume = .6;
+function unlockSfx(){ Object.values(SFX).forEach(a => { a.muted = true; a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; }); }); }
+function sfx(kind){ const a = SFX[kind]; if(!a) return; try{ a.currentTime = 0; a.play().catch(() => {}); }catch(e){} }
 // lecteur <audio> (et non Web Audio) : sur iPhone en mode silencieux, Web Audio est coupé mais pas <audio>
 const urls = {};
 async function playModel(p){
@@ -312,8 +315,8 @@ function endGame(){
   $("endL").innerHTML = G.results.map((r, i) => `<li><b>${r.fr}</b><span>${r.first ? "a la primera" : r.help ? "con ayuda" : "con práctica"}</span></li>`).join("");
   $("end").hidden = false;
 }
-$("go").onclick = () => { ac(); $("start").hidden = true; newGame(); };
-$("again").onclick = () => { $("end").hidden = true; newGame(); };
+$("go").onclick = () => { ac(); unlockSfx(); $("start").hidden = true; newGame(); };
+$("again").onclick = () => { unlockSfx(); $("end").hidden = true; newGame(); };
 newGame(); G.state = "intro"; resize(); requestAnimationFrame(loop);
 </script>
 </body>
