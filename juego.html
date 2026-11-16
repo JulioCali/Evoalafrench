@@ -308,6 +308,7 @@ function win(help){
   const p = PH[G.i];
   const kind = help ? "skip" : G.hintUsed ? "hint" : G.tries <= 1 ? "first" : "practice";
   G.results[G.i] = { fr: p.fr, kind, help: kind === "skip" || kind === "hint", first: kind === "first" };
+  try{ const k = "evoala-practiced", a = JSON.parse(localStorage.getItem(k) || "[]"); if(!a.includes(p.fr)){ a.push(p.fr); localStorage.setItem(k, JSON.stringify(a)); } }catch(e){}   // pratiquée, quelle que soit la note
   if(!help){ try{ const k = "evoala-said", a = JSON.parse(localStorage.getItem(k) || "[]"); if(!a.includes(p.fr)){ a.push(p.fr); localStorage.setItem(k, JSON.stringify(a)); } }catch(e){} }
   if(G.results[G.i].first) G.stars++; $("stars").textContent = G.stars ? "★ " + G.stars : "";
   const n = ++G.cardTok; $("mic").disabled = true;

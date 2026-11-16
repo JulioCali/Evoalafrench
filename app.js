@@ -48,7 +48,7 @@ const TXT = {
       pHead:"¿Qué ver en Paris ?",pSub:"Descubre aquí tus próximas visitas en Paris",city:"Entender la ciudad",mapT:"Mapa de los distritos",mapAlt:"Mapa de los distritos de París",
       move:"Moverse",safety:"Seguridad",hours:"Horarios y cierres",credits:"Créditos de las fotos",src:"Fuente",lic:"Licencia",
       paid:"De pago",free:"Gratis",metro:"Metro cercano",go:"Cómo llegar",crnote:"Toca una foto para ver su autor y su licencia",
-      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",next:"Página siguiente",pick:"Elige la categoría que quieres estudiar",gTitle:"Francés para viajar",gKicker:"Guía de supervivencia",prog:"Tu progreso",pSeen:"Páginas visitadas",pHeard:"Frases escuchadas",cont:"Continúa donde lo dejaste",startAt:"Empieza por aquí",choose:"Elige una categoría",nPh:"frases",swipe:"Desliza",practice:"Practicar",practicePage:"Practicar esta página",practiceSub:"¡Escuchaste todo! Ayuda a Evo a saltar los muros",more:"Más categorías",found:"frases encontradas",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
+      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",next:"Página siguiente",pick:"Elige la categoría que quieres estudiar",gTitle:"Francés para viajar",gKicker:"Guía de supervivencia",prog:"Tu progreso",pSeen:"Páginas visitadas",pHeard:"Frases escuchadas",pPract:"Frases practicadas",progHow:"mitad escucha, mitad práctica",cont:"Continúa donde lo dejaste",startAt:"Empieza por aquí",choose:"Elige una categoría",nPh:"frases",swipe:"Desliza",practice:"Practicar",practicePage:"Practicar esta página",practiceSub:"¡Escuchaste todo! Ayuda a Evo a saltar los muros",more:"Más categorías",found:"frases encontradas",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
   en:{guide:"FRENCH",guide2:"Survival guide",from:"EN",start:"Start",dep:"DEPARTURE",now:"Now",dest:"DESTINATION",me:"The French me",first:"FIRST CLASS",
       search:"Search a phrase in English or French",searchL:"Search a phrase",resume:"Pick up where you left off",toc:"Table of contents",tap:"Tap a topic",
       paris:"Paris Guide",parisSub:"What to see in Paris? Monuments, museums, walks…",bonusT:"Bonus",bonusS:"Extra content",extra:"Extra content",
@@ -56,7 +56,7 @@ const TXT = {
       pHead:"What to see in Paris?",pSub:"Discover your next visits in Paris",city:"Understanding the city",mapT:"Map of the districts",mapAlt:"Map of the Paris districts",
       move:"Getting around",safety:"Safety",hours:"Opening hours",credits:"Photo credits",src:"Source",lic:"License",
       paid:"Paid",free:"Free",metro:"Nearest metro",go:"Directions",crnote:"Tap a photo to see its author and license",
-      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",next:"Next page",pick:"Choose the category you want to study",gTitle:"French for travelers",gKicker:"Survival guide",prog:"Your progress",pSeen:"Pages visited",pHeard:"Phrases listened to",cont:"Pick up where you left off",startAt:"Start here",choose:"Choose a category",nPh:"phrases",swipe:"Swipe",practice:"Practice",practicePage:"Practice this page",practiceSub:"You listened to everything! Help Evo jump the walls",more:"More categories",found:"phrases found",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
+      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",next:"Next page",pick:"Choose the category you want to study",gTitle:"French for travelers",gKicker:"Survival guide",prog:"Your progress",pSeen:"Pages visited",pHeard:"Phrases listened to",pPract:"Phrases practiced",progHow:"half listening, half practice",cont:"Pick up where you left off",startAt:"Start here",choose:"Choose a category",nPh:"phrases",swipe:"Swipe",practice:"Practice",practicePage:"Practice this page",practiceSub:"You listened to everything! Help Evo jump the walls",more:"More categories",found:"phrases found",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
 };
 const t = k => TXT[LANG][k];
 const homeTitle = (e, i) => LANG === "en" ? (i < 0 ? [t("bonusT"), t("bonusS")] : HOME_EN[i]) : [e[0], e[1]];
@@ -190,7 +190,7 @@ function onAuth(u){
   if(uid && uid !== lastUid){
     window.EvoAuth.load().then(d => {
       if(d && d.last){ try{ localStorage.setItem("evoala-last", d.last); }catch(e){} }
-      ['seen','heard'].forEach(f => { if(d && Array.isArray(d[f])){ const k = 'evoala-' + f, m = [...new Set([...seen.get(k), ...d[f]])]; try{ localStorage.setItem(k, JSON.stringify(m)); }catch(e){} if(m.length > d[f].length) syncProgress(); } else if(seen.get('evoala-' + f).length) syncProgress(); });
+      ['seen','heard','practiced'].forEach(f => { if(d && Array.isArray(d[f])){ const k = 'evoala-' + f, m = [...new Set([...seen.get(k), ...d[f]])]; try{ localStorage.setItem(k, JSON.stringify(m)); }catch(e){} if(m.length > d[f].length) syncProgress(); } else if(seen.get('evoala-' + f).length) syncProgress(); });
       HEARDC = null;
       if(location.hash === '#guia') route();
       if(d && Array.isArray(d.lists)){ lists.put(d.lists, false); refreshHearts(); if(/^#lista/.test(location.hash)) route(); }
@@ -210,7 +210,7 @@ const HUB = {
   es:{t1:"Una guía para",t2:"cada objetivo",sub:"Cada guía te acompaña hacia una meta concreta. Empieza por la que más te sirve hoy.",
       subWide:" Viajar, empezar desde cero o aprobar el DELF: tú decides.",badge:"Versión de prueba",kicker:"Guía de supervivencia",title:"Francés para viajar",
       mission:"Misión:",goal:"entender y hacerte entender en Francia durante tu viaje.",chips:["757 frases útiles","Audio y pronunciación","Guía de Paris","Todos los niveles"],
-      cta:"Empezar a aprender",cta2:"Seguir aprendiendo",heardOf:"frases escuchadas",others:"Otras guías",othersSub:"Cada una con su objetivo",level:"Nivel",soon:"Muy pronto",more:"Más guías en camino",
+      cta:"Empezar a aprender",cta2:"Seguir aprendiendo",heardOf:"frases escuchadas",heardS:"escuchadas",practS:"practicadas",others:"Otras guías",othersSub:"Cada una con su objetivo",level:"Nivel",soon:"Muy pronto",more:"Más guías en camino",
       notify:"Avísame cuando salga una guía",notifyToast:"Muy pronto podrás dejar tu correo aquí.",how:"¿Cómo aprendes?",
       steps:[["Elige tu objetivo","Viajar, empezar desde cero o preparar el DELF."],["Escucha y repite","Cada frase tiene su audio y su pronunciación escrita."],["Úsalo en la vida real","En tu teléfono, cuando lo necesites, incluso en Francia."]],
       guides:[["Francés A1","desde cero","Descubrir el francés y dar tus primeros pasos"],["DELF A1","examen oficial","Hablar de ti, tu casa y tus gustos, y obtener tu primer diploma"],
@@ -218,7 +218,7 @@ const HUB = {
   en:{t1:"A guide for",t2:"every goal",sub:"Each guide takes you toward a concrete goal. Start with the one that helps you most today.",
       subWide:" Travel, start from scratch or pass the DELF: you decide.",badge:"Trial version",kicker:"Survival guide",title:"French for traveling",
       mission:"Mission:",goal:"understand and make yourself understood in France during your trip.",chips:["757 useful phrases","Audio and pronunciation","Paris Guide","All levels"],
-      cta:"Start learning",cta2:"Keep learning",heardOf:"phrases listened to",others:"Other guides",othersSub:"Each with its own goal",level:"Level",soon:"Coming soon",more:"More guides on the way",
+      cta:"Start learning",cta2:"Keep learning",heardOf:"phrases listened to",heardS:"listened",practS:"practiced",others:"Other guides",othersSub:"Each with its own goal",level:"Level",soon:"Coming soon",more:"More guides on the way",
       notify:"Let me know when a new guide is out",notifyToast:"Soon you'll be able to leave your email here.",how:"How do you learn?",
       steps:[["Choose your goal","Travel, start from scratch or prepare for the DELF."],["Listen and repeat","Each phrase has its audio and its written pronunciation."],["Use it in real life","On your phone, whenever you need it, even in France."]],
       guides:[["French A1","from scratch","Discover French and take your first steps"],["DELF A1","official exam","Talk about yourself, your home and your tastes, and earn your first diploma"],
@@ -227,9 +227,8 @@ const HUB = {
 const HUB_LOOK = [["a1","A1","#0F7C72","#E3F4F1"],["delfa1","A1","#C2410C","#FDEBDD"],["delfa2","A2","#BE185D","#FCE4EF"],["delfb1","B1","#1D4ED8","#E2EAFD"],["delfb2","B2","#6D28D9","#EDE7FC"]];
 function hub(){
   // après une première utilisation : barre de progression (phrases écoutées) au lieu des étiquettes
-  const heardSet = new Set(seen.get("evoala-heard")), started = heardSet.size > 0 || seen.get("evoala-seen").length > 0;
-  const allIdx = C ? [...index().values()] : [], total = allIdx.length || 757, nHeard = allIdx.filter(x => heardSet.has(x.p.fr)).length;
-  const pct = nHeard ? Math.max(1, Math.round(nHeard * 100 / total)) : 0;
+  const started = seen.get("evoala-heard").length > 0 || seen.get("evoala-seen").length > 0 || seen.get("evoala-practiced").length > 0;
+  const PG = C ? progress([...index().values()]) : { nh: 0, np: 0, tot: 757, raw: 0, pct: 0 };
   const H = HUB[LANG], arrow = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   const card = (g, i) => { const [img, lvl, fg, bg] = HUB_LOOK[i];
     return `<div class="gcard" style="--fg:${fg};--bg:${bg}"><div class="gcover"><img src="img/hub/${img}.webp" alt=""><span>${H.level} ${lvl}</span></div>
@@ -243,7 +242,7 @@ function hub(){
         <div class="fhead"><span class="fimg"><img src="img/hub/voyage.webp" alt=""></span>
           <div><span class="fbadge">${H.badge}</span><small>${MINIFLAG}${H.kicker}</small><b>${H.title}</b></div></div>
         <div class="fbody"><p><strong>${H.mission}</strong> ${H.goal}</p>
-          ${started ? `<div class="fprog"><div class="fpl"><b>${pct}%</b><span>${nHeard} / ${total} ${H.heardOf}</span></div><div class="gtrack ph"><i style="width:${nHeard ? Math.max(2, nHeard * 100 / total) : 0}%"></i></div></div>`
+          ${started ? `<div class="fprog"><div class="fpl"><b>${PG.pct}%</b><span>${PG.nh} ${H.heardS} · ${PG.np} ${H.practS}</span></div><div class="gtrack ph"><i style="width:${PG.raw ? Math.max(2, PG.raw) : 0}%"></i></div></div>`
             : `<div class="fchips">${H.chips.map(c => `<span>${c}</span>`).join("")}</div>`}
           <button class="fcta" data-go="guia">${started ? H.cta2 : H.cta} ${arrow}</button></div>
       </section></div>
@@ -283,8 +282,15 @@ const seen = {
   get(k){ try{ const v = JSON.parse(localStorage.getItem(k)); return Array.isArray(v) ? v : []; }catch(e){ return []; } },
   add(k, v){ const a = this.get(k); if(a.includes(v)) return; a.push(v); try{ localStorage.setItem(k, JSON.stringify(a)); }catch(e){} syncProgress(); }
 };
+// progression : moitié écoute, moitié pratique (le jeu, quelle que soit la note)
+function progress(entries){
+  const h = new Set(seen.get("evoala-heard")), pr = new Set(seen.get("evoala-practiced")), tot = entries.length || 1;
+  const nh = entries.filter(x => h.has(x.p.fr)).length, np = entries.filter(x => pr.has(x.p.fr)).length;
+  const raw = (nh + np) / (2 * tot) * 100;
+  return { nh, np, tot: entries.length, raw, pct: raw > 0 ? Math.max(1, Math.round(raw)) : 0 };
+}
 let syncT;
-function syncProgress(){ clearTimeout(syncT); syncT = setTimeout(() => window.EvoAuth?.save({ seen: seen.get("evoala-seen"), heard: seen.get("evoala-heard") }), 3000); }
+function syncProgress(){ clearTimeout(syncT); syncT = setTimeout(() => window.EvoAuth?.save({ seen: seen.get("evoala-seen"), heard: seen.get("evoala-heard"), practiced: seen.get("evoala-practiced") }), 3000); }
 let HEARDC = null;                                           // phrases déjà écoutées (cache)
 const heardHas = k => (HEARDC ??= new Set(seen.get("evoala-heard"))).has(k);
 const markHeard = key => { if(!key) return; seen.add("evoala-heard", key); HEARDC = null; };
@@ -297,23 +303,25 @@ function home(){
   const last = lastInfo(), pages = allPages(), seenP = new Set(seen.get("evoala-seen")), heard = new Set(seen.get("evoala-heard"));
   const idx = [...index().values()];
   const nSeen = pages.filter(h => seenP.has(h)).length, nHeard = idx.filter(x => heard.has(x.p.fr)).length;
-  const perCat = si => { const own = idx.filter(x => x.si === si); return [own.filter(x => heard.has(x.p.fr)).length, own.length]; };
+  const perCat = si => { const own = idx.filter(x => x.si === si), g = progress(own); return [g.pct, own.length, g.raw]; };
+  const PG = progress(idx);
   const bar = (icon, label, n, tot, cls) => `<div class="gbar ${cls}"><div class="gbl">${icon}<span>${label}</span><em><b>${n}</b> / ${tot}</em></div><div class="gtrack"><i style="width:${n ? Math.max(3, n * 100 / tot) : 0}%"></i></div></div>`;
   const arrow = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   const tile = (e, i) => { const [tt, ts] = homeTitle(e, i), [n, tot] = perCat(i);
     return `<button class="gtile" data-go="s${i}t0"><span class="gico">${mi("t-" + GRID[i])}</span><b>${esc(tt)}</b><small>${esc(ts)}</small>
-      ${n ? `<span class="gmini"><i style="width:${n * 100 / tot}%"></i></span><em>${n} / ${tot} ${t("nPh")}</em>` : `<em>${tot} ${t("nPh")}</em>`}</button>`; };
+      ${n ? `<span class="gmini"><i style="width:${perCat(i)[2]}%"></i></span><em>${n}% · ${tot} ${t("nPh")}</em>` : `<em>${tot} ${t("nPh")}</em>`}</button>`; };
   const [bn, btot] = perCat(8);
   app.innerHTML = `${topbar("ghub")}
   <div class="gtitle"><small>${MINIFLAG}${t("gKicker")}</small><b>${t("gTitle")}</b></div>
-  <section class="gprog"><div class="gpt">${t("prog")}</div>
-    ${bar('<svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></svg>', t("pSeen"), nSeen, pages.length, "pg")}
-    ${bar(ICON.spk, t("pHeard"), nHeard, idx.length, "ph")}
+  <section class="gprog"><div class="gpt gptot"><span>${t("prog")}<small>${t("progHow")}</small></span><b>${PG.pct}%</b></div>
+    <div class="gtrack big"><i style="width:${PG.raw ? Math.max(2, PG.raw) : 0}%"></i></div>
+    ${bar(ICON.spk, t("pHeard"), PG.nh, idx.length, "ph")}
+    ${bar('<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>', t("pPract"), PG.np, idx.length, "pp")}
     <button class="gcont" data-go="${last ? last.hash : "s0t0"}"><span><small>${last ? t("cont") : t("startAt")}</small><b>${esc(last ? `${last.cat} › ${last.label}` : tileLabel(GRID[0]))}</b></span>${arrow}</button>
   </section>
   <div class="gch">${t("choose")}</div>
   <div class="gtiles">${HOME.map((e, i) => tile(e, i)).join("")}</div>
-  <button class="gwide bonus" data-go="s8t0"><span class="gico">${mi("t-bonus")}</span><span class="gw"><b>${t("bonusT")}</b><small>${t("bonusS")} · ${bn ? `${bn} / ` : ""}${btot} ${t("nPh")}</small></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+  <button class="gwide bonus" data-go="s8t0"><span class="gico">${mi("t-bonus")}</span><span class="gw"><b>${t("bonusT")}</b><small>${t("bonusS")} · ${bn ? `${bn}% · ` : ""}${btot} ${t("nPh")}</small></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
   <button class="gwide" data-go="p1"><span class="gico pimg"><img src="${UI['h:Guía de Paris']}" alt=""></span><span class="gw"><b>${t("paris")}</b><small>${t("parisSub")}</small></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
   <div class="gend"></div>`;
 }

@@ -552,3 +552,11 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .pop{animation:ppop .5s cubic-bezier(.2,1.6,.4,1)}
 @keyframes ppop{0%{transform:scale(.4);opacity:0}100%{transform:none;opacity:1}}
 .ppage:not(:empty) + .nextsub{background:#fff;color:#5940BF;border:1.5px solid var(--violet)}
+/* progression totale : moitié écoute, moitié pratique */
+.gptot{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.gptot span{display:flex;flex-direction:column}
+.gptot small{font-size:11px;font-weight:500;color:#8A8398}
+.gptot b{font-size:26px;font-weight:600;color:#1A1A1A;line-height:1}
+.gtrack.big{height:14px;margin-top:-6px;background:#E6E1FA}
+.gtrack.big i{background:linear-gradient(90deg,#D6336C,#6C4FE0)}
+.gbar.pp .gbl svg{fill:none;stroke:var(--violet);stroke-width:2.2;stroke-linecap:round}
