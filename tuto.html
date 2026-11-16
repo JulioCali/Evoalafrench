@@ -144,7 +144,11 @@ function goGame(){
   try{ sessionStorage.setItem("evoala-game", JSON.stringify({ title: "Tutorial", tuto: true, backUrl: "tuto.html#fin", lang: "es", items: PH.map(p => ({ fr: p.fr, es: p.es, pr: p.pr, audio: p.audio })) })); }catch(e){}
   location.href = "juego.html";
 }
-function finish(){ try{ localStorage.setItem("evoala-tuto", "1"); }catch(e){} location.href = "/#s0t0"; }
+function finish(){
+  let back = "#guia"; try{ localStorage.setItem("evoala-tuto", "1"); back = sessionStorage.getItem("evoala-tuto-back") || "#guia"; }catch(e){}
+  location.href = "/" + back;
+}
+try{ sessionStorage.setItem("evoala-tuto-s", "1"); }catch(e){}   // vu pendant cette visite : il ne se relance pas
 // retour du jeu : on reprend à l'étape « fin », la page dans l'état « tout écouté »
 if(location.hash === "#fin"){
   PH.forEach((_, i) => { row(i).classList.add("heard"); heard.add(i); }); showPron(0); row(0).querySelector(".heart").classList.add("on");

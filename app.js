@@ -48,7 +48,7 @@ const TXT = {
       pHead:"¿Qué ver en Paris ?",pSub:"Descubre aquí tus próximas visitas en Paris",city:"Entender la ciudad",mapT:"Mapa de los distritos",mapAlt:"Mapa de los distritos de París",
       move:"Moverse",safety:"Seguridad",hours:"Horarios y cierres",credits:"Créditos de las fotos",src:"Fuente",lic:"Licencia",
       paid:"De pago",free:"Gratis",metro:"Metro cercano",go:"Cómo llegar",crnote:"Toca una foto para ver su autor y su licencia",
-      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",next:"Página siguiente",pick:"Elige la categoría que quieres estudiar",gTitle:"Francés para viajar",gKicker:"Guía de supervivencia",prog:"Tu progreso",pSeen:"Páginas visitadas",pHeard:"Frases escuchadas",pPract:"Frases practicadas",progHow:"mitad escucha, mitad práctica",cont:"Continúa donde lo dejaste",startAt:"Empieza por aquí",choose:"Elige una categoría",nPh:"frases",swipe:"Desliza",practice:"Practicar",practicePage:"Practicar esta página",practiceSub:"¡Escuchaste todo! Ayuda a Evo a saltar los muros",more:"Más categorías",found:"frases encontradas",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
+      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",next:"Página siguiente",pick:"Elige la categoría que quieres estudiar",tuto:"Ver el tutorial",gTitle:"Francés para viajar",gKicker:"Guía de supervivencia",prog:"Tu progreso",pSeen:"Páginas visitadas",pHeard:"Frases escuchadas",pPract:"Frases practicadas",progHow:"mitad escucha, mitad práctica",cont:"Continúa donde lo dejaste",startAt:"Empieza por aquí",choose:"Elige una categoría",nPh:"frases",swipe:"Desliza",practice:"Practicar",practicePage:"Practicar esta página",practiceSub:"¡Escuchaste todo! Ayuda a Evo a saltar los muros",more:"Más categorías",found:"frases encontradas",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
   en:{guide:"FRENCH",guide2:"Survival guide",from:"EN",start:"Start",dep:"DEPARTURE",now:"Now",dest:"DESTINATION",me:"The French me",first:"FIRST CLASS",
       search:"Search a phrase in English or French",searchL:"Search a phrase",resume:"Pick up where you left off",toc:"Table of contents",tap:"Tap a topic",
       paris:"Paris Guide",parisSub:"What to see in Paris? Monuments, museums, walks…",bonusT:"Bonus",bonusS:"Extra content",extra:"Extra content",
@@ -56,7 +56,7 @@ const TXT = {
       pHead:"What to see in Paris?",pSub:"Discover your next visits in Paris",city:"Understanding the city",mapT:"Map of the districts",mapAlt:"Map of the Paris districts",
       move:"Getting around",safety:"Safety",hours:"Opening hours",credits:"Photo credits",src:"Source",lic:"License",
       paid:"Paid",free:"Free",metro:"Nearest metro",go:"Directions",crnote:"Tap a photo to see its author and license",
-      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",next:"Next page",pick:"Choose the category you want to study",gTitle:"French for travelers",gKicker:"Survival guide",prog:"Your progress",pSeen:"Pages visited",pHeard:"Phrases listened to",pPract:"Phrases practiced",progHow:"half listening, half practice",cont:"Pick up where you left off",startAt:"Start here",choose:"Choose a category",nPh:"phrases",swipe:"Swipe",practice:"Practice",practicePage:"Practice this page",practiceSub:"You listened to everything! Help Evo jump the walls",more:"More categories",found:"phrases found",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
+      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",next:"Next page",pick:"Choose the category you want to study",tuto:"See the tutorial",gTitle:"French for travelers",gKicker:"Survival guide",prog:"Your progress",pSeen:"Pages visited",pHeard:"Phrases listened to",pPract:"Phrases practiced",progHow:"half listening, half practice",cont:"Pick up where you left off",startAt:"Start here",choose:"Choose a category",nPh:"phrases",swipe:"Swipe",practice:"Practice",practicePage:"Practice this page",practiceSub:"You listened to everything! Help Evo jump the walls",more:"More categories",found:"phrases found",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
 };
 const t = k => TXT[LANG][k];
 const homeTitle = (e, i) => LANG === "en" ? (i < 0 ? [t("bonusT"), t("bonusS")] : HOME_EN[i]) : [e[0], e[1]];
@@ -330,7 +330,7 @@ function home(){
 function topbar(where){
   const toHub = where === "ghub";
   return `<div class="top"><button class="home" data-go="${toHub ? "" : "guia"}"${toHub ? " data-home" : ""} aria-label="${toHub ? t("allGuides") : t("home")}">${ICON.home}</button>
-    <img class="logo" src="img/ui/logo.webp" alt="evoala"><span class="tsp"></span>${langToggle("hl sm")}</div>`;
+    <img class="logo" src="img/ui/logo.webp" alt="evoala"><span class="tsp"></span>${where === "guide" || where === "ghub" ? `<button class="tutob" data-tuto aria-label="${t("tuto")}">${ICON.bulb}</button>` : ""}${langToggle("hl sm")}</div>`;
 }
 // barre du bas : Guía / Paris / Bonus, sur toutes les pages
 function navbar(where){
@@ -342,7 +342,7 @@ function navbar(where){
 
 /* ---------- Pages de phrases ---------- */
 function rowHTML(p, crumb){
-  const bulb = `<i class="bulb">${ICON.bulb}</i>`, al = ` role="button" aria-label="${t("seePr")}"`;
+  const bulb = "", al = ` role="button" aria-label="${t("seePr")}"`;   // plus d'ampoule : le tutoriel apprend à toucher l'image
   const ic = p.num ? `<div class="ic num${p.num.length>2?' long':''}"${al}>${esc(p.num)}${bulb}</div>` : p.icon ? `<div class="ic" style="background-image:url('${p.icon[0]}');--i:${p.icon[1]}"${al}>${bulb}</div>` : `<div class="ic"${al}>${bulb}</div>`;
   const au = p.audio ? `${p.audio[0]}#${p.audio[1]}` : "";
   return `<div class="row${p.who==='staff'?' staff':''}${heardHas(p.fr)?' heard':''}" data-audio="${esc(au)}" data-key="${esc(p.fr)}">
@@ -359,6 +359,7 @@ function tipHTML(t){
 // bandeau « Toca la imagen » : affiché tant qu'on n'a pas touché « Entendido »
 const hintSeen = () => { try{ return localStorage.getItem("evoala-hint") === "1"; }catch(e){ return false; } };
 function hintHTML(view){
+  return "";   // remplacé par le tutoriel
   const p = view.groups.flatMap(g => g.phrases).find(x => x.icon);
   if(hintSeen() || !p) return "";
   return `<div class="hint"><div class="ic" style="background-image:url('${p.icon[0]}');--i:${p.icon[1]}"><i class="bulb">${ICON.bulb}</i></div>
@@ -774,6 +775,7 @@ app.addEventListener("click", e => {
   if(sd){ heartClick(sd.dataset.sdel); return; }
   const openRow = app.querySelector(".swipe .row.open");
   if(openRow){ swipeTo(openRow, 0); return; }               // un toucher ailleurs referme le bouton « Quitar »
+  if(e.target.closest("[data-tuto]")){ openTuto(); return; }
   const pr = e.target.closest("[data-practice]");
   if(pr){ startPractice(pr.dataset.practice); return; }
   const hb = e.target.closest(".heart");
@@ -828,8 +830,22 @@ async function playRow(row){
 // précharge l'audio de la page affichée
 function preload(){ const r = app.querySelector(".row[data-audio^='snd']"); if(r) bundle(r.dataset.audio.split("#")[0]); }
 
+/* ---------- Tutoriel : à la première utilisation, et à chaque visite pour qui n'a pas de compte (« Ahora no ») ---------- */
+function openTuto(){ try{ sessionStorage.setItem("evoala-tuto-back", location.hash || "#guia"); }catch(e){} location.href = "tuto.html"; }
+function maybeTuto(h, tries = 0){
+  if(!(h === "guia" || /^s\d/.test(h))) return;
+  let doneS = false, done = false; try{ doneS = !!sessionStorage.getItem("evoala-tuto-s"); done = !!localStorage.getItem("evoala-tuto"); }catch(e){}
+  if(doneS) return;                                              // déjà vu pendant cette visite
+  if(AUTH_ON && !window.EvoAuth && tries < 12){ setTimeout(() => maybeTuto(location.hash.slice(1), tries + 1), 250); return; }
+  const A = window.EvoAuth;
+  if(A && !A.disabled && !A.ready && tries < 24){ setTimeout(() => maybeTuto(location.hash.slice(1), tries + 1), 250); return; }
+  const loggedIn = !!(A && A.user);
+  if(loggedIn && done) return;                                   // avec un compte : une seule fois
+  openTuto();
+}
 function route(){
   const h = location.hash.slice(1);
+  maybeTuto(h);
   delete app.dataset.list; PVIEW = null; if(QPLAY) stopQueue(); closeSheet();
   let m;
   let where = "home";

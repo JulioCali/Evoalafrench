@@ -560,3 +560,6 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .gtrack.big{height:14px;margin-top:-6px;background:#E6E1FA}
 .gtrack.big i{background:linear-gradient(90deg,#D6336C,#6C4FE0)}
 .gbar.pp .gbl svg{fill:none;stroke:var(--violet);stroke-width:2.2;stroke-linecap:round}
+/* ampoule dans le coin : revoir le tutoriel */
+.tutob{flex:none;width:38px;height:38px;border-radius:50%;background:#FFF1E0;display:grid;place-items:center;margin-right:6px}
+.tutob svg{width:20px;height:20px;fill:none;stroke:#C25A00;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
