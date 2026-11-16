@@ -191,6 +191,7 @@ function onAuth(u){
     window.EvoAuth.load().then(d => {
       if(d && d.last){ try{ localStorage.setItem("evoala-last", d.last); }catch(e){} }
       ['seen','heard'].forEach(f => { if(d && Array.isArray(d[f])){ const k = 'evoala-' + f, m = [...new Set([...seen.get(k), ...d[f]])]; try{ localStorage.setItem(k, JSON.stringify(m)); }catch(e){} if(m.length > d[f].length) syncProgress(); } else if(seen.get('evoala-' + f).length) syncProgress(); });
+      HEARDC = null;
       if(location.hash === '#guia') route();
       if(d && Array.isArray(d.lists)){ lists.put(d.lists, false); refreshHearts(); if(/^#lista/.test(location.hash)) route(); }
       else if(lists.all().length) window.EvoAuth.save({ lists: lists.all() });
@@ -284,7 +285,9 @@ const seen = {
 };
 let syncT;
 function syncProgress(){ clearTimeout(syncT); syncT = setTimeout(() => window.EvoAuth?.save({ seen: seen.get("evoala-seen"), heard: seen.get("evoala-heard") }), 3000); }
-const markHeard = key => { if(!key) return; seen.add("evoala-heard", key); refreshPractice(true); };
+let HEARDC = null;                                           // phrases déjà écoutées (cache)
+const heardHas = k => (HEARDC ??= new Set(seen.get("evoala-heard"))).has(k);
+const markHeard = key => { if(!key) return; seen.add("evoala-heard", key); HEARDC = null; };
 function allPages(){
   const out = [];
   [...GRID, "Bonus"].forEach((name, si) => sec(name)?.tabs.forEach((tb, ti) => (tb.subs || [tb]).forEach((v, u) => { if(hasPh(v)) out.push(pageHash(si, ti, tb.subs ? u : 0)); })));
@@ -334,7 +337,7 @@ function rowHTML(p, crumb){
   const bulb = `<i class="bulb">${ICON.bulb}</i>`, al = ` role="button" aria-label="${t("seePr")}"`;
   const ic = p.num ? `<div class="ic num${p.num.length>2?' long':''}"${al}>${esc(p.num)}${bulb}</div>` : p.icon ? `<div class="ic" style="background-image:url('${p.icon[0]}');--i:${p.icon[1]}"${al}>${bulb}</div>` : `<div class="ic"${al}>${bulb}</div>`;
   const au = p.audio ? `${p.audio[0]}#${p.audio[1]}` : "";
-  return `<div class="row${p.who==='staff'?' staff':''}" data-audio="${esc(au)}" data-key="${esc(p.fr)}">
+  return `<div class="row${p.who==='staff'?' staff':''}${heardHas(p.fr)?' heard':''}" data-audio="${esc(au)}" data-key="${esc(p.fr)}">
     ${ic}<div class="ph">${crumb ? `<button class="crumb" data-go="${crumb[1]}">${esc(crumb[0])}</button>` : ""}<div class="fr">${esc(p.fr)}</div>
     <div class="es" data-es="${esc(p.es)}" data-pr="${esc(p.pr)}">${esc(p.es)}</div></div>
     <div class="spk">${ICON.spk}</div>
@@ -812,6 +815,7 @@ async function playRow(row){
   row.classList.add("playing");
   try{ const u = await audioUrl(file, id); markHeard(row.dataset.key); await playUrl(u); }catch(e){ toast(t("noPlay")); }
   row.classList.remove("playing");
+  if(row.dataset.key && heardHas(row.dataset.key)){ document.querySelectorAll(`.row[data-key="${CSS.escape(row.dataset.key)}"]`).forEach(r => r.classList.add("heard")); refreshPractice(true); }   // « Practicar » n'apparaît qu'après la fin du son
 }
 // précharge l'audio de la page affichée
 function preload(){ const r = app.querySelector(".row[data-audio^='snd']"); if(r) bundle(r.dataset.audio.split("#")[0]); }
