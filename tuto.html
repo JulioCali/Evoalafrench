@@ -97,6 +97,7 @@ const STEPS = [
   // retour du jeu ↓
   { id:"fin", target:"#t-nav", title:"¡Lo lograste!", text:"Ya sabes escuchar, ver la pronunciación, guardar y practicar. Abajo tienes la guía, tus listas y la Guía de París." },
   { target:"#t-lists", round:true, title:"Mis listas", text:"Aquí encuentras las frases que guardaste con el corazón." },
+  { target:"#t-paris", round:true, title:"La Guía de París 🗼", text:"¿Vas a París? Aquí tienes los lugares que no te puedes perder: monumentos, museos, barrios y joyas escondidas, con consejos prácticos." },
   { title:"¡Listo para viajar! 🇫🇷", text:"Ahora explora la guía a tu ritmo. ¡Bon voyage!", next:"Ir a la guía", end:true },
 ];
 let k = 0;
@@ -140,7 +141,7 @@ blk.addEventListener("click", async e => {
   if(done !== false){ k++; show(); }
 });
 function goGame(){
-  try{ sessionStorage.setItem("evoala-game", JSON.stringify({ title: "Tutorial", backUrl: "tuto.html#fin", lang: "es", items: PH.map(p => ({ fr: p.fr, es: p.es, pr: p.pr, audio: p.audio })) })); }catch(e){}
+  try{ sessionStorage.setItem("evoala-game", JSON.stringify({ title: "Tutorial", tuto: true, backUrl: "tuto.html#fin", lang: "es", items: PH.map(p => ({ fr: p.fr, es: p.es, pr: p.pr, audio: p.audio })) })); }catch(e){}
   location.href = "juego.html";
 }
 function finish(){ try{ localStorage.setItem("evoala-tuto", "1"); }catch(e){} location.href = "/#s0t0"; }

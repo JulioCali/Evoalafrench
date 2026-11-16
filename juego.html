@@ -70,6 +70,15 @@
   .res li{display:flex;gap:8px;padding:6px 0;border-top:1px solid #EFEDF6}
   .res li b{font-weight:600}.res li span{color:#6E6680;margin-left:auto;white-space:nowrap}
   .note{font-size:12px;color:#8A8398;margin-top:12px}
+  /* tutoriel dans le jeu : projecteur sur une zone */
+  .tblock{position:fixed;inset:0;z-index:20}
+  .spot{position:fixed;z-index:21;border-radius:18px;pointer-events:none;box-shadow:0 0 0 9999px rgba(22,14,48,.68);transition:top .45s ease,left .45s ease,width .45s ease,height .45s ease,border-radius .45s ease}
+  .tbub{position:fixed;z-index:22;left:14px;right:14px;max-width:420px;margin:0 auto;background:#fff;border-radius:22px;padding:14px 16px 14px 14px;box-shadow:0 14px 40px rgba(0,0,0,.25);display:flex;gap:12px;align-items:flex-start;transition:top .45s ease}
+  .tbub img{width:54px;height:auto;flex:none}
+  .tbub b{display:block;font-size:16px;font-weight:600;margin-bottom:2px}
+  .tbub p{margin:0;font-size:14px;line-height:1.45;color:#3A3550}
+  .tbub .bf{display:flex;justify-content:flex-end;margin-top:10px}
+  .tbub button{height:42px;padding:0 18px;border-radius:12px;background:#6C4FE0;color:#fff;font-weight:600;font-size:14px}
   .back2{display:block;margin-top:12px;font-size:15px;font-weight:600;color:#5940BF;text-decoration:none;padding:8px}
 </style>
 </head>
@@ -243,6 +252,36 @@ function showCard(){
   $("help").innerHTML = T.help;
   $("fb").className = "fb"; $("skip").style.display = "none"; setMic("idle");
   $("card").classList.remove("hide");
+  if(SET && SET.tuto && G.i === 0 && !G.coached){ G.coached = true; coach(); }
+}
+// tutoriel : au premier mur, on explique la carte, le micro, l'ampoule et le haut-parleur
+const COACH = EN ? [
+  ["#dots", "Your walls", "At the top you see how many walls are left."],
+  ["#es", "The phrase", "Evo stops in front of each wall. To jump it, say this phrase in French."],
+  ["#lis", "Listen", "Don't remember how it sounds? Tap the speaker to hear the model."],
+  ["#hintb", "Need help?", "The light bulb shows the phrase in French and its pronunciation."],
+  ["#mic", "Your turn!", "Tap the microphone and say the phrase. Evo jumps if it sounds right."]]
+ : [
+  ["#dots", "Tus muros", "Arriba ves cuántos muros te quedan."],
+  ["#es", "La frase", "Evo se detiene delante de cada muro. Para saltarlo, di esta frase en francés."],
+  ["#lis", "Escucha", "¿No recuerdas cómo suena? Toca el altavoz para escuchar el modelo."],
+  ["#hintb", "¿Necesitas ayuda?", "La bombilla te muestra la frase en francés y su pronunciación."],
+  ["#mic", "¡Tu turno!", "Toca el micrófono y di la frase. Evo saltará si se entiende bien."]];
+function coach(){
+  let k = 0;
+  const blk = document.createElement("div"), spot = document.createElement("div"), bub = document.createElement("div");
+  blk.className = "tblock"; spot.className = "spot"; bub.className = "tbub"; document.body.append(blk, spot, bub);
+  const show = () => {
+    const [sel, title, text] = COACH[k], el = document.querySelector(sel), r = el.getBoundingClientRect(), pad = sel === "#mic" ? 4 : 8, round = sel === "#mic" || sel === "#lis" || sel === "#hintb";
+    const w = r.width + pad * 2, h = r.height + pad * 2;
+    spot.style.cssText = `top:${r.top - pad}px;left:${r.left - pad}px;width:${w}px;height:${h}px;border-radius:${sel === "#mic" ? w / 2 : round ? 20 : 14}px`;
+    const last = k === COACH.length - 1;
+    bub.innerHTML = `<img src="img/ui/evo.png" alt=""><div style="flex:1"><b>${title}</b><p>${text}</p><div class="bf"><button>${last ? (EN ? "Let's play!" : "¡A jugar!") : (EN ? "Next" : "Siguiente")}</button></div></div>`;
+    const bh = bub.offsetHeight;
+    bub.style.top = (r.top - pad - 14 - bh > 10 ? r.top - pad - 14 - bh : r.bottom + pad + 14) + "px";
+    bub.querySelector("button").onclick = () => { if(last){ blk.remove(); spot.remove(); bub.remove(); } else { k++; show(); } };
+  };
+  setTimeout(show, 450);   // le temps que la carte monte
 }
 function hideCard(){ $("card").classList.add("hide"); }
 function setMic(m){ const b = $("mic"); b.className = "mic" + (m === "rec" ? " rec" : m === "wait" ? " wait" : ""); b.disabled = m === "wait";
