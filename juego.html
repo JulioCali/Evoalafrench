@@ -27,7 +27,8 @@
   .hint{display:inline-block;margin-top:4px;background:#EEEBFD;color:#5940BF;border-radius:999px;padding:2px 12px;font-size:14px;font-weight:500}
   .row{display:flex;gap:10px;margin-top:12px}
   button{font:inherit;border:0;cursor:pointer;color:inherit}
-  .row{align-items:center;justify-content:center;gap:28px}
+  .row{align-items:center;justify-content:flex-start;gap:12px;padding:0 4px}
+  .helpers{margin-left:auto;display:flex;gap:10px}
   /* micro rond, comme WhatsApp : des cercles transparents qui grandissent pour inviter à toucher */
   .mic{position:relative;width:84px;height:84px;border-radius:50%;background:none;padding:0;display:grid;place-items:center;flex:none}
   .mic .disc{position:relative;z-index:2;width:76px;height:76px;border-radius:50%;background:#6C4FE0;color:#fff;display:grid;place-items:center;box-shadow:0 6px 16px rgba(108,79,224,.35);transition:background .2s,transform .15s}
@@ -41,7 +42,7 @@
   .mic.rec .ring.r2{animation-delay:.55s}
   .mic.wait .disc{background:#A99BEA}
   .mic.wait .ring{animation:none;opacity:0}
-  .miclab{text-align:center;font-size:14px;font-weight:600;color:#5940BF;margin-top:8px;min-height:20px}
+  .miclab{text-align:left;padding-left:2px;font-size:14px;font-weight:600;color:#5940BF;margin-top:8px;min-height:20px}
   .mic.rec + * {}
   .sq{flex:none;width:58px;height:58px;border-radius:16px;background:#EEEBFD;display:grid;place-items:center}
   .sq svg{width:22px;height:22px}
@@ -79,9 +80,10 @@
     <div class="es" id="es"></div>
     <div class="help" id="help">Dilo en francés para que Evo salte el muro</div>
     <div class="row">
-      <button class="sq hintb" id="hintb" aria-label="Pista"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg></button>
       <button class="mic" id="mic" aria-label="Grabar"><i class="ring r1"></i><i class="ring r2"></i><span class="disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span></button>
-      <button class="sq" id="lis" aria-label="Escuchar"><svg viewBox="0 0 24 24"><path fill="#5940BF" d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg></button>
+      <span class="helpers">
+      <button class="sq hintb" id="hintb" aria-label="Pista"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg></button>
+      <button class="sq" id="lis" aria-label="Escuchar"><svg viewBox="0 0 24 24"><path fill="#5940BF" d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg></button></span>
     </div>
     <div class="miclab" id="miclab">Dale clic para decirlo en francés</div>
     <div class="fb" id="fb"></div>
@@ -254,11 +256,13 @@ function sfx(kind){
   if(kind === "jump"){ o.type = "triangle"; o.frequency.setValueAtTime(420, t); o.frequency.exponentialRampToValueAtTime(980, t + .25); g.gain.setValueAtTime(.18, t); g.gain.exponentialRampToValueAtTime(.001, t + .35); o.start(t); o.stop(t + .36); }
   else { o.type = "square"; o.frequency.setValueAtTime(160, t); o.frequency.exponentialRampToValueAtTime(90, t + .2); g.gain.setValueAtTime(.08, t); g.gain.exponentialRampToValueAtTime(.001, t + .25); o.start(t); o.stop(t + .26); }
 }
+// lecteur <audio> (et non Web Audio) : sur iPhone en mode silencieux, Web Audio est coupé mais pas <audio>
+const urls = {};
 async function playModel(p){
-  const a = ac(), [f, id] = p.audio;
-  if(!decoded[id]){ const b = await (bundles[f] ??= fetch(f).then(r => r.json())); const bin = Uint8Array.from(atob(b[id]), c => c.charCodeAt(0)); decoded[id] = await new Promise((ok, ko) => a.decodeAudioData(bin.buffer, ok, ko)); }
-  if(playing) try{ playing.stop(); }catch(e){}
-  const s = a.createBufferSource(); s.buffer = decoded[id]; s.connect(a.destination); s.onended = () => playing = null; playing = s; s.start();
+  const [f, id] = p.audio;
+  if(!urls[id]){ const b = await (bundles[f] ??= fetch(f).then(r => r.json())); const bin = Uint8Array.from(atob(b[id]), c => c.charCodeAt(0)); urls[id] = URL.createObjectURL(new Blob([bin], { type: "audio/mpeg" })); }
+  if(playing) try{ playing.pause(); }catch(e){}
+  playing = new Audio(urls[id]); playing.onended = () => playing = null; playing.play().catch(() => {});
 }
 
 /* ---------- Micro + reconnaissance (serveur Cloudflare, Whisper) ---------- */
@@ -282,7 +286,7 @@ function watchSilence(st){
 $("mic").onclick = async () => {
   if(G.state !== "wall" && G.state !== "fail") return;
   if(mrec && mrec.state === "recording"){ mrec.stop(); return; }
-  if(playing) try{ playing.stop(); }catch(e){}
+  if(playing) try{ playing.pause(); }catch(e){}
   let st; try{ st = await getStream(); }catch(e){ const fb = $("fb"); fb.className = "fb ko"; fb.innerHTML = "<b>Micrófono bloqueado</b> Permite el acceso al micrófono en los ajustes del navegador."; return; }
   chunks = []; mrec = MIME ? new MediaRecorder(st, { mimeType: MIME }) : new MediaRecorder(st);
   mrec.ondataavailable = e => { if(e.data && e.data.size) chunks.push(e.data); };
