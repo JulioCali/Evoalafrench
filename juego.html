@@ -117,6 +117,7 @@ const PH = [
   { fr:"Je ne comprends pas", es:"No entiendo", pr:"ye ne kom-pran PÁ", audio:["snd/p2.json","ea825df785"] },
 ];
 const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 
 /* ---------- Dessin de la scène ---------- */
 const cv = $("cv"), ctx = cv.getContext("2d");
@@ -243,10 +244,12 @@ function win(help){
   setTimeout(() => { if(G.cardTok === n && G.state !== "wall") hideCard(); }, help ? 300 : 1500);   // le message vert reste pendant le saut
   burst(); sfx("jump"); G.state = "jump"; G.jumpT = 0;
 }
-function fail(said, s){
+function fail(said, s, why){
   G.state = "fail"; G.failT = 0; G.wallShake = 1; sfx("bump");
   const fb = $("fb"); fb.className = "fb " + (s >= 0.55 ? "mid" : "ko");
-  fb.innerHTML = (s >= 0.55 ? "<b>¡Casi!</b> Escucha y vuelve a intentarlo." : "<b>Evo no pudo saltar.</b> Inténtalo otra vez.") + (said ? `<small>Entendimos: «${said}»</small>` : "");
+  fb.innerHTML = why === "silent" ? "<b>No te escuchamos.</b> Habla un poco más fuerte, cerca del teléfono."
+    : why === "unclear" ? "<b>No te entendimos.</b> Escucha el modelo y repite despacio."
+    : (s >= 0.55 ? "<b>¡Casi!</b> Escucha y vuelve a intentarlo." : "<b>Evo no pudo saltar.</b> Inténtalo otra vez.") + (said ? `<small>Entendimos: «${esc(said)}»</small>` : "");
   if(G.tries >= 3){ $("skip").style.display = "block"; $("help").innerHTML = `<span class="hint">${PH[G.i].fr} · ${PH[G.i].pr}</span>`; }
 }
 
@@ -274,14 +277,14 @@ function lev(a, b){ const m = a.length, n = b.length, d = Array.from({length: m 
   for(let i = 1; i <= m; i++) for(let j = 1; j <= n; j++) d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1)); return d[m][n]; }
 const score = (said, target) => { const a = norm(said), b = norm(target); if(!a) return 0; return 1 - lev(a, b) / Math.max(a.length, b.length); };
 const MIME = ["audio/mp4", "audio/webm;codecs=opus", "audio/webm", "audio/ogg"].find(t => window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || "";
-let stream = null, mrec = null, chunks = [], vad = null;
+let stream = null, mrec = null, chunks = [], vad = null, heardVoice = false;
 async function getStream(){ if(stream && stream.active) return stream; stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); return stream; }
 function watchSilence(st){
   const a = ac(), src = a.createMediaStreamSource(st), an = a.createAnalyser(); an.fftSize = 1024; src.connect(an);
   const data = new Uint8Array(an.fftSize); let spoke = false, lastLoud = Date.now(); const t0 = Date.now();
   const tick = () => { if(!mrec || mrec.state !== "recording"){ src.disconnect(); return; }
     an.getByteTimeDomainData(data); let sum = 0; for(const v of data){ const x = (v - 128) / 128; sum += x * x; }
-    if(Math.sqrt(sum / data.length) > 0.04){ spoke = true; lastLoud = Date.now(); }
+    if(Math.sqrt(sum / data.length) > 0.04){ spoke = heardVoice = true; lastLoud = Date.now(); }
     if((spoke && Date.now() - lastLoud > 1000) || Date.now() - t0 > 6000){ mrec.stop(); return; }
     vad = requestAnimationFrame(tick); };
   tick();
@@ -293,8 +296,17 @@ $("mic").onclick = async () => {
   let st; try{ st = await getStream(); }catch(e){ const fb = $("fb"); fb.className = "fb ko"; fb.innerHTML = "<b>Micrófono bloqueado</b> Permite el acceso al micrófono en los ajustes del navegador."; return; }
   chunks = []; mrec = MIME ? new MediaRecorder(st, { mimeType: MIME }) : new MediaRecorder(st);
   mrec.ondataavailable = e => { if(e.data && e.data.size) chunks.push(e.data); };
-  mrec.onstop = check; mrec.start(); setMic("rec"); $("fb").className = "fb"; watchSilence(st);
+  mrec.onstop = check; heardVoice = false; mrec.start(); setMic("rec"); $("fb").className = "fb"; watchSilence(st);
 };
+// Whisper « invente » parfois du texte quand il n'entend rien de clair (génériques de sous-titres, chiffres…)
+const JUNK = /sous[- ]?titr|amara|radio[- ]?canada|abonnez|merci d'avoir regard|merci de votre attention|www\.|\.com|♪/i;
+function junk(said, target){
+  const a = norm(said);
+  if(!a) return true;
+  if(JUNK.test(said) || /\d/.test(said)) return true;
+  if(a.length > norm(target).length * 2.5 + 12) return true;        // beaucoup trop long pour la phrase demandée
+  return false;
+}
 async function check(){
   cancelAnimationFrame(vad); setMic("wait");
   const blob = new Blob(chunks, { type: (mrec && mrec.mimeType) || MIME || "audio/mp4" });
@@ -302,8 +314,9 @@ async function check(){
   try{ const r = await fetch("/api/stt", { method: "POST", headers: { "content-type": blob.type }, body: blob }); const d = await r.json(); if(!r.ok) throw new Error(d.error || r.status); said = d.text || ""; }
   catch(e){ setMic("idle"); const fb = $("fb"); fb.className = "fb ko"; fb.innerHTML = `<b>Sin conexión</b> Revisa internet y vuelve a intentarlo.<small>(${e.message})</small>`; return; }
   setMic("idle"); G.tries++;
+  if(junk(said, PH[G.i].fr)) return fail("", 0, heardVoice ? "unclear" : "silent");
   const s = score(said, PH[G.i].fr);
-  if(s >= 0.8){ const fb = $("fb"); fb.className = "fb ok"; fb.innerHTML = `<b>¡Muy bien! 🎉</b><small>Entendimos: «${said}»</small>`; setTimeout(() => win(false), 450); }
+  if(s >= 0.8){ const fb = $("fb"); fb.className = "fb ok"; fb.innerHTML = `<b>¡Muy bien! 🎉</b><small>Entendimos: «${esc(said)}»</small>`; setTimeout(() => win(false), 450); }
   else fail(said, s);
 }
 
