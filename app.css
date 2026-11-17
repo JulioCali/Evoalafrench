@@ -563,3 +563,13 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 /* ampoule dans le coin : revoir le tutoriel */
 .tutob{flex:none;width:38px;height:38px;border-radius:50%;background:#FFF1E0;display:grid;place-items:center;margin-right:6px}
 .tutob svg{width:20px;height:20px;fill:none;stroke:#C25A00;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+/* étoiles gagnées au jeu */
+.pst{color:#F5A623;font-size:18px;letter-spacing:2px;line-height:1}
+.pst i{font-style:normal;color:#E4DFF3}
+.pdone{display:flex;align-items:center;gap:10px;width:100%;padding:0 4px}
+.pdone b{flex:1;font-size:15px;font-weight:600;color:#1A1A1A}
+.pbtn.ghost{background:#EEEBFD;color:#5940BF;box-shadow:none;height:40px;font-size:14px}
+.pbig.won{background:#fff;color:#1A1A1A;border:2px solid #F5C58A;box-shadow:0 6px 18px rgba(245,166,35,.18)}
+.pbig.won small{color:#6E6680}.pbig.won>svg{stroke:#5940BF}
+.pbig .pst{display:block;margin:2px 0}
+.ppage:has(.pbig.won) + .nextsub{background:var(--violet);color:#fff;border-color:var(--violet)}

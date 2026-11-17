@@ -399,6 +399,7 @@ function endGame(){
   const avg = G.results.reduce((a, r) => a + (pts[r.kind] ?? .5), 0) / Math.max(1, G.results.length);
   const stars = avg >= .85 ? 3 : avg >= .6 ? 2 : 1;
   $("endT").textContent = stars === 3 ? (G.results.every(r => r.first) ? T.perfect : T.great) : stars >= 2 ? T.bravo : T.made;
+  if(SET && SET.key){ try{ const B = JSON.parse(localStorage.getItem("evoala-stars") || "{}"); if(!(B[SET.key] >= stars)){ B[SET.key] = stars; localStorage.setItem("evoala-stars", JSON.stringify(B)); } }catch(e){} }   // meilleure note gardée pour l'appli
   document.querySelector("#end img").src = stars >= 2 ? "img/ui/evo-happy.png" : "img/ui/evo.png";
   $("endS").textContent = "★".repeat(stars) + "☆".repeat(3 - stars);
   $("endL").innerHTML = G.results.map((r, i) => `<li><b>${esc(r.fr)}</b><span>${r.kind === "first" ? T.first : r.kind === "practice" ? T.practice : T.help2}</span></li>`).join("");
