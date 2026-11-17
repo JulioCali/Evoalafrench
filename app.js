@@ -807,7 +807,7 @@ app.addEventListener("click", e => {
     const on = !es.classList.contains("showpr");
     es.classList.toggle("showpr", on);
     row.classList.toggle("pron", on);
-    es.innerHTML = on ? `<span class="pr">${esc(es.dataset.pr)}</span>` : esc(es.dataset.es);
+    es.innerHTML = esc(es.dataset.es) + (on && es.dataset.pr ? `<span class="pr pr-under">${esc(es.dataset.pr)}</span>` : "");   // la prononciation s'ajoute sous la traduction
     return;
   }
   if(!row.dataset.audio){ toast(t("audioSoon")); return; }  // le reste de la ligne = audio

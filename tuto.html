@@ -97,7 +97,7 @@ async function play(i){
   await new Promise(ok => { player = new Audio(urls[id]); player.onended = ok; player.onerror = ok; player.play().catch(ok); });
   r.classList.remove("playing"); r.classList.add("heard"); heard.add(i);
 }
-function showPron(i){ const es = row(i).querySelector(".es"); es.innerHTML = `<span class="pr">${PH[i].pr}</span>`; row(i).classList.add("pron"); }
+function showPron(i){ const es = row(i).querySelector(".es"); es.innerHTML = `${PH[i].es}<span class="pr pr-under">${PH[i].pr}</span>`; row(i).classList.add("pron"); }
 
 /* ---------- Les étapes ---------- */
 // target : élément à éclairer ; tap : ce que l'apprenant doit toucher (sinon bouton « Siguiente »)
@@ -107,8 +107,8 @@ const STEPS = [
   { target:"#t-tabs", title:"Los temas", text:"Cada categoría tiene varios temas. Toca uno para cambiar de página." },
   { target:".row[data-i='0'] .spk", round:true, title:"Escucha", text:"Toca el altavoz para escuchar la frase en francés.", tap:t => t.closest(".row[data-i='0'] .spk"), act:() => play(0), wait:"Toca el altavoz 👆" },
   { target:".row[data-i='0']", title:"¡Muy bien!", text:"El círculo claro alrededor del altavoz te recuerda que ya escuchaste esta frase." },
-  { target:".row[data-i='0'] .ic", title:"La pronunciación", text:"Toca la imagen para ver cómo se pronuncia la frase.", tap:t => t.closest(".row[data-i='0'] .ic"), act:() => showPron(0), wait:"Toca la imagen 👆" },
-  { target:".row[data-i='0']", title:"Así se dice", text:"", dyn:() => `«${PH[0].pr}»: la sílaba en mayúsculas es la que se marca más. Toca otra vez la imagen cuando quieras volver a la traducción.` },
+  { target:".row[data-i='0'] .ic", title:"La pronunciación", text:"Toca la imagen para ver cómo se pronuncia: la pronunciación aparece debajo de la traducción.", tap:t => t.closest(".row[data-i='0'] .ic"), act:() => showPron(0), wait:"Toca la imagen 👆" },
+  { target:".row[data-i='0']", title:"Así se dice", text:"", dyn:() => `«${PH[0].pr}»: la sílaba en mayúsculas es la que se marca más. Toca otra vez la imagen para ocultarla.` },
   { target:".row[data-i='0'] .heart", round:true, title:"Guarda tus frases", text:"Toca el corazón para guardar la frase en «Mis listas» y repasarla después.", tap:t => t.closest(".row[data-i='0'] .heart"), act:() => row(0).querySelector(".heart").classList.add("on"), wait:"Toca el corazón 👆" },
   { target:"#t-card", title:"Tu turno", text:"", dyn:() => `Escucha las otras dos frases: «${PH[1].fr}» y «${PH[2].fr}».`, tap:t => t.closest(".row[data-i='1'] .spk, .row[data-i='2'] .spk"),
     act:async t => { const i = +t.closest(".row").dataset.i; await play(i); return heard.has(1) && heard.has(2); }, wait:"Escucha las 2 frases 👆" },
