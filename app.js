@@ -833,7 +833,7 @@ function preload(){ const r = app.querySelector(".row[data-audio^='snd']"); if(r
 /* ---------- Tutoriel : à la première utilisation, et à chaque visite pour qui n'a pas de compte (« Ahora no ») ---------- */
 function openTuto(){ try{ sessionStorage.setItem("evoala-tuto-back", location.hash || "#guia"); }catch(e){} location.href = "tuto.html"; }
 function maybeTuto(h, tries = 0){
-  if(!(h === "guia" || /^s\d/.test(h))) return;
+  if(!/^s\d/.test(h)) return;                                  // on voit d'abord le hub et ses thèmes ; le tuto s'ouvre au premier thème choisi
   let doneS = false, done = false; try{ doneS = !!sessionStorage.getItem("evoala-tuto-s"); done = !!localStorage.getItem("evoala-tuto"); }catch(e){}
   if(doneS) return;                                              // déjà vu pendant cette visite
   if(AUTH_ON && !window.EvoAuth && tries < 12){ setTimeout(() => maybeTuto(location.hash.slice(1), tries + 1), 250); return; }

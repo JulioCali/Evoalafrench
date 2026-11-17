@@ -39,7 +39,7 @@
 
 <script>
 /* ---------- La page « guide » simulée : 3 phrases simples ---------- */
-const PH = [
+let PH = [
   { fr:"Bonjour", es:"Buenos días", pr:"bon-YÚR", icon:["img/icons/p2.webp",0], audio:["snd/p2.json","426b3e4647"] },
   { fr:"Merci", es:"Gracias", pr:"mer-SÍ", icon:["img/icons/p2.webp",7], audio:["snd/p2.json","4c431b3930"] },
   { fr:"Au revoir", es:"Hasta luego", pr:"o re-VUÁR", icon:["img/icons/p2.webp",3], audio:["snd/p2.json","307939d20f"] },
@@ -48,15 +48,33 @@ const SPK = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.
 const HEART = '<svg viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>';
 const MIC = '<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
 const mi = n => `<i class="mi" style="-webkit-mask-image:url('img/ui/${n}.png');mask-image:url('img/ui/${n}.png')"></i>`;
-const CATS = [["t-esenciales","Esenciales"],["t-compras","Compras"],["t-transporte","Transporte"],["t-visitas","Exploración"],["t-comida","Comida"]];
+const CATS = [["t-esenciales","Esenciales"],["t-compras","Compras"],["t-transporte","Transporte"],["t-visitas","Exploración"],["t-comida","Comida"],["t-hospedaje","Hospedaje"],["t-imprevistos","Imprevistos"],["t-opiniones","Opiniones"],["t-bonus","Bonus"]];
+const GRID = ["Esenciales","Compras","Transporte","Visitas","Comida","Hospedaje","Imprevistos","Opiniones","Bonus"];
 const heard = new Set();
+// la page du tutoriel reprend le thème que l'apprenant vient de choisir (ses 3 premières phrases)
+let PAGE = { cat: 0, tabs: ["Indispensables", "Parisinas", "Salvavidas"], ti: 0, label: "Saludos", intro: "Expresiones que tienes que conocer" };
+async function loadPage(){
+  let back = ""; try{ back = sessionStorage.getItem("evoala-tuto-back") || ""; }catch(e){}
+  const m = back.match(/^#s(\d+)t(\d+)(?:p(\d+))?$/); if(!m) return;
+  try{
+    const C = await fetch("content.json").then(r => r.json());
+    const sec = C.sections.find(x => x.name === GRID[+m[1]]), tab = sec && sec.tabs[+m[2]]; if(!tab) return;
+    const view = tab.subs ? tab.subs[+(m[3] || 0)] || tab.subs[0] : tab;
+    const g = view.groups.find(g => g.phrases.filter(p => p.audio && p.icon && p.pr).length >= 3); if(!g) return;
+    const ps = g.phrases.filter(p => p.audio && p.icon && p.pr && p.who !== "staff");
+    const pick = (ps.length >= 3 ? ps : g.phrases.filter(p => p.audio && p.icon && p.pr)).slice(0, 3);
+    PH = pick.map(p => ({ fr: p.fr, es: p.es, pr: p.pr, icon: p.icon, audio: p.audio }));
+    PAGE = { cat: +m[1], tabs: sec.tabs.map(t => t.name), ti: +m[2], label: g.label || "", intro: view.intro || "" };
+  }catch(e){}
+}
+function render(){
 document.getElementById("app").innerHTML = `
   <div class="top flow"><button class="home" aria-label="Inicio"><svg viewBox="0 0 24 24"><path d="M12 3 2 11.5h3V21h5.5v-6h3v6H19v-9.5h3z"/></svg></button><img class="logo" src="img/ui/logo.webp" alt="evoala"></div>
   <label class="search psearch" id="t-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input placeholder="Buscar una frase en español o francés" disabled></label>
-  <div class="catwrap atstart atend" id="t-cats"><div class="cats">${CATS.map((c, i) => `<button class="cat${i ? "" : " on"}">${mi(c[0])}<span>${c[1]}</span></button>`).join("")}</div></div>
-  <div class="ptabs" id="t-tabs"><button class="tab on">Indispensables</button><button class="tab">Parisinas</button><button class="tab">Salvavidas</button></div>
-  <p class="intro">Expresiones que tienes que conocer</p>
-  <div class="card" id="t-card"><div class="label">Saludos</div>
+  <div class="catwrap atstart atend" id="t-cats"><div class="cats">${CATS.map((c, i) => `<button class="cat${i === PAGE.cat ? " on" : ""}">${mi(c[0])}<span>${c[1]}</span></button>`).join("")}</div></div>
+  <div class="ptabs" id="t-tabs">${PAGE.tabs.map((n, i) => `<button class="tab${i === PAGE.ti ? " on" : ""}">${n}</button>`).join("")}</div>
+  ${PAGE.intro ? `<p class="intro">${PAGE.intro}</p>` : ""}
+  <div class="card" id="t-card">${PAGE.label ? `<div class="label">${PAGE.label}</div>` : ""}
     ${PH.map((p, i) => `<div class="row" data-i="${i}"><div class="ic" style="background-image:url('${p.icon[0]}');--i:${p.icon[1]}"></div>
       <div class="ph"><div class="fr">${p.fr}</div><div class="es">${p.es}</div></div>
       <div class="spk">${SPK}</div><button class="heart" aria-label="Guardar">${HEART}</button></div>`).join("")}
@@ -64,6 +82,9 @@ document.getElementById("app").innerHTML = `
   <nav class="nav" id="t-nav"><button class="on"><svg class="nico" viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:2"><path d="M3 5c3-1 6-1 9 1 3-2 6-2 9-1v14c-3-1-6-1-9 1-3-2-6-2-9-1z"/><path d="M12 6v14"/></svg><span>Guía</span></button>
     <button id="t-lists"><i class="nico nheart">${HEART}</i><span>Mis listas</span></button>
     <button id="t-paris"><svg class="nico" viewBox="0 0 24 24"><path d="M12 2v3M10.5 5h3l1 6h-5zM9.5 11h5l3.5 10h-3.8a2.2 2.2 0 0 0-4.4 0H6z"/><path d="M8 15h8"/></svg><span>Paris</span></button></nav>`;
+const cats = document.querySelector("#t-cats .cats"), on = cats.querySelector(".on");
+if(on) cats.scrollLeft = on.offsetLeft - (cats.clientWidth - on.offsetWidth) / 2;
+}
 const row = i => document.querySelector(`.row[data-i="${i}"]`);
 
 /* ---------- audio (comme dans l'appli) ---------- */
@@ -81,15 +102,15 @@ function showPron(i){ const es = row(i).querySelector(".es"); es.innerHTML = `<s
 /* ---------- Les étapes ---------- */
 // target : élément à éclairer ; tap : ce que l'apprenant doit toucher (sinon bouton « Siguiente »)
 const STEPS = [
-  { title:"¡Hola! Soy Evo 👋", text:"Te enseño a usar la guía en un minuto, con tres palabras fáciles.", next:"Empezar", skip:true },
+  { title:"¡Hola! Soy Evo 👋", text:"Antes de empezar, te enseño a usar la guía en un minuto, con las tres primeras frases de este tema.", next:"Empezar", skip:true },
   { target:"#t-cats", title:"Las categorías", text:"Aquí eliges lo que quieres aprender: saludos, compras, transporte… Desliza para ver más." },
   { target:"#t-tabs", title:"Los temas", text:"Cada categoría tiene varios temas. Toca uno para cambiar de página." },
   { target:".row[data-i='0'] .spk", round:true, title:"Escucha", text:"Toca el altavoz para escuchar la frase en francés.", tap:t => t.closest(".row[data-i='0'] .spk"), act:() => play(0), wait:"Toca el altavoz 👆" },
   { target:".row[data-i='0']", title:"¡Muy bien!", text:"El círculo claro alrededor del altavoz te recuerda que ya escuchaste esta frase." },
   { target:".row[data-i='0'] .ic", title:"La pronunciación", text:"Toca la imagen para ver cómo se pronuncia la frase.", tap:t => t.closest(".row[data-i='0'] .ic"), act:() => showPron(0), wait:"Toca la imagen 👆" },
-  { target:".row[data-i='0']", title:"Así se dice", text:"«bon-YÚR»: la sílaba en mayúsculas es la que se marca más. Toca otra vez la imagen cuando quieras volver a la traducción." },
+  { target:".row[data-i='0']", title:"Así se dice", text:"", dyn:() => `«${PH[0].pr}»: la sílaba en mayúsculas es la que se marca más. Toca otra vez la imagen cuando quieras volver a la traducción.` },
   { target:".row[data-i='0'] .heart", round:true, title:"Guarda tus frases", text:"Toca el corazón para guardar la frase en «Mis listas» y repasarla después.", tap:t => t.closest(".row[data-i='0'] .heart"), act:() => row(0).querySelector(".heart").classList.add("on"), wait:"Toca el corazón 👆" },
-  { target:"#t-card", title:"Tu turno", text:"Escucha las otras dos frases: «Merci» y «Au revoir».", tap:t => t.closest(".row[data-i='1'] .spk, .row[data-i='2'] .spk"),
+  { target:"#t-card", title:"Tu turno", text:"", dyn:() => `Escucha las otras dos frases: «${PH[1].fr}» y «${PH[2].fr}».`, tap:t => t.closest(".row[data-i='1'] .spk, .row[data-i='2'] .spk"),
     act:async t => { const i = +t.closest(".row").dataset.i; await play(i); return heard.has(1) && heard.has(2); }, wait:"Escucha las 2 frases 👆" },
   { target:"#t-pslot", before:() => { document.getElementById("t-pslot").innerHTML = `<button class="pbtn pop">${MIC}Practicar</button>`; },
     title:"¡Escuchaste todo! 🎉", text:"Cuando escuchas todas las frases, aparece «Practicar»: ayuda a Evo a saltar los muros diciendo las frases en francés.",
@@ -109,7 +130,7 @@ function show(){
   const el = s.target && document.querySelector(s.target);
   if(el){ el.scrollIntoView({ block: "center", behavior: "smooth" }); }
   setTimeout(() => place(s), el ? 380 : 0);
-  bub.innerHTML = `<img src="img/ui/evo.png" alt=""><div class="bt"><b>${s.title}</b><p>${s.text}</p>
+  bub.innerHTML = `<img src="img/ui/evo.png" alt=""><div class="bt"><b>${s.title}</b><p>${s.dyn ? s.dyn() : s.text}</p>
     <div class="bf"><span class="cnt">${k >= 1 && k <= 9 ? `${k} / 9` : ""}</span>${s.skip ? `<button class="sk" data-skip>Saltar</button>` : ""}
     ${s.tap ? `<span class="wait">${s.wait}</span>` : `<button class="nx" data-next>${s.next || "Siguiente"}</button>`}</div></div>`;
 }
@@ -150,12 +171,15 @@ function finish(){
 }
 try{ sessionStorage.setItem("evoala-tuto-s", "1"); }catch(e){}   // vu pendant cette visite : il ne se relance pas
 // retour du jeu : on reprend à l'étape « fin », la page dans l'état « tout écouté »
+(async () => {
+await loadPage(); render();
 if(location.hash === "#fin"){
   PH.forEach((_, i) => { row(i).classList.add("heard"); heard.add(i); }); showPron(0); row(0).querySelector(".heart").classList.add("on");
   document.getElementById("t-pslot").innerHTML = `<button class="pbtn">${MIC}Practicar</button>`;
   k = STEPS.findIndex(s => s.id === "fin");
 }
 show();
+})();
 </script>
 </body>
 </html>
