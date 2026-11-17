@@ -48,7 +48,7 @@ const TXT = {
       pHead:"¿Qué ver en Paris ?",pSub:"Descubre aquí tus próximas visitas en Paris",city:"Entender la ciudad",mapT:"Mapa de los distritos",mapAlt:"Mapa de los distritos de París",
       move:"Moverse",safety:"Seguridad",hours:"Horarios y cierres",credits:"Créditos de las fotos",src:"Fuente",lic:"Licencia",
       paid:"De pago",free:"Gratis",metro:"Metro cercano",go:"Cómo llegar",crnote:"Toca una foto para ver su autor y su licencia",
-      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",next:"Página siguiente",pick:"Elige la categoría que quieres estudiar",tuto:"Ver el tutorial",gTitle:"Francés para viajar",gKicker:"Guía de supervivencia",prog:"Tu progreso",pSeen:"Páginas visitadas",pHeard:"Frases escuchadas",pPract:"Frases practicadas",progHow:"mitad escucha, mitad práctica",cont:"Continúa donde lo dejaste",startAt:"Empieza por aquí",choose:"Elige una categoría",nPh:"frases",swipe:"Desliza",practice:"Practicar",again:"Repetir",won1:"¡Superado!",won2:"¡Muy bien!",won3:"¡Perfecto!",pageWon:"Página superada",pageAgain:"Toca para practicar otra vez",practicePage:"Practicar esta página",practiceSub:"¡Escuchaste todo! Ayuda a Evo a saltar los muros",more:"Más categorías",found:"frases encontradas",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
+      none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",next:"Página siguiente",pick:"Elige la categoría que quieres estudiar",tuto:"Ver el tutorial",gTitle:"Francés para viajar",gKicker:"Guía de supervivencia",prog:"Tu progreso",pSeen:"Páginas visitadas",pHeard:"Frases escuchadas",pPract:"Frases practicadas",starsL:"estrellas",progHow:"mitad escucha, mitad práctica",cont:"Continúa donde lo dejaste",startAt:"Empieza por aquí",choose:"Elige una categoría",nPh:"frases",swipe:"Desliza",practice:"Practicar",again:"Repetir",won1:"¡Superado!",won2:"¡Muy bien!",won3:"¡Perfecto!",pageWon:"Página superada",pageAgain:"Toca para practicar otra vez",practicePage:"Practicar esta página",practiceSub:"¡Escuchaste todo! Ayuda a Evo a saltar los muros",more:"Más categorías",found:"frases encontradas",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
   en:{guide:"FRENCH",guide2:"Survival guide",from:"EN",start:"Start",dep:"DEPARTURE",now:"Now",dest:"DESTINATION",me:"The French me",first:"FIRST CLASS",
       search:"Search a phrase in English or French",searchL:"Search a phrase",resume:"Pick up where you left off",toc:"Table of contents",tap:"Tap a topic",
       paris:"Paris Guide",parisSub:"What to see in Paris? Monuments, museums, walks…",bonusT:"Bonus",bonusS:"Extra content",extra:"Extra content",
@@ -56,7 +56,7 @@ const TXT = {
       pHead:"What to see in Paris?",pSub:"Discover your next visits in Paris",city:"Understanding the city",mapT:"Map of the districts",mapAlt:"Map of the Paris districts",
       move:"Getting around",safety:"Safety",hours:"Opening hours",credits:"Photo credits",src:"Source",lic:"License",
       paid:"Paid",free:"Free",metro:"Nearest metro",go:"Directions",crnote:"Tap a photo to see its author and license",
-      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",next:"Next page",pick:"Choose the category you want to study",tuto:"See the tutorial",gTitle:"French for travelers",gKicker:"Survival guide",prog:"Your progress",pSeen:"Pages visited",pHeard:"Phrases listened to",pPract:"Phrases practiced",progHow:"half listening, half practice",cont:"Pick up where you left off",startAt:"Start here",choose:"Choose a category",nPh:"phrases",swipe:"Swipe",practice:"Practice",again:"Play again",won1:"Completed!",won2:"Great job!",won3:"Perfect!",pageWon:"Page completed",pageAgain:"Tap to practice again",practicePage:"Practice this page",practiceSub:"You listened to everything! Help Evo jump the walls",more:"More categories",found:"phrases found",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
+      none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",next:"Next page",pick:"Choose the category you want to study",tuto:"See the tutorial",gTitle:"French for travelers",gKicker:"Survival guide",prog:"Your progress",pSeen:"Pages visited",pHeard:"Phrases listened to",pPract:"Phrases practiced",starsL:"stars",progHow:"half listening, half practice",cont:"Pick up where you left off",startAt:"Start here",choose:"Choose a category",nPh:"phrases",swipe:"Swipe",practice:"Practice",again:"Play again",won1:"Completed!",won2:"Great job!",won3:"Perfect!",pageWon:"Page completed",pageAgain:"Tap to practice again",practicePage:"Practice this page",practiceSub:"You listened to everything! Help Evo jump the walls",more:"More categories",found:"phrases found",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
 };
 const t = k => TXT[LANG][k];
 const homeTitle = (e, i) => LANG === "en" ? (i < 0 ? [t("bonusT"), t("bonusS")] : HOME_EN[i]) : [e[0], e[1]];
@@ -244,7 +244,7 @@ function hub(){
         <div class="fhead"><span class="fimg"><img src="img/hub/voyage.webp" alt=""></span>
           <div><span class="fbadge">${H.badge}</span><small>${MINIFLAG}${H.kicker}</small><b>${H.title}</b></div></div>
         <div class="fbody"><p><strong>${H.mission}</strong> ${H.goal}</p>
-          ${started ? `<div class="fprog"><div class="fpl"><b>${PG.pct}%</b><span>${PG.nh} ${H.heardS} · ${PG.np} ${H.practS}</span></div><div class="gtrack ph"><i style="width:${PG.raw ? Math.max(2, PG.raw) : 0}%"></i></div></div>`
+          ${started ? `<div class="fprog"><div class="fpl"><b>${PG.pct}%</b><span>${PG.nh} ${H.heardS} · ${PG.np} ${H.practS}</span>${starsOf() ? starChip(starsOf(), "fp") : ""}</div><div class="gtrack ph"><i style="width:${PG.raw ? Math.max(2, PG.raw) : 0}%"></i></div></div>`
             : `<div class="fchips">${H.chips.map(c => `<span>${c}</span>`).join("")}</div>`}
           <button class="fcta" data-go="guia">${started ? H.cta2 : H.cta} ${arrow}</button></div>
       </section></div>
@@ -310,12 +310,12 @@ function home(){
   const bar = (icon, label, n, tot, cls) => `<div class="gbar ${cls}"><div class="gbl">${icon}<span>${label}</span><em><b>${n}</b> / ${tot}</em></div><div class="gtrack"><i style="width:${n ? Math.max(3, n * 100 / tot) : 0}%"></i></div></div>`;
   const arrow = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   const tile = (e, i) => { const [tt, ts] = homeTitle(e, i), [n, tot] = perCat(i);
-    return `<button class="gtile" data-go="s${i}t0"><span class="gico">${mi("t-" + GRID[i])}</span><b>${esc(tt)}</b><small>${esc(ts)}</small>
+    return `<button class="gtile" data-go="s${i}t0">${starsOf(i) ? starChip(starsOf(i), "tile") : ""}<span class="gico">${mi("t-" + GRID[i])}</span><b>${esc(tt)}</b><small>${esc(ts)}</small>
       ${n ? `<span class="gmini"><i style="width:${perCat(i)[2]}%"></i></span><em>${n}% · ${tot} ${t("nPh")}</em>` : `<em>${tot} ${t("nPh")}</em>`}</button>`; };
   const [bn, btot] = perCat(8);
   app.innerHTML = `${topbar("ghub")}
   <div class="gtitle"><small>${MINIFLAG}${t("gKicker")}</small><b>${t("gTitle")}</b></div>
-  <section class="gprog"><div class="gpt gptot"><span>${t("prog")}<small>${t("progHow")}</small></span><b>${PG.pct}%</b></div>
+  <section class="gprog"><div class="gpt gptot"><span>${t("prog")}<small>${t("progHow")}</small></span>${starsOf() ? starChip(starsOf(), "big") : ""}<b>${PG.pct}%</b></div>
     <div class="gtrack big"><i style="width:${PG.raw ? Math.max(2, PG.raw) : 0}%"></i></div>
     ${bar(ICON.spk, t("pHeard"), PG.nh, idx.length, "ph")}
     ${bar('<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>', t("pPract"), PG.np, idx.length, "pp")}
@@ -323,7 +323,7 @@ function home(){
   </section>
   <div class="gch">${t("choose")}</div>
   <div class="gtiles">${HOME.map((e, i) => tile(e, i)).join("")}</div>
-  <button class="gwide bonus" data-go="s8t0"><span class="gico">${mi("t-bonus")}</span><span class="gw"><b>${t("bonusT")}</b><small>${t("bonusS")} · ${bn ? `${bn}% · ` : ""}${btot} ${t("nPh")}</small></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+  <button class="gwide bonus" data-go="s8t0"><span class="gico">${mi("t-bonus")}</span><span class="gw"><b>${t("bonusT")}${starsOf(8) ? " " + starChip(starsOf(8), "in") : ""}</b><small>${t("bonusS")} · ${bn ? `${bn}% · ` : ""}${btot} ${t("nPh")}</small></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
   <button class="gwide" data-go="p1"><span class="gico pimg"><img src="${UI['h:Guía de Paris']}" alt=""></span><span class="gw"><b>${t("paris")}</b><small>${t("parisSub")}</small></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
   <div class="gend"></div>`;
 }
@@ -731,6 +731,8 @@ const withAudio = ps => ps.filter(p => p.audio && p.audio[0]);
 const allHeard = ps => { const h = new Set(seen.get("evoala-heard")); const a = withAudio(ps); return a.length > 0 && a.every(p => h.has(p.fr)); };
 // meilleures étoiles gagnées au jeu, par carte et par page (ne baissent jamais)
 const bestStars = () => { try{ return JSON.parse(localStorage.getItem("evoala-stars") || "{}") || {}; }catch(e){ return {}; } };
+const starsOf = si => Object.entries(bestStars()).reduce((a, [k, v]) => { const m = k.match(/^s(\d+)t/); return a + (m && (si == null || +m[1] === si) ? v : 0); }, 0);
+const starChip = (n, cls = "") => `<span class="schip ${cls}">★ ${n}</span>`;
 const starsHTML = n => `<span class="pst" aria-label="${n}/3">${"★".repeat(n)}<i>${"★".repeat(3 - n)}</i></span>`;
 function refreshPractice(animate){
   if(!PVIEW || app.dataset.list) return;
