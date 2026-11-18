@@ -20,7 +20,7 @@
   .dots i.ok{background:#6C4FE0}.dots i.help{background:#F5C58A}.dots i.now{background:#fff;box-shadow:0 0 0 2px #6C4FE0}
   .stars{min-width:40px;text-align:right;font-weight:700;color:#E08A00;font-size:16px}
   /* carte du mur */
-  #card{flex:none;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -8px 24px rgba(40,20,120,.12);padding:16px 16px calc(16px + env(safe-area-inset-bottom));min-height:250px;transition:transform .3s ease}
+  #card{flex:none;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -8px 24px rgba(40,20,120,.12);padding:16px 16px calc(16px + env(safe-area-inset-bottom));height:calc(352px + env(safe-area-inset-bottom));box-sizing:border-box;overflow:hidden;transition:transform .3s ease}
   #card.hide{transform:translateY(105%)}
   .kick{font-size:12px;font-weight:600;color:#5940BF;letter-spacing:.03em;text-transform:uppercase}
   .es{font-size:22px;font-weight:600;line-height:1.25;margin:2px 0 4px}
@@ -82,7 +82,9 @@
   /* niveaux */
   .sub{font-size:15px;color:#6E6680;font-style:italic;margin:0 0 2px}
   #card.lvl2 .row .mic, #card.lvl2 #hintb, #card.lvl2 .miclab{display:none}
-  #card.lvl2 .row{justify-content:flex-end}
+  #card.lvl2 .row{justify-content:flex-end;margin-top:8px}
+  #card{position:relative}
+  #card.lvl2 .skip{position:absolute;left:16px;right:96px;bottom:calc(20px + env(safe-area-inset-bottom));width:auto;height:52px;margin:0}
   .ans{display:none;margin-top:10px;min-height:58px;border-radius:16px;border:2px dashed #CFC8EA;background:#FBFAFF;padding:7px;flex-wrap:wrap;gap:8px;align-items:center;transition:background .2s,border-color .2s}
   .pool{display:none;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
   #card.lvl2 .ans,#card.lvl2 .pool{display:flex}
@@ -187,7 +189,10 @@ const cv = $("cv"), ctx = cv.getContext("2d");
 const evo = new Image(); evo.src = "img/ui/evo.png";
 const evoHappy = new Image(); evoHappy.src = "img/ui/evo-happy.png";   // bouche ouverte, quand la phrase est réussie
 let W = 0, H = 0, DPR = 1;
-function resize(){ const r = cv.getBoundingClientRect(); DPR = Math.min(2, window.devicePixelRatio || 1); W = r.width; H = r.height; cv.width = W * DPR; cv.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0); }
+function resize(){ const r = cv.getBoundingClientRect(); DPR = Math.min(2, window.devicePixelRatio || 1);
+  if(Math.abs(r.width - W) < .5 && Math.abs(r.height - H) < .5 && cv.width) return;     // rien n'a changé : on ne vide pas le dessin
+  W = r.width; H = r.height; cv.width = W * DPR; cv.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if(G) drawFrame(0); }
 addEventListener("resize", resize);
 if(window.ResizeObserver) new ResizeObserver(() => resize()).observe(cv);   // la carte change de hauteur : on redimensionne le dessin pour ne pas déformer Evo
 
@@ -246,10 +251,16 @@ function drawWalls(){
     [["#1E4FB5",0],["#fff",1],["#EF3340",2]].forEach(([c, k]) => { ctx.fillStyle = c; ctx.fillRect(fx + 4 + k * 18, y - 120, 18, 36); });
   }
 }
+function drawFrame(dt){ drawSky(); drawSkyline(); drawRoof(); drawWalls(); drawEvo(dt); drawParts(dt); }
 function drawEvo(dt){
-  const y0 = groundY(), size = 78; let x = evoX(), y = y0 - size, rot = 0, sq = 1;
-  if(G.state === "run" || G.state === "finish"){ y += Math.abs(Math.sin(G.t * 11)) * -10; rot = Math.sin(G.t * 11) * 0.06; }
-  if(G.state === "wall"){ y += Math.sin(G.t * 3) * 2; if(G.thinking) rot = Math.sin(G.t * 2.4) * 0.12; }
+  const y0 = groundY(), size = 78; let x = evoX(), y = y0 - size, rot = 0;
+  // rebond et inclinaison lissés : à l'arrêt, Evo se pose en douceur au lieu de « sauter » d'une pose à l'autre
+  let tb = 0, tr = 0;
+  if(G.state === "run" || G.state === "finish"){ tb = Math.abs(Math.sin(G.t * 11)) * -10; tr = Math.sin(G.t * 11) * 0.06; }
+  if(G.state === "wall"){ tb = Math.sin(G.t * 3) * 2; if(G.thinking) tr = Math.sin(G.t * 2.4) * 0.12; }
+  const kf = dt ? Math.min(1, dt * (G.state === "run" || G.state === "finish" ? 30 : 9)) : 1;
+  G.bob = (G.bob ?? tb) + (tb - (G.bob ?? tb)) * kf; G.tilt = (G.tilt ?? tr) + (tr - (G.tilt ?? tr)) * kf;
+  if(G.state === "run" || G.state === "finish" || G.state === "wall"){ y += G.bob; rot = G.tilt; }
   if(G.state === "jump"){ const k = G.jumpT; y -= Math.sin(Math.PI * k) * 150; rot = k * Math.PI * 2; x += 0; }
   if(G.state === "fail"){ const k = G.failT; x -= Math.sin(Math.PI * Math.min(1, k * 2)) * 18; rot = Math.sin(k * 30) * 0.15 * (1 - k); }
   ctx.save(); ctx.fillStyle = "rgba(40,30,80,.18)";                  // ombre
@@ -291,7 +302,7 @@ function loop(ts){
     if(G.jumpT >= 1){ G.jumpT = 0; G.i++; renderDots(); G.state = G.i < PH.length ? "run" : "finish"; } }
   if(G.state === "fail"){ G.failT += dt / 0.7; if(G.failT >= 1){ G.failT = 0; G.state = "wall"; } }
   G.wallShake = Math.max(0, G.wallShake - dt * 1.6);
-  drawSky(); drawSkyline(); drawRoof(); drawWalls(); drawEvo(dt); drawParts(dt);
+  drawFrame(dt);
   requestAnimationFrame(loop);
 }
 
@@ -431,13 +442,13 @@ function checkOrder(){
   G.tries++;
   if(got.join("|") === ORDER.list.join("|")){
     $("ans").classList.add("ok"); G.happy = G.t + 2.6;
-    const fb = $("fb"); fb.className = "fb ok"; fb.innerHTML = `<b>${T.ok} 🎉</b>`;
+    $("help").innerHTML = `<b style="color:#1F8A70">${T.ok} 🎉</b>`;   // message dans la carte (la hauteur ne bouge pas)
     try{ MODEL.pause(); }catch(e){}
     sfx("ding"); setTimeout(() => win(false), 800);   // mots en vert + petit « ding », un temps, puis Evo repart
   } else {
     $("ans").classList.add("bad"); G.state = "fail"; G.failT = 0; G.wallShake = 1; sfx("bump");
-    const fb = $("fb"); fb.className = "fb mid"; fb.innerHTML = `<b>${T.wrong}</b> ${T.wrongS}`;
-    if(G.tries >= 3){ $("skip").style.display = "block"; $("help").innerHTML = `<span class="hint">${esc(ORDER.list.join(" "))}</span>`; }
+    $("help").innerHTML = G.tries >= 3 ? `<span class="hint">${esc(ORDER.list.join(" "))}</span>` : `<b style="color:#C2410C">${T.wrong}</b> ${T.wrongS}`;
+    if(G.tries >= 3) $("skip").style.display = "block";
     setTimeout(() => { $("ans").className = "ans"; $("ans").innerHTML = ""; ORDER.placed = []; $("pool").querySelectorAll(".tok").forEach(b => b.classList.remove("gone")); }, 900);
   }
 }
