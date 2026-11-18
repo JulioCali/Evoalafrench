@@ -765,7 +765,7 @@ function startPractice(which){
   const pick = pool.map(p => [Math.random(), p]).sort((a, b) => a[0] - b[0]).slice(0, n).map(x => x[1])
                    .sort((a, b) => a.fr.length - b.fr.length);   // des plus courtes aux plus longues
   const title = page ? PVIEW.title : (v.groups[+which].label || PVIEW.title);
-  try{ sessionStorage.setItem("evoala-game", JSON.stringify({ title, back: PVIEW.back, key: PVIEW.back + "|" + (page ? "page" : which), lang: LANG, items: pick.map(p => ({ fr: p.fr, es: p.es, pr: p.pr || "", audio: p.audio })) })); }catch(e){}
+  try{ sessionStorage.setItem("evoala-game", JSON.stringify({ title, back: PVIEW.back, coach: window.EvoAuth && window.EvoAuth.user ? "user" : "guest", key: PVIEW.back + "|" + (page ? "page" : which), lang: LANG, items: pick.map(p => ({ fr: p.fr, es: p.es, pr: p.pr || "", audio: p.audio })) })); }catch(e){}
   location.href = "juego.html";
 }
 
@@ -846,7 +846,7 @@ async function playRow(row){
 function preload(){ const r = app.querySelector(".row[data-audio^='snd']"); if(r) bundle(r.dataset.audio.split("#")[0]); }
 
 /* ---------- Tutoriel : à la première utilisation, et à chaque visite pour qui n'a pas de compte (« Ahora no ») ---------- */
-function openTuto(){ try{ sessionStorage.setItem("evoala-tuto-back", location.hash || "#guia"); }catch(e){} location.href = "tuto.html"; }
+function openTuto(){ try{ sessionStorage.setItem("evoala-tuto-back", location.hash || "#guia"); sessionStorage.setItem("evoala-tuto-guest", window.EvoAuth && window.EvoAuth.user ? "0" : "1"); }catch(e){} location.href = "tuto.html"; }
 function maybeTuto(h, tries = 0){
   if(!/^s\d/.test(h)) return;                                  // on voit d'abord le hub et ses thèmes ; le tuto s'ouvre au premier thème choisi
   let doneS = false, done = false; try{ doneS = !!sessionStorage.getItem("evoala-tuto-s"); done = !!localStorage.getItem("evoala-tuto"); }catch(e){}

@@ -307,7 +307,7 @@ function showCard(){
   $("fb").className = "fb"; $("skip").style.display = "none"; setMic("idle");
   if(LV !== 2){ $("ans").innerHTML = ""; $("pool").innerHTML = ""; }
   if(LV < 3) setTimeout(() => { if(G.state === "wall" && PH[G.i] === p) playModel(p); }, 500);   // l'audio se lance tout seul (niveaux 1 et 2)
-  if(SET && SET.tuto && G.i === 0 && !G.coached){ G.coached = true; coach(); }
+  if(G.i === 0 && !G.coached && coachDue("l" + LV)){ G.coached = true; coach(LV === 1 ? COACH : LV === 2 ? COACH_2 : COACH_3); }
 }
 // tutoriel : au premier mur, on explique la carte, le micro, l'ampoule et le haut-parleur
 const COACH = EN ? [
@@ -322,16 +322,30 @@ const COACH = EN ? [
   ["#lis", "Escucha", "¿No recuerdas cómo suena? Toca el altavoz para escuchar el modelo."],
   ["#hintb", "¿Necesitas ayuda?", "La bombilla te muestra cómo se pronuncia la frase."],
   ["#mic", "¡Tu turno!", "Toca el micrófono y di la frase. Evo saltará si se entiende bien."]];
-function coach(){
+// tutoriel du jeu : chaque explication une fois (avec un compte) ou à chaque visite (sans compte)
+const COACH_LV = EN ? [["#lvls", "3 levels", "Listen and repeat, put the phrase in order, then say it yourself. Each level opens when you finish the previous one."]]
+  : [["#lvls", "3 niveles", "Escucha y repite, ordena la frase y, al final, dila tú solo. Cada nivel se abre al terminar el anterior."]];
+const COACH_2 = EN ? [["#pool", "Put it in order", "Tap the words in the right order to build the phrase. Tap a word again to send it back."]]
+  : [["#pool", "Ordena la frase", "Toca las palabras en el orden correcto para formar la frase. Si te equivocas, toca una palabra para devolverla."]];
+const COACH_3 = EN ? [["#es", "Now without seeing it", "You only see the phrase in Spanish: say it in French."], ["#hintb", "Stuck?", "The light bulb shows you the French phrase."]]
+  : [["#es", "Ahora sin verla", "Solo ves la frase en español: dila en francés."], ["#hintb", "¿Te bloqueas?", "La bombilla te muestra la frase en francés."]];
+function coachDue(id){
+  if(!SET || !(SET.coach || SET.tuto)) return false;
+  const st = SET.coach === "user" ? localStorage : sessionStorage, k = "evoala-gt-" + id;
+  try{ if(st.getItem(k)) return false; st.setItem(k, "1"); }catch(e){}
+  return true;
+}
+function coach(steps = COACH){
+  const COACH_ = steps;
   let k = 0;
   const blk = document.createElement("div"), spot = document.createElement("div"), bub = document.createElement("div");
   blk.className = "tblock"; spot.className = "spot"; bub.className = "tbub"; document.body.append(blk, spot, bub);
   const show = () => {
-    const [sel, title, text] = COACH[k], el = document.querySelector(sel), r = el.getBoundingClientRect(), pad = sel === "#mic" ? 4 : 8, round = sel === "#mic" || sel === "#lis" || sel === "#hintb";
+    const [sel, title, text] = COACH_[k], el = document.querySelector(sel), r = el.getBoundingClientRect(), pad = sel === "#mic" ? 4 : 8, round = sel === "#mic" || sel === "#lis" || sel === "#hintb";
     const w = r.width + pad * 2, h = r.height + pad * 2;
     spot.style.cssText = `top:${r.top - pad}px;left:${r.left - pad}px;width:${w}px;height:${h}px;border-radius:${sel === "#mic" ? w / 2 : round ? 20 : 14}px`;
-    const last = k === COACH.length - 1;
-    bub.innerHTML = `<img src="img/ui/evo.png" alt=""><div style="flex:1"><b>${title}</b><p>${text}</p><div class="bf"><button>${last ? (EN ? "Let's play!" : "¡A jugar!") : (EN ? "Next" : "Siguiente")}</button></div></div>`;
+    const last = k === COACH_.length - 1;
+    bub.innerHTML = `<img src="img/ui/evo.png" alt=""><div style="flex:1"><b>${title}</b><p>${text}</p><div class="bf"><button>${last ? (steps === COACH_LV ? (EN ? "Got it" : "Entendido") : (EN ? "Let's play!" : "¡A jugar!")) : (EN ? "Next" : "Siguiente")}</button></div></div>`;
     const bh = bub.offsetHeight;
     bub.style.top = (r.top - pad - 14 - bh > 10 ? r.top - pad - 14 - bh : r.bottom + pad + 14) + "px";
     bub.querySelector("button").onclick = () => { if(last){ blk.remove(); spot.remove(); bub.remove(); } else { k++; show(); } };
@@ -525,7 +539,7 @@ const backUrl = SET && SET.backUrl ? SET.backUrl : SET && SET.back ? "/#" + SET.
 document.querySelector(".hud .back").href = backUrl; $("back2").href = backUrl; $("back2").textContent = T.back; $("back1").href = backUrl; $("back1").textContent = T.back;
 // départ : avec les niveaux (sauf dans le tutoriel, qui joue directement le niveau 1)
 if(SET && SET.tuto){ document.querySelector("#start h1").textContent = T.start; $("startP").innerHTML = T.startP.replace(EN ? "say the phrase in French" : "di la frase en francés", EN ? "read the phrase and repeat it" : "lee la frase y repítela"); $("go").textContent = T.go; $("back1").style.display = "none"; }
-else { document.querySelector("#start h1").textContent = SET ? SET.title : T.start; $("startP").textContent = `${T.startL} · ${PH.length} ${T.phr}`; $("go").style.display = "none"; renderLevels(); }
+else { document.querySelector("#start h1").textContent = SET ? SET.title : T.start; $("startP").textContent = `${T.startL} · ${PH.length} ${T.phr}`; $("go").style.display = "none"; renderLevels(); if(coachDue("lv")) setTimeout(() => coach(COACH_LV), 300); }
 $("skip").textContent = T.skip; $("miclab").textContent = T.mic;
 newGame(); G.state = "intro"; resize(); requestAnimationFrame(loop);
 </script>

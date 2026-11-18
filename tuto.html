@@ -25,6 +25,12 @@
   .bub .cnt{font-size:12px;color:#8A8398;flex:1}
   .bub .nx{height:42px;padding:0 18px;border-radius:12px;background:#6C4FE0;color:#fff;font-weight:600;font-size:14px}
   .bub .sk{height:42px;padding:0 10px;color:#6E6680;font-size:13px}
+  .bub .sk.acc{color:#5940BF;font-weight:600;white-space:nowrap}
+  .bub .nx,.bub .sk{white-space:nowrap}
+  .bub .bf{flex-wrap:wrap;justify-content:flex-end;row-gap:4px}
+  .bub .cnt:empty{display:none}
+  .bub .sk{padding:0 6px}
+  .bub .nx{padding:0 14px}
   .bub .wait{font-size:13px;font-weight:600;color:#C25A00}
   .center{top:50%!important;transform:translateY(-50%)}
   .row .pr{display:inline-block}
@@ -102,7 +108,7 @@ function showPron(i){ const es = row(i).querySelector(".es"); es.innerHTML = `${
 /* ---------- Les étapes ---------- */
 // target : élément à éclairer ; tap : ce que l'apprenant doit toucher (sinon bouton « Siguiente »)
 const STEPS = [
-  { title:"¡Hola! Soy Evo 👋", text:"Antes de empezar, te enseño a usar la guía en un minuto, con las tres primeras frases de este tema.", next:"Empezar", skip:true },
+  { title:"¡Hola! Soy Evo 👋", text:"", dyn:() => AGAIN ? "¡Hola de nuevo! Crea tu cuenta gratis para guardar tu progreso y tus listas, y no volver a ver este tutorial." : "Antes de empezar, te enseño a usar la guía en 30 segundos, con las tres primeras frases de este tema.", next:"Empezar", skip:true, account:true },
   { target:"#t-cats", title:"Las categorías", text:"Aquí eliges lo que quieres aprender: saludos, compras, transporte… Desliza para ver más." },
   { target:"#t-tabs", title:"Los temas", text:"Cada categoría tiene varios temas. Toca uno para cambiar de página." },
   { target:".row[data-i='0'] .spk", round:true, title:"Escucha", text:"Toca el altavoz para escuchar la frase en francés.", tap:t => t.closest(".row[data-i='0'] .spk"), act:() => play(0), wait:"Toca el altavoz 👆" },
@@ -113,10 +119,9 @@ const STEPS = [
   { target:"#t-card", title:"Tu turno", text:"", dyn:() => `Escucha las otras dos frases: «${PH[1].fr}» y «${PH[2].fr}».`, tap:t => t.closest(".row[data-i='1'] .spk, .row[data-i='2'] .spk"),
     act:async t => { const i = +t.closest(".row").dataset.i; await play(i); return heard.has(1) && heard.has(2); }, wait:"Escucha las 2 frases 👆" },
   { target:"#t-pslot", before:() => { document.getElementById("t-pslot").innerHTML = `<button class="pbtn pop">${MIC}Practicar</button>`; },
-    title:"¡Escuchaste todo! 🎉", text:"Cuando escuchas todas las frases, aparece «Practicar»: ayuda a Evo a saltar los muros diciendo las frases en francés.",
-    tap:t => t.closest("#t-pslot .pbtn"), act:() => { goGame(); return false; }, wait:"Toca Practicar 👆" },
+    title:"¡Escuchaste todo! 🎉", text:"Cuando escuchas todas las frases de una tarjeta, aparece «Practicar»: un juego para decirlas en francés. Te lo explico cuando lo abras." },
   // retour du jeu ↓
-  { id:"fin", target:"#t-nav", title:"¡Lo lograste!", text:"Ya sabes escuchar, ver la pronunciación, guardar y practicar. Abajo tienes la guía, tus listas y la Guía de París." },
+  { id:"fin", target:"#t-nav", title:"Tu menú", text:"Abajo tienes la guía, tus listas y la Guía de París." },
   { target:"#t-lists", round:true, title:"Mis listas", text:"Aquí encuentras las frases que guardaste con el corazón." },
   { target:"#t-paris", round:true, title:"La Guía de París 🗼", text:"¿Vas a París? Aquí tienes los lugares que no te puedes perder: monumentos, museos, barrios y joyas escondidas, con consejos prácticos." },
   { title:"¡Listo para viajar! 🇫🇷", text:"Ahora explora la guía a tu ritmo. ¡Bon voyage!", next:"Ir a la guía", end:true },
@@ -131,8 +136,8 @@ function show(){
   if(el){ el.scrollIntoView({ block: "center", behavior: "smooth" }); }
   setTimeout(() => place(s), el ? 380 : 0);
   bub.innerHTML = `<img src="img/ui/evo.png" alt=""><div class="bt"><b>${s.title}</b><p>${s.dyn ? s.dyn() : s.text}</p>
-    <div class="bf"><span class="cnt">${k >= 1 && k <= 9 ? `${k} / 9` : ""}</span>${s.skip ? `<button class="sk" data-skip>Saltar</button>` : ""}
-    ${s.tap ? `<span class="wait">${s.wait}</span>` : `<button class="nx" data-next>${s.next || "Siguiente"}</button>`}</div></div>`;
+    <div class="bf"><span class="cnt">${k >= 1 && k < STEPS.length - 1 ? `${k} / ${STEPS.length - 2}` : ""}</span>${s.skip ? `<button class="sk" data-skip>Saltar</button>` : ""}${s.account && AGAIN ? `<button class="sk acc" data-next>Ver tutorial</button><button class="nx" data-acc>Crear cuenta</button>`
+      : s.tap ? `<span class="wait">${s.wait}</span>` : `<button class="nx" data-next>${s.next || "Siguiente"}</button>`}</div></div>`;
 }
 function place(s){
   const r = s.target && rectOf(s.target), pad = s.round ? 8 : 6;
@@ -150,6 +155,7 @@ addEventListener("scroll", () => place(STEPS[k]), { passive: true });
 // les touches : bouton de la bulle, ou zone éclairée quand l'étape demande de toucher
 bub.addEventListener("click", e => {
   if(e.target.closest("[data-skip]")) return finish();
+  if(e.target.closest("[data-acc]")){ try{ localStorage.setItem("evoala-tuto", "1"); }catch(_){} location.href = "/#cuenta"; return; }
   if(e.target.closest("[data-next]")){ if(STEPS[k].end) return finish(); k++; show(); }
 });
 let busy = false;
@@ -169,7 +175,11 @@ function finish(){
   let back = "#guia"; try{ localStorage.setItem("evoala-tuto", "1"); back = sessionStorage.getItem("evoala-tuto-back") || "#guia"; }catch(e){}
   location.href = "/" + back;
 }
-try{ sessionStorage.setItem("evoala-tuto-s", "1"); }catch(e){}   // vu pendant cette visite : il ne se relance pas
+try{ sessionStorage.setItem("evoala-tuto-s", "1"); }catch(e){}
+// sans compte, le tutoriel revient à chaque visite : dès la 2e fois, on propose de créer un compte
+let AGAIN = false;
+try{ const guest = sessionStorage.getItem("evoala-tuto-guest") === "1", n = +(localStorage.getItem("evoala-tuto-count") || 0) + 1;
+  localStorage.setItem("evoala-tuto-count", String(n)); AGAIN = guest && n >= 2; }catch(e){}   // vu pendant cette visite : il ne se relance pas
 // retour du jeu : on reprend à l'étape « fin », la page dans l'état « tout écouté »
 (async () => {
 await loadPage(); render();
