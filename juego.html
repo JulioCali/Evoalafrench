@@ -306,8 +306,9 @@ function showCard(){
   else { $("es").textContent = p.es; $("sub").textContent = ""; $("help").innerHTML = T.help; }
   $("fb").className = "fb"; $("skip").style.display = "none"; setMic("idle");
   if(LV !== 2){ $("ans").innerHTML = ""; $("pool").innerHTML = ""; }
-  if(LV < 3) setTimeout(() => { if(G.state === "wall" && PH[G.i] === p) playModel(p); }, 500);   // l'audio se lance tout seul (niveaux 1 et 2)
-  if(G.i === 0 && !G.coached && coachDue("l" + LV)){ G.coached = true; coach(LV === 1 ? COACH : LV === 2 ? COACH_2 : COACH_3); }
+  const coaching = G.i === 0 && !G.coached && coachDue("l" + LV);
+  if(coaching){ G.coached = true; coach(LV === 1 ? COACH : LV === 2 ? COACH_2 : COACH_3, () => { if(LV === 2) setTimeout(() => playModel(p), 100); }); }
+  else if(LV < 3) setTimeout(() => { if(G.state === "wall" && PH[G.i] === p) playModel(p); }, 500);   // l'audio se lance tout seul (niveaux 1 et 2)
 }
 // tutoriel : au premier mur, on explique la carte, le micro, l'ampoule et le haut-parleur
 const COACH = EN ? [
@@ -335,7 +336,7 @@ function coachDue(id){
   try{ if(st.getItem(k)) return false; st.setItem(k, "1"); }catch(e){}
   return true;
 }
-function coach(steps = COACH){
+function coach(steps = COACH, onEnd){
   const COACH_ = steps;
   let k = 0;
   const blk = document.createElement("div"), spot = document.createElement("div"), bub = document.createElement("div");
@@ -348,7 +349,8 @@ function coach(steps = COACH){
     bub.innerHTML = `<img src="img/ui/evo.png" alt=""><div style="flex:1"><b>${title}</b><p>${text}</p><div class="bf"><button>${last ? (steps === COACH_LV ? (EN ? "Got it" : "Entendido") : (EN ? "Let's play!" : "¡A jugar!")) : (EN ? "Next" : "Siguiente")}</button></div></div>`;
     const bh = bub.offsetHeight;
     bub.style.top = (r.top - pad - 14 - bh > 10 ? r.top - pad - 14 - bh : r.bottom + pad + 14) + "px";
-    bub.querySelector("button").onclick = () => { if(last){ blk.remove(); spot.remove(); bub.remove(); } else { k++; show(); } };
+    bub.querySelector("button").onclick = () => { if(last){ blk.remove(); spot.remove(); bub.remove(); if(onEnd) onEnd(); } else { k++; show(); } };
+    if(sel === "#es" && LV === 1) setTimeout(() => { const p = PH[G.i]; if(p) playModel(p); }, 100);   // l'audio part juste après avoir montré la phrase
   };
   setTimeout(show, 450);   // le temps que la carte monte
 }
