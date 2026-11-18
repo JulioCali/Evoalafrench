@@ -189,6 +189,7 @@ const evoHappy = new Image(); evoHappy.src = "img/ui/evo-happy.png";   // bouche
 let W = 0, H = 0, DPR = 1;
 function resize(){ const r = cv.getBoundingClientRect(); DPR = Math.min(2, window.devicePixelRatio || 1); W = r.width; H = r.height; cv.width = W * DPR; cv.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0); }
 addEventListener("resize", resize);
+if(window.ResizeObserver) new ResizeObserver(() => resize()).observe(cv);   // la carte change de hauteur : on redimensionne le dessin pour ne pas déformer Evo
 
 const GAP = 560, SPEED = 170;             // distance entre les murs, vitesse de course (px/s)
 let G;                                    // état de la partie
@@ -432,7 +433,7 @@ function checkOrder(){
     $("ans").classList.add("ok"); G.happy = G.t + 2.6;
     const fb = $("fb"); fb.className = "fb ok"; fb.innerHTML = `<b>${T.ok} 🎉</b>`;
     try{ MODEL.pause(); }catch(e){}
-    sfx("ding"); setTimeout(() => win(false), 500);   // mots en vert + petit « ding », puis Evo repart
+    sfx("ding"); setTimeout(() => win(false), 800);   // mots en vert + petit « ding », un temps, puis Evo repart
   } else {
     $("ans").classList.add("bad"); G.state = "fail"; G.failT = 0; G.wallShake = 1; sfx("bump");
     const fb = $("fb"); fb.className = "fb mid"; fb.innerHTML = `<b>${T.wrong}</b> ${T.wrongS}`;
@@ -447,7 +448,7 @@ const bundles = {}, decoded = {};
 function ac(){ actx ??= new (window.AudioContext || window.webkitAudioContext)(); if(actx.state === "suspended") actx.resume(); return actx; }
 // bruitages (fichiers créés pour Evoala, libres de droits) joués avec <audio> : ils marchent aussi en mode silencieux
 const SFX = { jump: new Audio("snd/jump.wav"), bump: new Audio("snd/bump.wav"), win: new Audio("snd/win.wav"), ding: new Audio("snd/ding.wav") };
-SFX.jump.volume = .7; SFX.bump.volume = .6;
+// volume réglé directement dans les fichiers (sur iPhone, le volume ne se règle pas par le code)
 function unlockSfx(){ [...Object.values(SFX), MODEL].forEach(a => { a.muted = true; a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; }); }); }
 function sfx(kind){ const a = SFX[kind]; if(!a) return; try{ a.currentTime = 0; a.play().catch(() => {}); }catch(e){} }
 // lecteur <audio> (et non Web Audio) : sur iPhone en mode silencieux, Web Audio est coupé mais pas <audio>
