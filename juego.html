@@ -415,7 +415,8 @@ function checkOrder(){
   if(got.join("|") === ORDER.list.join("|")){
     $("ans").classList.add("ok"); G.happy = G.t + 2.6;
     const fb = $("fb"); fb.className = "fb ok"; fb.innerHTML = `<b>${T.ok} 🎉</b>`;
-    playModel(PH[G.i]); setTimeout(() => win(false), 650);
+    try{ MODEL.pause(); }catch(e){}
+    sfx("ding"); setTimeout(() => win(false), 500);   // mots en vert + petit « ding », puis Evo repart
   } else {
     $("ans").classList.add("bad"); G.state = "fail"; G.failT = 0; G.wallShake = 1; sfx("bump");
     const fb = $("fb"); fb.className = "fb mid"; fb.innerHTML = `<b>${T.wrong}</b> ${T.wrongS}`;
@@ -429,7 +430,7 @@ let actx = null, playing = null;
 const bundles = {}, decoded = {};
 function ac(){ actx ??= new (window.AudioContext || window.webkitAudioContext)(); if(actx.state === "suspended") actx.resume(); return actx; }
 // bruitages (fichiers créés pour Evoala, libres de droits) joués avec <audio> : ils marchent aussi en mode silencieux
-const SFX = { jump: new Audio("snd/jump.wav"), bump: new Audio("snd/bump.wav"), win: new Audio("snd/win.wav") };
+const SFX = { jump: new Audio("snd/jump.wav"), bump: new Audio("snd/bump.wav"), win: new Audio("snd/win.wav"), ding: new Audio("snd/ding.wav") };
 SFX.jump.volume = .7; SFX.bump.volume = .6;
 function unlockSfx(){ [...Object.values(SFX), MODEL].forEach(a => { a.muted = true; a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; }); }); }
 function sfx(kind){ const a = SFX[kind]; if(!a) return; try{ a.currentTime = 0; a.play().catch(() => {}); }catch(e){} }
