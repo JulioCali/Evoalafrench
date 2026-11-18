@@ -8,7 +8,7 @@
      "intro": "Expresiones que tienes que conocer",
      "groups": [
       {
-       "label": "Saludos y despedidas",
+       "label": "Saludar",
        "phrases": [
         {
          "fr": "Bonjour",
@@ -37,18 +37,23 @@
          ]
         },
         {
-         "fr": "Bonne journée",
-         "es": "Que tenga un feliz día",
-         "pr": "bon yur—-NÉ",
+         "fr": "Salut",
+         "es": "Hola",
+         "pr": "sa-LÚ",
          "icon": [
           "img/icons/p2.webp",
-          2
+          20
          ],
          "audio": [
           "snd/p2.json",
-          "5d23a92c02"
+          "e5d06e4130"
          ]
-        },
+        }
+       ]
+      },
+      {
+       "label": "Despedirse",
+       "phrases": [
         {
          "fr": "Au revoir",
          "es": "Hasta luego",
@@ -73,6 +78,32 @@
          "audio": [
           "snd/p2.json",
           "002d3c5f41"
+         ]
+        },
+        {
+         "fr": "Bonne journée",
+         "es": "Que tenga un feliz día",
+         "pr": "bon yur—-NÉ",
+         "icon": [
+          "img/icons/p2.webp",
+          2
+         ],
+         "audio": [
+          "snd/p2.json",
+          "5d23a92c02"
+         ]
+        },
+        {
+         "fr": "Salut",
+         "es": "Chao",
+         "pr": "sa-LÚ",
+         "icon": [
+          "img/icons/p2.webp",
+          21
+         ],
+         "audio": [
+          "snd/p2.json",
+          "e5d06e4130"
          ]
         }
        ]
