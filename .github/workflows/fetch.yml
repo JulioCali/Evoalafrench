@@ -1,0 +1,22 @@
+name: fetch-assets
+on:
+  push:
+    paths: ['fetch/list.txt']
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir -p fetch/out
+          while read -r name url; do
+            [ -z "$name" ] && continue
+            curl -sSfL "$url" -o "fetch/out/$name"
+          done < fetch/list.txt
+          rm fetch/list.txt
+          git config user.name "fetch-bot"
+          git config user.email "fetch-bot@users.noreply.github.com"
+          git add -A fetch
+          git commit -m "fetch assets" && git push
