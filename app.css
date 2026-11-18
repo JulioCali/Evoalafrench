@@ -582,3 +582,14 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .gtile{position:relative}
 .fpl .schip{color:#B86E00;font-size:13px}
 .pr.pr-under{display:table;margin-top:4px;font-style:normal}
+/* niveaux du jeu : cercles verts (faits) / violets (à faire) */
+.lcs{display:inline-flex;align-items:center;gap:3px}
+.lcs i{width:12px;height:2px;border-radius:2px;background:#E4DFF3}.lcs i.d{background:#1F8A70}
+.lc{flex:none;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;box-sizing:border-box}
+.lc.d{background:#1F8A70;color:#fff}.lc.n{background:var(--violet);color:#fff}.lc.t{border:2px solid #CFC8EA;color:#8A7BD8}
+.lc.w.n{background:#fff;color:var(--violet)}.lc.w.t{border-color:rgba(255,255,255,.65);color:#fff}.lc.w.d{box-shadow:0 0 0 2px #fff}
+.lcs:has(.w) i{background:rgba(255,255,255,.45)}
+.pbig .lcs{margin:6px 0 4px}
+.pbig.won{border-color:#1F8A70;box-shadow:0 6px 18px rgba(31,138,112,.15)}
+.schip{background:#E6F6EE;color:#14532D}
+.fpl .schip{color:#14532D}

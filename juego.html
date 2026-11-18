@@ -79,6 +79,33 @@
   .tbub p{margin:0;font-size:14px;line-height:1.45;color:#3A3550}
   .tbub .bf{display:flex;justify-content:flex-end;margin-top:10px}
   .tbub button{height:42px;padding:0 18px;border-radius:12px;background:#6C4FE0;color:#fff;font-weight:600;font-size:14px}
+  /* niveaux */
+  .sub{font-size:15px;color:#6E6680;font-style:italic;margin:0 0 2px}
+  #card.lvl2 .row .mic, #card.lvl2 #hintb, #card.lvl2 .miclab{display:none}
+  #card.lvl2 .row{justify-content:flex-end}
+  .ans{display:none;margin-top:10px;min-height:58px;border-radius:16px;border:2px dashed #CFC8EA;background:#FBFAFF;padding:7px;flex-wrap:wrap;gap:8px;align-items:center;transition:background .2s,border-color .2s}
+  .pool{display:none;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+  #card.lvl2 .ans,#card.lvl2 .pool{display:flex}
+  .ans.ok{border:2px solid #1F8A70;background:#E6F6EE}.ans.bad{border-color:#E8590C;background:#FFF4E6;animation:shake .4s}
+  @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .tok{height:46px;padding:0 16px;border-radius:12px;background:#fff;color:#1A1A1A;border:1.5px solid #DCD5FA;box-shadow:0 3px 0 #DCD5FA;font-size:17px;font-weight:500}
+  .ans .tok{background:#6C4FE0;color:#fff;border-color:#6C4FE0;box-shadow:none}
+  .ans.ok .tok{background:#1F8A70;border-color:#1F8A70}
+  .tok.gone{visibility:hidden}
+  .lvls{display:flex;flex-direction:column;gap:10px;text-align:left;margin:4px 0 6px}
+  .lv{display:flex;align-items:center;gap:12px;width:100%;border-radius:18px;padding:11px 12px;border:1.5px solid #E7E4F5;background:#fff;text-align:left}
+  .lv.next{border:2px solid #6C4FE0;background:#F7F5FF;box-shadow:0 6px 18px rgba(108,79,224,.18)}
+  .lv.lock{border-style:dashed;border-color:#DCD5FA;opacity:.7;cursor:default}
+  .lv b{display:block;font-size:15px;font-weight:600}.lv small{font-size:12px;color:#6E6680;line-height:1.35;display:block}
+  .lv .tx{flex:1}
+  .lv .go2{height:34px;padding:0 14px;border-radius:999px;background:#6C4FE0;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center}
+  .lv .done{font-size:13px;font-weight:600;color:#1F8A70}
+  .lv .lk{width:20px;height:20px;fill:none;stroke:#B5AECB;stroke-width:2.2;stroke-linecap:round}
+  .cir{flex:none;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;box-sizing:border-box}
+  .cir.d{background:#1F8A70;color:#fff}.cir.n{background:#6C4FE0;color:#fff}.cir.t{border:2px solid #CFC8EA;color:#8A7BD8}
+  .cirs{display:flex;align-items:center;justify-content:center;gap:4px;margin:6px 0 14px}
+  .cirs .cir{width:38px;height:38px;font-size:16px}
+  .cirs i{width:16px;height:2px;border-radius:2px;background:#E4DFF3}.cirs i.d{background:#1F8A70}
   .back2{display:block;margin-top:12px;font-size:15px;font-weight:600;color:#5940BF;text-decoration:none;padding:8px}
 </style>
 </head>
@@ -90,7 +117,10 @@
   <div id="card" class="hide">
     <div class="kick" id="kick"></div>
     <div class="es" id="es"></div>
+    <div class="sub" id="sub"></div>
     <div class="help" id="help">Dilo en francés para que Evo salte el muro</div>
+    <div class="ans" id="ans"></div>
+    <div class="pool" id="pool"></div>
     <div class="row">
       <button class="mic" id="mic" aria-label="Grabar"><i class="ring r1"></i><i class="ring r2"></i><span class="disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span></button>
       <span class="helpers">
@@ -106,18 +136,19 @@
 <div class="over" id="start"><div class="panel">
   <img src="img/ui/evo.png" alt="">
   <h1>Ayuda a Evo a cruzar París</h1>
-  <p>Evo corre por los techos de París. Delante de cada muro, <b>di la frase en francés</b> y Evo saltará.</p>
+  <p id="startP">Evo corre por los techos de París. Delante de cada muro, <b>di la frase en francés</b> y Evo saltará.</p>
+  <div class="lvls" id="lvls"></div>
   <button class="go" id="go">¡Vamos!</button>
-  <div class="note">Prototipo · 5 muros · frases de Esenciales</div>
+  <a class="back2" id="back1" href="/">Volver a la guía</a>
 </div></div>
 
 <div class="over" id="end" hidden><div class="panel">
   <img src="img/ui/evo.png" alt="">
   <h1 id="endT">¡Bravo!</h1>
-  <div class="big" id="endS"></div>
-  <ul class="res" id="endL"></ul>
-  <a class="go" id="back2" href="/">Volver a la guía</a>
-  <button class="again2" id="again">Jugar otra vez</button>
+  <div class="cirs" id="endC"></div>
+  <p id="endP"></p>
+  <button class="go" id="nextLvl">Nivel 2 →</button>
+  <a class="back2" id="back2" href="/">Volver a la guía</a>
 </div></div>
 
 <script>
@@ -136,12 +167,19 @@ const EN = (SET && SET.lang || (()=>{ try{ return localStorage.getItem("evoala-l
 const T = EN ? { help:"Say it in French so Evo jumps the wall", mic:"Tap to say it in French", rec:"Listening… (tap to finish)", wait:"Checking…", wall:"Wall", of:"of",
     ok:"Great job!", almost:"Almost!", almostS:"Listen and try again.", no:"Evo couldn't jump.", noS:"Try again.", heard:"We heard", silent:"We couldn't hear you.", silentS:"Speak a little louder, close to the phone.",
     unclear:"We didn't understand.", unclearS:"Listen to the model and repeat slowly.", skip:"Jump with help", first:"first try", help2:"with help", practice:"with practice",
-    perfect:"Perfect!",great:"Excellent!", bravo:"Bravo!", made:"You made it!", again:"Play again", back:"Back to the guide", start:"Help Evo cross Paris", startP:"Evo runs across the rooftops of Paris. In front of each wall, <b>say the phrase in French</b> and Evo will jump.", go:"Let's go!", phr:"phrases" }
+    perfect:"Perfect!",great:"Excellent!", l1:"Listen and repeat", l1s:"Read the phrase and repeat it after the audio", l2:"Put the phrase in order", l2s:"Tap the words in the right order", l3:"Say it yourself", l3s:"Say the phrase in French without seeing it",
+    play:"Play", done:"Done", nlv:"Level", lvdone:"completed!", nextL:"Level", order:"Build the phrase in French:", orderS:"Put the syllables in order:", wrong:"Not quite.", wrongS:"Listen and try again.", rep:"Listen and repeat in French", startL:"3 levels", e1:"Great! Now put the phrases in order.", e2:"You can build them. Ready to say them without seeing them?", e3:"You master these phrases. Bravo!", tutoBack:"Continue", lvl3:"Level 3",  bravo:"Bravo!", made:"You made it!", again:"Play again", back:"Back to the guide", start:"Help Evo cross Paris", startP:"Evo runs across the rooftops of Paris. In front of each wall, <b>say the phrase in French</b> and Evo will jump.", go:"Let's go!", phr:"phrases" }
   : { help:"Dilo en francés para que Evo salte el muro", mic:"Dale clic para decirlo en francés", rec:"Te escucho… (toca para terminar)", wait:"Escuchando…", wall:"Muro", of:"de",
     ok:"¡Muy bien!", almost:"¡Casi!", almostS:"Escucha y vuelve a intentarlo.", no:"Evo no pudo saltar.", noS:"Inténtalo otra vez.", heard:"Entendimos", silent:"No te escuchamos.", silentS:"Habla un poco más fuerte, cerca del teléfono.",
     unclear:"No te entendimos.", unclearS:"Escucha el modelo y repite despacio.", skip:"Saltar con ayuda", first:"a la primera", help2:"con ayuda", practice:"con práctica",
-    perfect:"¡Perfecto!",great:"¡Excelente!", bravo:"¡Bravo!", made:"¡Llegaste!", again:"Jugar otra vez", back:"Volver a la guía", start:"Ayuda a Evo a cruzar París", startP:"Evo corre por los techos de París. Delante de cada muro, <b>di la frase en francés</b> y Evo saltará.", go:"¡Vamos!", phr:"frases" };
+    perfect:"¡Perfecto!",great:"¡Excelente!", l1:"Escucha y repite", l1s:"Lees la frase y la repites después del audio", l2:"Ordena la frase", l2s:"Toca las palabras en el orden correcto", l3:"Tradúcela tú", l3s:"Dices la frase en francés sin verla",
+    play:"Jugar", done:"Hecho", nlv:"Nivel", lvdone:"completado!", nextL:"Nivel", order:"Forma la frase en francés:", orderS:"Ordena las sílabas:", wrong:"Casi.", wrongS:"Escucha y vuelve a intentarlo.", rep:"Escucha y repite en francés", startL:"3 niveles", e1:"¡Muy bien! Ahora ordena las frases.", e2:"Ya sabes formarlas. ¿Te atreves a decirlas sin verlas?", e3:"Dominas estas frases. ¡Bravo!", tutoBack:"Continuar", lvl3:"Nivel 3",  bravo:"¡Bravo!", made:"¡Llegaste!", again:"Jugar otra vez", back:"Volver a la guía", start:"Ayuda a Evo a cruzar París", startP:"Evo corre por los techos de París. Delante de cada muro, <b>di la frase en francés</b> y Evo saltará.", go:"¡Vamos!", phr:"frases" };
 const $ = id => document.getElementById(id);
+// niveaux faits pour cette carte / page (0 à 3), gardés pour l'appli
+const LKEY = SET && SET.key ? SET.key : "demo";
+const lvDone = () => { try{ return (JSON.parse(localStorage.getItem("evoala-levels") || "{}") || {})[LKEY] || 0; }catch(e){ return 0; } };
+function saveLv(n){ try{ const B = JSON.parse(localStorage.getItem("evoala-levels") || "{}") || {}; if(!(B[LKEY] >= n)){ B[LKEY] = n; localStorage.setItem("evoala-levels", JSON.stringify(B)); } }catch(e){} }
+let LV = SET && SET.tuto ? 1 : Math.min(3, lvDone() + 1);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 
 /* ---------- Dessin de la scène ---------- */
@@ -261,24 +299,28 @@ function renderDots(){ $("dots").innerHTML = PH.map((_, i) => { const r = G.resu
 function showCard(){
   G.cardTok++;
   const p = PH[G.i]; G.tries = 0; G.hintUsed = false;
-  $("kick").textContent = `${T.wall} ${G.i + 1} ${T.of} ${PH.length}`; $("es").textContent = p.es;
-  $("help").innerHTML = T.help;
+  $("kick").textContent = `${T.wall} ${G.i + 1} ${T.of} ${PH.length} · ${T.nlv} ${LV}`;
+  $("card").className = "lvl" + LV;
+  if(LV === 1){ $("es").textContent = p.fr; $("sub").textContent = p.es; $("help").innerHTML = ""; }
+  else if(LV === 2){ const tk = tokens(p.fr); $("es").textContent = p.es; $("sub").textContent = ""; $("help").innerHTML = tk.syl ? T.orderS : T.order; buildOrder(tk.list); }
+  else { $("es").textContent = p.es; $("sub").textContent = ""; $("help").innerHTML = T.help; }
   $("fb").className = "fb"; $("skip").style.display = "none"; setMic("idle");
-  $("card").classList.remove("hide");
+  if(LV !== 2){ $("ans").innerHTML = ""; $("pool").innerHTML = ""; }
+  if(LV < 3) setTimeout(() => { if(G.state === "wall" && PH[G.i] === p) playModel(p); }, 500);   // l'audio se lance tout seul (niveaux 1 et 2)
   if(SET && SET.tuto && G.i === 0 && !G.coached){ G.coached = true; coach(); }
 }
 // tutoriel : au premier mur, on explique la carte, le micro, l'ampoule et le haut-parleur
 const COACH = EN ? [
   ["#dots", "Your walls", "At the top you see how many walls are left."],
-  ["#es", "The phrase", "Evo stops in front of each wall. To jump it, say this phrase in French."],
+  ["#es", "The phrase", "Evo stops in front of each wall and you hear the phrase. Read it and repeat it in French so he jumps."],
   ["#lis", "Listen", "Don't remember how it sounds? Tap the speaker to hear the model."],
-  ["#hintb", "Need help?", "The light bulb shows the phrase in French and its pronunciation."],
+  ["#hintb", "Need help?", "The light bulb shows how the phrase is pronounced."],
   ["#mic", "Your turn!", "Tap the microphone and say the phrase. Evo jumps if it sounds right."]]
  : [
   ["#dots", "Tus muros", "Arriba ves cuántos muros te quedan."],
-  ["#es", "La frase", "Evo se detiene delante de cada muro. Para saltarlo, di esta frase en francés."],
+  ["#es", "La frase", "Evo se detiene delante de cada muro y escuchas la frase. Léela y repítela en francés para que salte."],
   ["#lis", "Escucha", "¿No recuerdas cómo suena? Toca el altavoz para escuchar el modelo."],
-  ["#hintb", "¿Necesitas ayuda?", "La bombilla te muestra la frase en francés y su pronunciación."],
+  ["#hintb", "¿Necesitas ayuda?", "La bombilla te muestra cómo se pronuncia la frase."],
   ["#mic", "¡Tu turno!", "Toca el micrófono y di la frase. Evo saltará si se entiende bien."]];
 function coach(){
   let k = 0;
@@ -298,9 +340,10 @@ function coach(){
 }
 function hideCard(){ $("card").classList.add("hide"); }
 function setMic(m){ G.thinking = m === "wait"; const b = $("mic"); b.className = "mic" + (m === "rec" ? " rec" : m === "wait" ? " wait" : ""); b.disabled = m === "wait";
-  const lab = $("miclab"); lab.textContent = m === "rec" ? T.rec : m === "wait" ? T.wait : T.mic;
+  const lab = $("miclab"); lab.textContent = m === "rec" ? T.rec : m === "wait" ? T.wait : (LV === 1 ? T.rep : T.mic);
   lab.style.color = m === "rec" ? "#C2255C" : "#5940BF"; }
-$("hintb").onclick = () => { const p = PH[G.i]; if(!p || G.state !== "wall") return; G.hintUsed = true; $("help").innerHTML = `<span class="hint">${esc(p.fr)}${p.pr ? " · " + esc(p.pr) : ""}</span>`; };
+$("hintb").onclick = () => { const p = PH[G.i]; if(!p || G.state !== "wall") return; G.hintUsed = true;
+  $("help").innerHTML = `<span class="hint">${LV === 1 ? esc(p.pr || p.fr) : esc(p.fr) + (p.pr ? " · " + esc(p.pr) : "")}</span>`; };
 $("lis").onclick = () => { const p = PH[G.i]; if(p) playModel(p); };
 $("skip").onclick = () => win(true);
 
@@ -310,8 +353,8 @@ function win(help){
   G.results[G.i] = { fr: p.fr, kind, help: kind === "skip" || kind === "hint", first: kind === "first" };
   try{ const k = "evoala-practiced", a = JSON.parse(localStorage.getItem(k) || "[]"); if(!a.includes(p.fr)){ a.push(p.fr); localStorage.setItem(k, JSON.stringify(a)); } }catch(e){}   // pratiquée, quelle que soit la note
   if(!help){ try{ const k = "evoala-said", a = JSON.parse(localStorage.getItem(k) || "[]"); if(!a.includes(p.fr)){ a.push(p.fr); localStorage.setItem(k, JSON.stringify(a)); } }catch(e){} }
-  if(G.results[G.i].first) G.stars++; $("stars").textContent = G.stars ? "★ " + G.stars : "";
-  const n = ++G.cardTok; $("mic").disabled = true;
+
+  const n = ++G.cardTok; $("mic").disabled = true; ORDER = null;
   setTimeout(() => { if(G.cardTok === n && G.state !== "wall") hideCard(); }, help ? 300 : 1500);   // le message vert reste pendant le saut
   burst(); sfx("jump"); G.state = "jump"; G.jumpT = 0;
 }
@@ -321,7 +364,64 @@ function fail(said, s, why){
   fb.innerHTML = why === "silent" ? `<b>${T.silent}</b> ${T.silentS}`
     : why === "unclear" ? `<b>${T.unclear}</b> ${T.unclearS}`
     : (s >= 0.55 ? `<b>${T.almost}</b> ${T.almostS}` : `<b>${T.no}</b> ${T.noS}`) + (said ? `<small>${T.heard}: «${esc(said)}»</small>` : "");
-  if(G.tries >= 3){ $("skip").style.display = "block"; $("help").innerHTML = `<span class="hint">${esc(PH[G.i].fr)}${PH[G.i].pr ? " · " + esc(PH[G.i].pr) : ""}</span>`; }
+  if(G.tries >= 3){ $("skip").style.display = "block"; if(LV !== 2) $("help").innerHTML = `<span class="hint">${esc(PH[G.i].fr)}${PH[G.i].pr ? " · " + esc(PH[G.i].pr) : ""}</span>`; }
+}
+
+/* ---------- Niveau 2 : remettre les mots (ou les syllabes) dans l'ordre ---------- */
+function syll(w){
+  const VW = "aeiouyàâäéèêëîïôöùûüœæ", isV = c => VW.includes(c.toLowerCase());
+  const KEEP = ["bl","br","cl","cr","dr","fl","fr","gl","gr","pl","pr","tr","vr","ch","ph","th","gn","qu","gu"];
+  let gs = []; for(let j = 0; j < w.length;){ if(isV(w[j])){ let k = j; while(k < w.length && isV(w[k])) k++; gs.push([j, k]); j = k; } else j++; }
+  const last = gs[gs.length - 1];
+  if(gs.length > 1 && w.slice(last[0], last[1]).toLowerCase() === "e" && /^(s|nt)?[.!?,]*$/i.test(w.slice(last[1]))) gs = gs.slice(0, -1);   // « e » muet final
+  if(gs.length < 2) return [w];
+  const cuts = [];
+  for(let g = 0; g < gs.length - 1; g++){
+    const a = gs[g][1], b = gs[g + 1][0], c = w.slice(a, b).toLowerCase(), n = b - a;
+    cuts.push(n <= 1 ? a : n === 2 ? (KEEP.includes(c) ? a : a + 1) : (KEEP.includes(c.slice(-2)) ? b - 2 : b - 1));
+  }
+  const out = []; let p = 0; for(const c of cuts){ if(c > p){ out.push(w.slice(p, c)); p = c; } } out.push(w.slice(p));
+  return out.filter(Boolean);
+}
+function tokens(fr){
+  const words = fr.trim().split(/\s+/);
+  if(words.length > 1) return { list: words, syl: false };
+  let sy = syll(words[0]);
+  if(sy.length < 2){ const w = words[0], h = Math.ceil(w.length / 2); sy = w.length > 1 ? [w.slice(0, h), w.slice(h)] : [w]; }
+  return { list: sy, syl: true };
+}
+let ORDER = null;
+function buildOrder(list){
+  let mix = list.map((t, i) => ({ t, i }));
+  for(let k = 0; k < 8; k++){ mix = mix.map(x => [Math.random(), x]).sort((a, b) => a[0] - b[0]).map(x => x[1]); if(list.length < 2 || mix.map(x => x.t).join("|") !== list.join("|")) break; }
+  ORDER = { list, placed: [] };
+  $("ans").className = "ans"; $("ans").innerHTML = "";
+  $("pool").innerHTML = mix.map((x, k) => `<button class="tok" data-k="${k}" data-t="${esc(x.t)}">${esc(x.t)}</button>`).join("");
+}
+$("pool").onclick = e => {
+  const b = e.target.closest(".tok"); if(!b || b.classList.contains("gone") || G.state !== "wall" || !ORDER) return;
+  b.classList.add("gone"); ORDER.placed.push(b.dataset.k);
+  const c = document.createElement("button"); c.className = "tok"; c.dataset.k = b.dataset.k; c.textContent = b.dataset.t; $("ans").appendChild(c);
+  if(ORDER.placed.length === ORDER.list.length) setTimeout(checkOrder, 250);   // vérification automatique dès que tout est placé
+};
+$("ans").onclick = e => {
+  const c = e.target.closest(".tok"); if(!c || G.state !== "wall" || !ORDER || $("ans").classList.contains("ok")) return;
+  ORDER.placed = ORDER.placed.filter(k => k !== c.dataset.k); c.remove();
+  const b = $("pool").querySelector(`.tok[data-k="${c.dataset.k}"]`); if(b) b.classList.remove("gone");
+};
+function checkOrder(){
+  const got = [...$("ans").querySelectorAll(".tok")].map(c => c.textContent);
+  G.tries++;
+  if(got.join("|") === ORDER.list.join("|")){
+    $("ans").classList.add("ok"); G.happy = G.t + 2.6;
+    const fb = $("fb"); fb.className = "fb ok"; fb.innerHTML = `<b>${T.ok} 🎉</b>`;
+    playModel(PH[G.i]); setTimeout(() => win(false), 650);
+  } else {
+    $("ans").classList.add("bad"); G.state = "fail"; G.failT = 0; G.wallShake = 1; sfx("bump");
+    const fb = $("fb"); fb.className = "fb mid"; fb.innerHTML = `<b>${T.wrong}</b> ${T.wrongS}`;
+    if(G.tries >= 3){ $("skip").style.display = "block"; $("help").innerHTML = `<span class="hint">${esc(ORDER.list.join(" "))}</span>`; }
+    setTimeout(() => { $("ans").className = "ans"; $("ans").innerHTML = ""; ORDER.placed = []; $("pool").querySelectorAll(".tok").forEach(b => b.classList.remove("gone")); }, 900);
+  }
 }
 
 /* ---------- Sons ---------- */
@@ -331,15 +431,17 @@ function ac(){ actx ??= new (window.AudioContext || window.webkitAudioContext)()
 // bruitages (fichiers créés pour Evoala, libres de droits) joués avec <audio> : ils marchent aussi en mode silencieux
 const SFX = { jump: new Audio("snd/jump.wav"), bump: new Audio("snd/bump.wav"), win: new Audio("snd/win.wav") };
 SFX.jump.volume = .7; SFX.bump.volume = .6;
-function unlockSfx(){ Object.values(SFX).forEach(a => { a.muted = true; a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; }); }); }
+function unlockSfx(){ [...Object.values(SFX), MODEL].forEach(a => { a.muted = true; a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; }); }); }
 function sfx(kind){ const a = SFX[kind]; if(!a) return; try{ a.currentTime = 0; a.play().catch(() => {}); }catch(e){} }
 // lecteur <audio> (et non Web Audio) : sur iPhone en mode silencieux, Web Audio est coupé mais pas <audio>
 const urls = {};
+const MODEL = new Audio();     // un seul lecteur, débloqué au premier toucher : l'audio peut ensuite se lancer tout seul
+MODEL.onended = () => playing = null;
 async function playModel(p){
   const [f, id] = p.audio;
   if(!urls[id]){ const b = await (bundles[f] ??= fetch(f).then(r => r.json())); const bin = Uint8Array.from(atob(b[id]), c => c.charCodeAt(0)); urls[id] = URL.createObjectURL(new Blob([bin], { type: "audio/mpeg" })); }
-  if(playing) try{ playing.pause(); }catch(e){}
-  playing = new Audio(urls[id]); playing.onended = () => playing = null; playing.play().catch(() => {});
+  try{ MODEL.pause(); }catch(e){}
+  MODEL.src = urls[id]; playing = MODEL; MODEL.play().catch(() => {});
 }
 
 /* ---------- Micro + reconnaissance (serveur Cloudflare, Whisper) ---------- */
@@ -393,24 +495,36 @@ async function check(){
 }
 
 /* ---------- Début / fin ---------- */
+function cirsHTML(done){ let h = ""; for(let n = 1; n <= 3; n++){ h += `<span class="cir ${n <= done ? "d" : n === done + 1 ? "n" : "t"}">${n}</span>`; if(n < 3) h += `<i class="${n <= done ? "d" : ""}"></i>`; } return h; }
 function endGame(){
-  // note bienveillante : réussir après quelques essais compte presque autant que du premier coup
-  const pts = { first: 1, practice: .75, hint: .5, skip: .25 };
-  const avg = G.results.reduce((a, r) => a + (pts[r.kind] ?? .5), 0) / Math.max(1, G.results.length);
-  const stars = avg >= .85 ? 3 : avg >= .6 ? 2 : 1;
-  $("endT").textContent = stars === 3 ? (G.results.every(r => r.first) ? T.perfect : T.great) : stars >= 2 ? T.bravo : T.made;
-  if(SET && SET.key){ try{ const B = JSON.parse(localStorage.getItem("evoala-stars") || "{}"); if(!(B[SET.key] >= stars)){ B[SET.key] = stars; localStorage.setItem("evoala-stars", JSON.stringify(B)); } }catch(e){} }   // meilleure note gardée pour l'appli
-  document.querySelector("#end img").src = stars >= 2 ? "img/ui/evo-happy.png" : "img/ui/evo.png";
-  $("endS").textContent = "★".repeat(stars) + "☆".repeat(3 - stars);
-  $("endL").innerHTML = G.results.map((r, i) => `<li><b>${esc(r.fr)}</b><span>${r.kind === "first" ? T.first : r.kind === "practice" ? T.practice : T.help2}</span></li>`).join("");
+  saveLv(LV);
+  const done = Math.max(lvDone(), LV);
+  $("endT").textContent = `${T.nlv} ${LV} ${T.lvdone}`.replace(/^/, EN ? "" : "¡");
+  $("endC").innerHTML = cirsHTML(done);
+  $("endP").textContent = T["e" + LV];
+  document.querySelector("#end img").src = "img/ui/evo-happy.png";
+  const nx = $("nextLvl");
+  if(SET && SET.tuto){ nx.textContent = T.tutoBack; nx.onclick = () => location.href = backUrl; $("back2").style.display = "none"; }
+  else if(LV < 3){ nx.textContent = `${T.nextL} ${LV + 1} →`; nx.onclick = () => { LV = LV + 1; $("end").hidden = true; unlockSfx(); newGame(); }; $("back2").style.display = ""; }
+  else { nx.textContent = T.back; nx.onclick = () => location.href = backUrl; $("back2").textContent = T.again; $("back2").href = "#"; $("back2").onclick = e => { e.preventDefault(); $("end").hidden = true; renderLevels(); $("start").hidden = false; }; }
   $("end").hidden = false;
 }
+// écran de départ : les 3 niveaux (fait = vert, prochain = violet, verrouillé)
+function renderLevels(){
+  const done = lvDone();
+  const LOCK = '<svg class="lk" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  $("lvls").innerHTML = [1, 2, 3].map(n => {
+    const st = n <= done ? "done" : n === done + 1 ? "next" : "lock";
+    return `<button class="lv ${st}" data-lv="${n}"${st === "lock" ? " disabled" : ""}><span class="cir ${st === "done" ? "d" : st === "next" ? "n" : "t"}">${n}</span><span class="tx"><b>${T["l" + n]}</b><small>${T["l" + n + "s"]}</small></span>${st === "done" ? `<span class="done">${T.done}</span>` : st === "next" ? `<span class="go2">${T.play}</span>` : LOCK}</button>`;
+  }).join("");
+}
+$("lvls").onclick = e => { const b = e.target.closest(".lv"); if(!b || b.disabled) return; LV = +b.dataset.lv; ac(); unlockSfx(); $("start").hidden = true; newGame(); };
 $("go").onclick = () => { ac(); unlockSfx(); $("start").hidden = true; newGame(); };
-$("again").onclick = () => { unlockSfx(); $("end").hidden = true; newGame(); };
 const backUrl = SET && SET.backUrl ? SET.backUrl : SET && SET.back ? "/#" + SET.back : "/";
-document.querySelector(".hud .back").href = backUrl; $("back2").href = backUrl; $("back2").textContent = T.back; $("again").textContent = T.again;
-document.querySelector("#start h1").textContent = T.start; document.querySelector("#start p").innerHTML = T.startP; $("go").textContent = T.go;
-document.querySelector("#start .note").textContent = SET ? `${SET.title} · ${PH.length} ${T.phr}` : "Prototipo · 5 muros · frases de Esenciales";
+document.querySelector(".hud .back").href = backUrl; $("back2").href = backUrl; $("back2").textContent = T.back; $("back1").href = backUrl; $("back1").textContent = T.back;
+// départ : avec les niveaux (sauf dans le tutoriel, qui joue directement le niveau 1)
+if(SET && SET.tuto){ document.querySelector("#start h1").textContent = T.start; $("startP").innerHTML = T.startP.replace(EN ? "say the phrase in French" : "di la frase en francés", EN ? "read the phrase and repeat it" : "lee la frase y repítela"); $("go").textContent = T.go; $("back1").style.display = "none"; }
+else { document.querySelector("#start h1").textContent = SET ? SET.title : T.start; $("startP").textContent = `${T.startL} · ${PH.length} ${T.phr}`; $("go").style.display = "none"; renderLevels(); }
 $("skip").textContent = T.skip; $("miclab").textContent = T.mic;
 newGame(); G.state = "intro"; resize(); requestAnimationFrame(loop);
 </script>
