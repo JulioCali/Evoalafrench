@@ -77,6 +77,79 @@ const ICON = {
 };
 
 let C, UI, player;
+
+/* ---------- Vente (Hotmart) ----------
+   CHECKOUT : le lien de paiement Hotmart du guide (pay.hotmart.com/…). Vide = bouton « Muy pronto ».
+   L'acheteur se connecte ensuite avec le même e-mail : le serveur (worker.js) lui envoie alors tout le contenu. */
+const CHECKOUT = "";
+const LK = {
+  es:{title:"Desbloquea la guía completa",page:n => `Esta página tiene <b>${n} frases</b> con audio y pronunciación.`,
+      all:n => `Con la guía completa: <b>${n} frases</b> en las 8 categorías, el Bonus y la Guía de Paris.`,
+      buy:"Comprar la guía",soon:"La compra estará disponible muy pronto.",have:"¿Ya la compraste?",login:"Inicia sesión con el correo de tu compra",
+      orFree:"o crea tu cuenta gratis",same:e => `Paga con el mismo correo (<b>${e}</b>): tu cuenta se desbloquea sola.`,
+      done:"Ya compré",check:"Verificando…",notYet:"Todavía no vemos tu compra. Puede tardar unos minutos. Si pagaste con otro correo, inicia sesión con ese correo.",
+      unlocked:"¡Guía desbloqueada! Buen viaje 🇫🇷",verT:"Confirma tu correo",verS:e => `Te enviamos un enlace a <b>${e}</b>. Ábrelo y luego toca « Ya confirmé ».`,
+      verDone:"Ya confirmé",verAgain:"Reenviar el correo",verSent:"Correo enviado. Revisa también la carpeta de spam.",verNo:"Tu correo aún no está confirmado.",
+      paris:n => `La Guía de Paris tiene <b>${n} lugares</b> con fotos, metro y mapa.`,signupSent:"Te enviamos un correo para confirmar tu dirección."},
+  en:{title:"Unlock the full guide",page:n => `This page has <b>${n} phrases</b> with audio and pronunciation.`,
+      all:n => `With the full guide: <b>${n} phrases</b> in all 8 categories, plus the Bonus and the Paris Guide.`,
+      buy:"Buy the guide",soon:"Purchase will be available very soon.",have:"Already bought it?",login:"Log in with the email you used to pay",
+      orFree:"or create your free account",same:e => `Pay with the same email (<b>${e}</b>): your account unlocks automatically.`,
+      done:"I bought it",check:"Checking…",notYet:"We don't see your purchase yet. It can take a few minutes. If you paid with another email, log in with that one.",
+      unlocked:"Guide unlocked! Bon voyage 🇫🇷",verT:"Confirm your email",verS:e => `We sent a link to <b>${e}</b>. Open it, then tap “I confirmed”.`,
+      verDone:"I confirmed",verAgain:"Resend the email",verSent:"Email sent. Check your spam folder too.",verNo:"Your email isn't confirmed yet.",
+      paris:n => `The Paris Guide has <b>${n} places</b> with photos, metro and map.`,signupSent:"We sent you an email to confirm your address."}
+};
+const lk = k => LK[LANG][k];
+const LOCK = '<svg class="lock" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+const isPro = () => !!(C && C._acc && C._acc.pro);
+const viewsOf = tab => tab.subs || [tab];
+const tabLocked = tab => viewsOf(tab).every(v => v.locked);
+// nombre de phrases cachées (pages verrouillées) : dans une section, ou dans tout le guide
+function lockedN(si){
+  let n = 0;
+  [...GRID, "Bonus"].forEach((name, i) => { if(si != null && i !== si) return; sec(name)?.tabs.forEach(tb => viewsOf(tb).forEach(v => { if(v.locked) n += v.n || 0; })); });
+  return n;
+}
+const totalN = si => (C ? [...index().values()].filter(x => si == null || x.si === si).length : 0) + (C ? lockedN(si) : 0);
+// le panneau « Desbloquea la guía completa » (pages verrouillées, Guía de Paris)
+function lockPanel(intro, labels){
+  const A = window.EvoAuth, u = A && A.user, acc = (C && C._acc) || {};
+  const mail = u && u.email ? esc(u.email) : "";
+  const buy = `<button class="bigbtn lbuy" data-buy>${LOCK}${lk("buy")}</button>`;
+  let foot;
+  if(!u) foot = `<p class="lhave">${lk("have")} <button data-lgo="entrar">${lk("login")}</button></p>
+      ${AUTH_ON ? `<p class="lfree"><button data-lgo="cuenta">${lk("orFree")}</button></p>` : ""}`;
+  else if(acc.user && !acc.verified && !(u.emailVerified)) foot = `<div class="lver"><b>${lk("verT")}</b><p>${lk("verS")(mail)}</p>
+      <div class="lrow"><button class="lbtn on" data-lverified>${lk("verDone")}</button><button class="lbtn" data-lresend>${lk("verAgain")}</button></div></div>`;
+  else foot = `<p class="lsame">${lk("same")(mail)}</p><button class="lbtn wide" data-lcheck>${lk("done")}</button>`;
+  return `<section class="lockp"><span class="lico">${LOCK}</span><h2>${lk("title")}</h2>
+    <p>${intro}</p>
+    ${labels && labels.length ? `<div class="lchips">${labels.map(x => `<span>${esc(x)}</span>`).join("")}</div>` : ""}
+    <p class="lall">${lk("all")(totalN())}</p>
+    ${buy}${foot}</section>`;
+}
+// le serveur renvoie le contenu complet ou gratuit selon le compte : on le recharge quand le compte change
+let lastAcc = "";
+function reloadContent(force){
+  delete contents[LANG];
+  return loadContent(LANG).then(c => {
+    const key = JSON.stringify(c._acc || {}), changed = key !== lastAcc;
+    lastAcc = key;
+    if(!changed && !force) return c;
+    const was = isPro(); C = c;
+    Object.keys(bundles).forEach(k => delete bundles[k]);
+    const y = scrollY; route(); scrollTo(0, y);
+    if(!was && isPro()) toast(lk("unlocked"));
+    return c;
+  }).catch(() => {});
+}
+async function checkPurchase(btn){
+  if(btn){ btn.disabled = true; btn.textContent = lk("check"); }
+  try{ await window.EvoAuth?.refresh(); }catch(e){}
+  const c = await reloadContent(true);
+  if(c && !(c._acc && c._acc.pro)) toast(c._acc && c._acc.user && !c._acc.verified ? lk("verNo") : lk("notYet"));
+}
 const app = document.getElementById("app");
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const slug = n => n.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ /g,"-").toLowerCase();
@@ -149,7 +222,9 @@ function account(mode){
   </form>`;
   const form = app.querySelector(".aform"), err = app.querySelector(".aerr"), btn = form.querySelector('[type="submit"]');
   const busy = (on, b = btn) => { b.disabled = on; b.classList.toggle("busy", on); };
-  const done = () => { onboarded.set(); toast(a("welcome")); location.hash = ""; route(); };
+  const done = () => { onboarded.set(); toast(up && !(window.EvoAuth.user && window.EvoAuth.user.emailVerified) ? lk("signupSent") : a("welcome"));
+    let back = ""; try{ back = sessionStorage.getItem("evoala-after") || ""; sessionStorage.removeItem("evoala-after"); }catch(e){}
+    location.hash = back; if(!back) route(); };
   const fail = e => { err.textContent = authErr(e); };
   const authOk = () => window.EvoAuth && !window.EvoAuth.disabled;
   form.onsubmit = async ev => {
@@ -230,7 +305,7 @@ const HUB_LOOK = [["a1","A1","#0F7C72","#E3F4F1"],["delfa1","A1","#C2410C","#FDE
 function hub(){
   // après une première utilisation : barre de progression (phrases écoutées) au lieu des étiquettes
   const started = seen.get("evoala-heard").length > 0 || seen.get("evoala-seen").length > 0 || seen.get("evoala-practiced").length > 0;
-  const PG = C ? progress([...index().values()]) : { nh: 0, np: 0, tot: 757, raw: 0, pct: 0 };
+  const PG = C ? progress([...index().values()], totalN()) : { nh: 0, np: 0, tot: 757, raw: 0, pct: 0 };
   const H = HUB[LANG], arrow = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   const card = (g, i) => { const [img, lvl, fg, bg] = HUB_LOOK[i];
     return `<div class="gcard" style="--fg:${fg};--bg:${bg}"><div class="gcover"><img src="img/hub/${img}.webp" alt=""><span>${H.level} ${lvl}</span></div>
@@ -285,11 +360,11 @@ const seen = {
   add(k, v){ const a = this.get(k); if(a.includes(v)) return; a.push(v); try{ localStorage.setItem(k, JSON.stringify(a)); }catch(e){} syncProgress(); }
 };
 // progression : moitié écoute, moitié pratique (le jeu, quelle que soit la note)
-function progress(entries){
-  const h = new Set(seen.get("evoala-heard")), pr = new Set(seen.get("evoala-practiced")), tot = entries.length || 1;
+function progress(entries, all){
+  const h = new Set(seen.get("evoala-heard")), pr = new Set(seen.get("evoala-practiced")), n = all || entries.length, tot = n || 1;
   const nh = entries.filter(x => h.has(x.p.fr)).length, np = entries.filter(x => pr.has(x.p.fr)).length;
   const raw = (nh + np) / (2 * tot) * 100;
-  return { nh, np, tot: entries.length, raw, pct: raw > 0 ? Math.max(1, Math.round(raw)) : 0 };
+  return { nh, np, tot: n, raw, pct: raw > 0 ? Math.max(1, Math.round(raw)) : 0 };
 }
 let syncT;
 function syncProgress(){ clearTimeout(syncT); syncT = setTimeout(() => window.EvoAuth?.save({ seen: seen.get("evoala-seen"), heard: seen.get("evoala-heard"), practiced: seen.get("evoala-practiced"), levels: levelsDone() }), 3000); }
@@ -305,26 +380,27 @@ function home(){
   const last = lastInfo(), pages = allPages(), seenP = new Set(seen.get("evoala-seen")), heard = new Set(seen.get("evoala-heard"));
   const idx = [...index().values()];
   const nSeen = pages.filter(h => seenP.has(h)).length, nHeard = idx.filter(x => heard.has(x.p.fr)).length;
-  const perCat = si => { const own = idx.filter(x => x.si === si), g = progress(own); return [g.pct, own.length, g.raw]; };
-  const PG = progress(idx);
+  const perCat = si => { const own = idx.filter(x => x.si === si), g = progress(own, totalN(si)); return [g.pct, g.tot, g.raw]; };
+  const PG = progress(idx, totalN());
+  const secLocked = si => (secOf(si)?.tabs || []).every(tabLocked);
   const bar = (icon, label, n, tot, cls) => `<div class="gbar ${cls}"><div class="gbl">${icon}<span>${label}</span><em><b>${n}</b> / ${tot}</em></div><div class="gtrack"><i style="width:${n ? Math.max(3, n * 100 / tot) : 0}%"></i></div></div>`;
   const arrow = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   const tile = (e, i) => { const [tt, ts] = homeTitle(e, i), [n, tot] = perCat(i);
-    return `<button class="gtile" data-go="s${i}t0">${doneOf(i) ? doneChip(doneOf(i), "tile") : ""}<span class="gico">${mi("t-" + GRID[i])}</span><b>${esc(tt)}</b><small>${esc(ts)}</small>
+    return `<button class="gtile${secLocked(i) ? " locked" : ""}" data-go="s${i}t0">${secLocked(i) ? `<span class="tlock">${LOCK}</span>` : ""}${doneOf(i) ? doneChip(doneOf(i), "tile") : ""}<span class="gico">${mi("t-" + GRID[i])}</span><b>${esc(tt)}</b><small>${esc(ts)}</small>
       ${n ? `<span class="gmini"><i style="width:${perCat(i)[2]}%"></i></span><em>${n}% · ${tot} ${t("nPh")}</em>` : `<em>${tot} ${t("nPh")}</em>`}</button>`; };
   const [bn, btot] = perCat(8);
   app.innerHTML = `${topbar("ghub")}
   <div class="gtitle"><small>${MINIFLAG}${t("gKicker")}</small><b>${t("gTitle")}</b></div>
   <section class="gprog"><div class="gpt gptot"><span>${t("prog")}<small>${t("progHow")}</small></span>${doneOf() ? doneChip(doneOf(), "big") : ""}<b>${PG.pct}%</b></div>
     <div class="gtrack big"><i style="width:${PG.raw ? Math.max(2, PG.raw) : 0}%"></i></div>
-    ${bar(ICON.spk, t("pHeard"), PG.nh, idx.length, "ph")}
-    ${bar('<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>', t("pPract"), PG.np, idx.length, "pp")}
+    ${bar(ICON.spk, t("pHeard"), PG.nh, PG.tot, "ph")}
+    ${bar('<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>', t("pPract"), PG.np, PG.tot, "pp")}
     <button class="gcont" data-go="${last ? last.hash : "s0t0"}"><span><small>${last ? t("cont") : t("startAt")}</small><b>${esc(last ? `${last.cat} › ${last.label}` : tileLabel(GRID[0]))}</b></span>${arrow}</button>
   </section>
   <div class="gch">${t("choose")}</div>
   <div class="gtiles">${HOME.map((e, i) => tile(e, i)).join("")}</div>
-  <button class="gwide bonus" data-go="s8t0"><span class="gico">${mi("t-bonus")}</span><span class="gw"><b>${t("bonusT")}${doneOf(8) ? " " + doneChip(doneOf(8), "in") : ""}</b><small>${t("bonusS")} · ${bn ? `${bn}% · ` : ""}${btot} ${t("nPh")}</small></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
-  <button class="gwide" data-go="p1"><span class="gico pimg"><img src="${UI['h:Guía de Paris']}" alt=""></span><span class="gw"><b>${t("paris")}</b><small>${t("parisSub")}</small></span><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+  <button class="gwide bonus" data-go="s8t0"><span class="gico">${mi("t-bonus")}</span><span class="gw"><b>${t("bonusT")}${doneOf(8) ? " " + doneChip(doneOf(8), "in") : ""}</b><small>${t("bonusS")} · ${bn ? `${bn}% · ` : ""}${btot} ${t("nPh")}</small></span>${secLocked(8) ? `<span class="wlock">${LOCK}</span>` : ""}<svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+  <button class="gwide" data-go="p1"><span class="gico pimg"><img src="${UI['h:Guía de Paris']}" alt=""></span><span class="gw"><b>${t("paris")}</b><small>${t("parisSub")}</small></span>${C.parisN && !C.paris.length ? `<span class="wlock">${LOCK}</span>` : ""}<svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
   <div class="gend"></div>`;
 }
 
@@ -368,7 +444,7 @@ function hintHTML(view){
     <p><b>${t("hintB")}</b>${t("hint")}</p><button data-hint>${t("ok")}</button></div>`;
 }
 const secOf = si => si === 8 ? sec("Bonus") : sec(GRID[si]);
-const hasPh = v => v.groups.some(g => g.phrases.length);
+const hasPh = v => !!v.locked || v.groups.some(g => g.phrases.length);
 const pageHash = (si, ti, sub) => `s${si}t${ti}${sub ? "p" + sub : ""}`;
 // page suivante dans l'ordre du guide : sous-page, puis onglet, puis catégorie (on saute les pages vides)
 function nextPage(si, ti, sub){
@@ -411,7 +487,7 @@ function phrases(si, ti, sub=0){
   if(tab.subs && !tab.subs[sub]) sub = 0;
   const view = tab.subs ? tab.subs[sub] : tab;
   const nx = nextPage(si, ti, sub);
-  if(hasPh(view)) seen.add("evoala-seen", pageHash(si, ti, tab.subs ? sub : 0));
+  if(hasPh(view) && !view.locked) seen.add("evoala-seen", pageHash(si, ti, tab.subs ? sub : 0));
   PVIEW = { view, title: view.name || tab.label || tab.name, back: pageHash(si, ti, tab.subs ? sub : 0) };
   app.innerHTML = `${topbar("guide").replace('class="top"','class="top flow"')}
     <label class="search psearch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" placeholder="${t("search")}" autocomplete="off" aria-label="${t("searchL")}"></label>
@@ -419,11 +495,11 @@ function phrases(si, ti, sub=0){
       ${catsBar([...GRID, "Bonus"], si, i => `s${i}t0`, true)}`}
     <div id="results"></div>
     <div id="menu">
-    <div class="ptabs">${s.tabs.map((tb,i)=>`<button class="tab${i===ti?' on':''}" data-go="s${si}t${i}">${esc(tb.label || tb.name)}</button>`).join("")}</div>
-    ${tab.subs?`<div class="psubs">${tab.subs.map((x,i)=>`<button class="${i===sub?'on':''}" data-go="${pageHash(si,ti,i)}">${esc(x.name)}</button>`).join("")}</div>`:""}
+    <div class="ptabs">${s.tabs.map((tb,i)=>`<button class="tab${i===ti?' on':''}" data-go="s${si}t${i}">${tabLocked(tb) ? LOCK : ""}${esc(tb.label || tb.name)}</button>`).join("")}</div>
+    ${tab.subs?`<div class="psubs">${tab.subs.map((x,i)=>`<button class="${i===sub?'on':''}" data-go="${pageHash(si,ti,i)}">${x.locked ? LOCK : ""}${esc(x.name)}</button>`).join("")}</div>`:""}
     ${view.intro?`<p class="intro">${esc(view.intro)}</p>`:""}
     ${hintHTML(view)}
-    ${!hasPh(view) ? `<div class="empty">${t("soon")}</div>` : ""}
+    ${view.locked ? lockPanel(lk("page")(view.n), view.groups.map(g => g.label).filter(Boolean)) : !hasPh(view) ? `<div class="empty">${t("soon")}</div>` : ""}
     ${view.groups.map((g, gi) => g.phrases.length ? `<div class="card${g.cols===2?' cols2':''}" data-g="${gi}">${g.label?`<div class="label">${esc(g.label)}</div>`:""}${g.phrases.map(p => rowHTML(p)).join("")}<div class="pslot"></div></div>` : "").join("")}
     ${(view.tips||[]).map(tipHTML).join("")}
     <div class="ppage"></div>
@@ -467,6 +543,10 @@ function credits(){
 function paris(ci, page=0){
   if(ci === 0) return sobre();
   const cat = PARIS_CATS[ci];
+  if(C.parisN && !C.paris.length){
+    app.innerHTML = `${parisHead(ci)}${lockPanel(lk("paris")(Object.values(C.parisN).reduce((a, b) => a + b, 0)), PARIS_CATS.slice(1).map(tileLabel))}`;
+    return;
+  }
   const all = C.paris.filter(p => p.cat === cat);
   const pages = Math.max(1, Math.ceil(all.length / PER_PAGE));
   const list = all.slice(page*PER_PAGE, (page+1)*PER_PAGE);
@@ -776,6 +856,17 @@ app.addEventListener("click", e => {
   const go = e.target.closest("[data-go]");
   if(go?.hasAttribute("data-cat")){ try{ localStorage.setItem("evoala-cat","1"); }catch(_){} }
   if(go){ if(go.dataset.go || go.classList.contains("home") || go.hasAttribute("data-home")){ location.hash = go.dataset.go; if(!go.dataset.go) route(); } return; }
+  if(e.target.closest("[data-buy]")){
+    if(!CHECKOUT){ toast(lk("soon")); return; }
+    const u = window.EvoAuth && window.EvoAuth.user;
+    location.href = CHECKOUT + (u && u.email ? (CHECKOUT.includes("?") ? "&" : "?") + "email=" + encodeURIComponent(u.email) : "");
+    return;
+  }
+  const lg = e.target.closest("[data-lgo]");
+  if(lg){ try{ sessionStorage.setItem("evoala-after", location.hash.slice(1)); }catch(e2){} location.hash = lg.dataset.lgo; return; }
+  const lc = e.target.closest("[data-lcheck],[data-lverified]");
+  if(lc){ checkPurchase(lc); return; }
+  if(e.target.closest("[data-lresend]")){ window.EvoAuth?.verify().then(() => toast(lk("verSent"))).catch(() => toast(t("noLoad"))); return; }
   if(e.target.closest("[data-start]")){ onboarded.set(); location.hash = "cuenta"; return; }
   if(e.target.closest("[data-later]")){ onboarded.set(); location.hash = ""; route(); return; }
   if(e.target.closest("[data-aback]")){ if(history.length > 1) history.back(); else { location.hash = ""; } return; }
@@ -896,5 +987,6 @@ function setLang(l, fromAccount){
 document.documentElement.lang = LANG;
 Promise.all([loadContent(LANG), fetch("ui.json").then(r=>r.json())])
   .then(([c,u]) => { C = c; UI = u; route();
-    if(AUTH_ON){ const hook = () => window.EvoAuth ? window.EvoAuth.onChange(onAuth) : setTimeout(hook, 150); hook(); } })
+    lastAcc = JSON.stringify(c._acc || {});
+    if(AUTH_ON){ const hook = () => { if(!window.EvoAuth) return setTimeout(hook, 150); window.EvoAuth.onChange(u => { onAuth(u); reloadContent(); }); window.EvoAuth.onToken(() => reloadContent()); }; hook(); } })
   .catch(() => app.innerHTML = `<div class="empty">${t("noLoad")}</div>`);

@@ -593,3 +593,36 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .pbig.won{border-color:#1F8A70;box-shadow:0 6px 18px rgba(31,138,112,.15)}
 .schip{background:#E6F6EE;color:#14532D}
 .fpl .schip{color:#14532D}
+
+/* ---------- Pages verrouillées (guide à acheter) ---------- */
+svg.lock{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;margin-right:4px;flex:none}
+.ptabs .tab svg.lock{opacity:.7}
+.psubs button svg.lock{width:12px;height:12px}
+.gtile .tlock{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;background:var(--lavender-soft);color:var(--violet-dark);display:flex;align-items:center;justify-content:center}
+.gtile .tlock svg.lock{margin:0;width:13px;height:13px}
+.lockp{margin:14px 12px 8px;padding:22px 18px 20px;border-radius:var(--radius);background:linear-gradient(180deg,#F4F1FF 0%,#fff 70%);border:1.5px solid var(--card-border);text-align:center}
+.lockp .lico{display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:#fff;border:1.5px solid var(--lavender);color:var(--violet)}
+.lockp .lico svg.lock{width:24px;height:24px;margin:0}
+.lockp h2{margin:12px 0 6px;font-size:20px;font-weight:600;color:var(--ink)}
+.lockp p{margin:0 0 10px;font-size:14px;line-height:1.5;color:#4E4760}
+.lockp b{color:var(--violet-dark);font-weight:600}
+.lchips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:4px 0 14px}
+.lchips span{padding:4px 11px;border-radius:999px;background:var(--lavender-soft);color:#4A33B0;font-size:12px;font-weight:500}
+.lockp .lall{font-size:13px;color:var(--gray);margin-bottom:16px}
+.lockp .lbuy svg.lock{width:18px;height:18px;margin:0}
+.lhave,.lfree,.lsame{margin:14px 0 0 !important;font-size:13px !important}
+.lfree{margin-top:6px !important}
+.lhave button,.lfree button{color:var(--violet);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.lfree button{color:var(--gray);font-weight:500}
+.lbtn{min-height:44px;padding:0 16px;border-radius:12px;border:1.5px solid var(--violet);color:var(--violet-dark);font-size:14px;font-weight:600;background:#fff}
+.lbtn.on{background:var(--violet);color:#fff}
+.lbtn.wide{width:100%;margin-top:10px}
+.lbtn:disabled{opacity:.6}
+.lver{margin-top:16px;padding:14px;border-radius:14px;background:#FFF8E6;border:1.5px solid #F4DFA6;text-align:left}
+.lver b{display:block;color:#7A5200 !important;margin-bottom:4px}
+.lver p{font-size:13px !important;margin-bottom:10px !important}
+.lver p b{display:inline;color:#7A5200 !important}
+.lrow{display:flex;gap:8px;flex-wrap:wrap}
+.lrow .lbtn{flex:1}
+.gwide .wlock{width:26px;height:26px;border-radius:50%;background:var(--lavender-soft);color:var(--violet-dark);display:flex;align-items:center;justify-content:center;flex:none;margin-right:2px}
+.gwide .wlock svg.lock{margin:0;width:13px;height:13px}
