@@ -464,7 +464,9 @@ function nextPage(si, ti, sub){
 }
 // rangée de catégories qui défile (Guía et Paris) : fixée en haut, flèches ‹ › quand il y en a d'autres hors de l'écran
 function catsBar(list, on, hash, isGuide){
-  return `<div class="catwrap atstart"><div class="cats">${list.map((g,i)=>`<button class="cat${i===on?' on':''}" data-go="${hash(i)}"${isGuide?' data-cat':''}>${mi("t-"+g)}<span>${tileLabel(g)}</span></button>`).join("")}</div>
+  // cadenas sur les catégories entièrement fermées (guide : toutes les pages verrouillées ; Paris : les lieux)
+  const shut = i => isGuide ? (secOf(i)?.tabs || []).every(tabLocked) : i > 0 && !!C.parisN && !C.paris.length;
+  return `<div class="catwrap atstart"><div class="cats">${list.map((g,i)=>`<button class="cat${i===on?' on':''}${shut(i)?' shut':''}" data-go="${hash(i)}"${isGuide?' data-cat':''}>${mi("t-"+g)}<span>${tileLabel(g)}</span>${shut(i) ? LOCK : ""}</button>`).join("")}</div>
     <button class="more l" data-scroll="-1" aria-label="${t("more")}"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
     <button class="more r" data-scroll="1" aria-label="${t("more")}"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button></div>`;
 }

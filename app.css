@@ -626,3 +626,5 @@ svg.lock{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;s
 .lrow .lbtn{flex:1}
 .gwide .wlock{width:26px;height:26px;border-radius:50%;background:var(--lavender-soft);color:var(--violet-dark);display:flex;align-items:center;justify-content:center;flex:none;margin-right:2px}
 .gwide .wlock svg.lock{margin:0;width:13px;height:13px}
+.cat.shut svg.lock{width:13px;height:13px;margin:0 0 0 -2px;color:#9A90B8}
+.cat.shut.on svg.lock{color:#fff;opacity:.85}
