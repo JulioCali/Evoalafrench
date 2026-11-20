@@ -16,8 +16,8 @@
 const PROJECT = "evoalafrench-db460";
 const FS = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents`;
 // pages gratuites : section / onglet / sous-page, comme les adresses de l'appli (#s0t0, #s4t0p0…)
-const FREE = new Set(["s0t0", "s4t0p0", "s6t0"]);
-const FREE_SND = new Set(["p2", "p15", "p24"]);
+const FREE = new Set(["s0t0", "s2t1", "s4t0p0", "s6t0"]);
+const FREE_SND = new Set(["p2", "p10", "p15", "p24"]);
 const GRANT = new Set(["PURCHASE_APPROVED", "PURCHASE_COMPLETE"]);
 const REVOKE = new Set(["PURCHASE_REFUNDED", "PURCHASE_CHARGEBACK"]);
 

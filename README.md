@@ -39,7 +39,7 @@ puis ouvrir http://localhost:8000. (Ouvrir `index.html` directement depuis le di
 ## Vente avec Hotmart : version gratuite et version complète
 
 Toutes les demandes passent par `worker.js`, qui envoie :
-- **à tout le monde** : les pages gratuites (Esenciales › Indispensables, Comida › El restaurante › Pedir, Imprevistos › Emergencias) et « Sobre París ». Les autres pages s'affichent avec un cadenas et le bouton « Comprar la guía ».
+- **à tout le monde** : les pages gratuites (Esenciales › Indispensables, Transporte › En el taxi, Comida › El restaurante › Pedir, Imprevistos › Emergencias) et « Sobre París ». Les autres pages s'affichent avec un cadenas et le bouton « Comprar la guía ».
 - **aux acheteurs** : tout le contenu et tous les audios.
 
 Pour changer les pages gratuites : `FREE` et `FREE_SND` en haut de `worker.js`.
