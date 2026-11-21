@@ -88,6 +88,11 @@
   .ans{display:none;margin-top:10px;min-height:58px;border-radius:16px;border:2px dashed #CFC8EA;background:#FBFAFF;padding:7px;flex-wrap:wrap;gap:8px;align-items:center;transition:background .2s,border-color .2s}
   .pool{display:none;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
   #card.lvl2 .ans,#card.lvl2 .pool{display:flex}
+  /* niveau 2 : on vérifie seulement quand la personne confirme (elle peut relire sa phrase avant) */
+  .okb{display:none;flex:1;height:56px;margin-right:12px;border-radius:16px;background:#1F8A70;color:#fff;font:600 17px Poppins,sans-serif;box-shadow:0 4px 0 #166B57;transition:opacity .2s,transform .1s}
+  .okb:disabled{opacity:.35;box-shadow:none}
+  .okb:not(:disabled):active{transform:translateY(2px);box-shadow:0 2px 0 #166B57}
+  #card.lvl2 .okb{display:block}
   .ans.ok{border:2px solid #1F8A70;background:#E6F6EE}.ans.bad{border-color:#E8590C;background:#FFF4E6;animation:shake .4s}
   @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
   .tok{height:46px;padding:0 16px;border-radius:12px;background:#fff;color:#1A1A1A;border:1.5px solid #DCD5FA;box-shadow:0 3px 0 #DCD5FA;font-size:17px;font-weight:500}
@@ -124,6 +129,7 @@
     <div class="ans" id="ans"></div>
     <div class="pool" id="pool"></div>
     <div class="row">
+      <button class="okb" id="okb" disabled>Confirmar</button>
       <button class="mic" id="mic" aria-label="Grabar"><i class="ring r1"></i><i class="ring r2"></i><span class="disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span></button>
       <span class="helpers">
       <button class="sq hintb" id="hintb" aria-label="Pista"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg></button>
@@ -880,8 +886,8 @@ const COACH = EN ? [
 // tutoriel du jeu : chaque explication une fois (avec un compte) ou à chaque visite (sans compte)
 const COACH_LV = EN ? [["#lvls", "3 levels", "Listen and repeat, put the phrase in order, then say it yourself. Each level opens when you finish the previous one."]]
   : [["#lvls", "3 niveles", "Escucha y repite, ordena la frase y, al final, dila tú solo. Cada nivel se abre al terminar el anterior."]];
-const COACH_2 = EN ? [["#pool", "Put it in order", "Tap the words in the right order to build the phrase. Tap a word again to send it back."]]
-  : [["#pool", "Ordena la frase", "Toca las palabras en el orden correcto para formar la frase. Si te equivocas, toca una palabra para devolverla."]];
+const COACH_2 = EN ? [["#pool", "Put it in order", "Tap the words in the right order, then tap “Confirm”. Tap a word again to send it back."]]
+  : [["#pool", "Ordena la frase", "Toca las palabras en el orden correcto y luego «Confirmar». Si te equivocas, toca una palabra para devolverla."]];
 const COACH_3 = EN ? [["#es", "Now without seeing it", "You only see the phrase in Spanish: say it in French."], ["#hintb", "Stuck?", "The light bulb shows you the French phrase."]]
   : [["#es", "Ahora sin verla", "Solo ves la frase en español: dila en francés."], ["#hintb", "¿Te bloqueas?", "La bombilla te muestra la frase en francés."]];
 function coachDue(id){
@@ -965,20 +971,23 @@ function buildOrder(list){
   let mix = list.map((t, i) => ({ t, i }));
   for(let k = 0; k < 8; k++){ mix = mix.map(x => [Math.random(), x]).sort((a, b) => a[0] - b[0]).map(x => x[1]); if(list.length < 2 || mix.map(x => x.t).join("|") !== list.join("|")) break; }
   ORDER = { list, placed: [] };
-  $("ans").className = "ans"; $("ans").innerHTML = "";
+  $("ans").className = "ans"; $("ans").innerHTML = ""; $("okb").disabled = true;
   $("pool").innerHTML = mix.map((x, k) => `<button class="tok" data-k="${k}" data-t="${esc(x.t)}">${esc(x.t)}</button>`).join("");
 }
 $("pool").onclick = e => {
   const b = e.target.closest(".tok"); if(!b || b.classList.contains("gone") || G.state !== "wall" || !ORDER) return;
   b.classList.add("gone"); ORDER.placed.push(b.dataset.k);
   const c = document.createElement("button"); c.className = "tok"; c.dataset.k = b.dataset.k; c.textContent = b.dataset.t; $("ans").appendChild(c);
-  if(ORDER.placed.length === ORDER.list.length) setTimeout(checkOrder, 250);   // vérification automatique dès que tout est placé
+  okState();   // le bouton « Confirmar » s'active quand tous les mots sont placés
 };
 $("ans").onclick = e => {
   const c = e.target.closest(".tok"); if(!c || G.state !== "wall" || !ORDER || $("ans").classList.contains("ok")) return;
-  ORDER.placed = ORDER.placed.filter(k => k !== c.dataset.k); c.remove();
+  ORDER.placed = ORDER.placed.filter(k => k !== c.dataset.k); c.remove(); okState();
   const b = $("pool").querySelector(`.tok[data-k="${c.dataset.k}"]`); if(b) b.classList.remove("gone");
 };
+$("okb").textContent = EN ? "Confirm" : "Confirmar";
+function okState(){ $("okb").disabled = !ORDER || ORDER.placed.length !== ORDER.list.length || $("ans").classList.contains("ok"); }
+$("okb").onclick = () => { if(G.state !== "wall" || !ORDER || ORDER.placed.length !== ORDER.list.length) return; $("okb").disabled = true; checkOrder(); };
 function checkOrder(){
   const got = [...$("ans").querySelectorAll(".tok")].map(c => c.textContent);
   G.tries++;
@@ -991,7 +1000,7 @@ function checkOrder(){
     $("ans").classList.add("bad"); G.state = "fail"; G.failT = 0; G.wallShake = 1; sfx("bump");
     $("help").innerHTML = G.tries >= 3 ? `<span class="hint">${esc(ORDER.list.join(" "))}</span>` : `<b style="color:#C2410C">${T.wrong}</b> ${T.wrongS}`;
     if(G.tries >= 3) $("skip").style.display = "block";
-    setTimeout(() => { $("ans").className = "ans"; $("ans").innerHTML = ""; ORDER.placed = []; $("pool").querySelectorAll(".tok").forEach(b => b.classList.remove("gone")); }, 900);
+    setTimeout(() => { $("ans").className = "ans"; $("ans").innerHTML = ""; ORDER.placed = []; $("pool").querySelectorAll(".tok").forEach(b => b.classList.remove("gone")); okState(); }, 900);
   }
 }
 
