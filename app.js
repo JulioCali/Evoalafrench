@@ -1100,12 +1100,12 @@ function pageTuto(){
       Object.assign(box.style, { left: l - p2 + "px", top: t2 - p2 + "px", width: rr - l + p2 * 2 + "px", height: b2 - t2 + p2 * 2 + "px" }); }
     if(s.act){                                                    // main qui tape + étiquette, juste sous la zone à toucher
       const hr = ptRect(s.hand ? s.hand() : el), cx = hr.left + hr.width / 2, tip = hr.bottom - 8;
-      hand.style.left = (cx - 18) + "px"; hand.style.top = (tip - 12) + "px";
-      const ra = s.labAt && ptRect(s.labAt()), lw = lab.offsetWidth, ly = ra ? ra.bottom + 30 : tip + 16;
-      let lx = ra ? ra.left + ra.width / 2 - lw / 2 : cx > innerWidth / 2 ? cx - 26 - lw : cx + 32;
+      hand.style.left = (cx - 13) + "px"; hand.style.top = (tip - 8) + "px";
+      const ra = s.labAt && ptRect(s.labAt()), lw = lab.offsetWidth, ly = ra ? ra.bottom + 30 : tip + 10;
+      let lx = ra ? ra.left + ra.width / 2 - lw / 2 : cx > innerWidth / 2 ? cx - 22 - lw : cx + 26;
       lab.style.left = Math.max(8, Math.min(innerWidth - lw - 8, lx)) + "px"; lab.style.top = ly + "px";
     }
-    const bh = bub.offsetHeight || 140, below = r.bottom + pad + 14 + (s.act && !s.hand ? 56 : s.labAt ? 58 : 0);
+    const bh = bub.offsetHeight || 140, below = r.bottom + pad + 14 + (s.act && !s.hand ? 48 : s.labAt ? 58 : 0);
     bub.style.top = (below + bh < innerHeight - 10 ? below : Math.max(10, r.top - pad - 14 - bh)) + "px";
   }
   function show(){
