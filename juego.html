@@ -238,13 +238,14 @@ function drawWalls(){
   PH.forEach((p, i) => {
     const sx = wallX(i) - G.x + evoX() + 70; if(sx < -80 || sx > W + 80) return;
     const done = i < G.i, shake = i === G.i ? Math.sin(G.wallShake * 40) * G.wallShake * 8 : 0;
+    if(TH.noWalls) return;                 // métro : pas d'obstacle, la rame s'arrête à une station
     const w = 46, h = 96, x = sx + shake;
     ctx.save(); TH.obstacle(x, y, w, h, done); ctx.restore();
     ctx.fillStyle = done ? "#1F8A70" : "#6C4FE0"; ctx.beginPath(); ctx.arc(x + w / 2, y - h - 16, 11, 0, 7); ctx.fill();   // pastille numérotée
     ctx.fillStyle = "#fff"; ctx.font = "600 13px Poppins"; ctx.textAlign = "center"; ctx.fillText(done ? "✓" : String(i + 1), x + w / 2, y - h - 11.5);
   });
   // drapeau d'arrivée
-  const fx = wallX(PH.length - 1) + 360 - G.x + evoX(); if(fx < W + 60){
+  const fx = wallX(PH.length - 1) + 360 - G.x + evoX(); if(fx < W + 60 && !TH.noWalls){
     ctx.fillStyle = "#555"; ctx.fillRect(fx, y - 120, 4, 120);
     [["#1E4FB5",0],["#fff",1],["#EF3340",2]].forEach(([c, k]) => { ctx.fillStyle = c; ctx.fillRect(fx + 4 + k * 18, y - 120, 18, 36); });
   }
@@ -360,42 +361,64 @@ const THEMES = {
       ctx.fillStyle = "rgba(255,255,255,.6)"; ctx.fillRect(x + 6, y - 82, 4, 22);
     } },
 
-  /* Station de métro : carrelage blanc, plaque bleue, plans, rame qui passe ; quai ; portillons */
-  metro: {
-    back(){
-      const gy = groundY();
-      ctx.fillStyle = "#F2F1EE"; ctx.fillRect(0, 0, W, gy);
-      ctx.strokeStyle = "#DEDCD6"; ctx.lineWidth = 1;                // carreaux biseautés
-      tile(24, .3, x => { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, gy); ctx.stroke(); });
-      for(let r = 0; r * 12 < gy; r++){ ctx.beginPath(); ctx.moveTo(0, r * 12); ctx.lineTo(W, r * 12); ctx.stroke(); }
-      ctx.fillStyle = "#E7E3DA"; ctx.beginPath(); ctx.ellipse(W / 2, 0, W * .9, 70, 0, 0, Math.PI); ctx.fill();   // voûte
-      tile(340, .3, (x, n) => {
-        fillRR(x + 30, gy - 230, 150, 34, 6, "#1F3F8C"); ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; roundRect(x + 33, gy - 227, 144, 28, 4); ctx.stroke();
-        ctx.fillStyle = "#fff"; ctx.font = "600 15px Poppins"; ctx.textAlign = "center"; ctx.fillText(pick(["Concorde", "Châtelet", "Bastille", "Opéra"], n), x + 105, gy - 207);
-        fillRR(x + 210, gy - 250, 90, 120, 6, "#fff"); ctx.strokeStyle = "#9AA3B5"; ctx.lineWidth = 2; roundRect(x + 210, gy - 250, 90, 120, 6); ctx.stroke();   // plan du métro
-        ["#F2C12E", "#2E6BD9", "#D63B5C", "#1F8A70", "#9B59D0"].forEach((c, i) => { ctx.strokeStyle = c; ctx.lineWidth = 3; ctx.beginPath();
-          ctx.moveTo(x + 218, gy - 236 + i * 20); ctx.bezierCurveTo(x + 245, gy - 250 + i * 26, x + 265, gy - 200 + i * 6, x + 292, gy - 226 + i * 18); ctx.stroke(); });
-        ctx.fillStyle = "#0A4A2F"; fillRR(x + 40, gy - 150, 26, 26, 13, "#0A4A2F"); ctx.fillStyle = "#fff"; ctx.font = "700 15px Poppins"; ctx.fillText("M", x + 53, gy - 132);
+  /* Métro : Evo est dans la rame. Entre deux phrases, le tunnel défile ; à chaque phrase, la rame s'arrête
+     à une nouvelle station (ligne 1), portes ouvertes. Pas d'obstacle : on avance de station en station. */
+  metro: { noWalls: true,
+    stations: ["La Défense", "Charles de Gaulle – Étoile", "George V", "Franklin D. Roosevelt", "Concorde", "Tuileries", "Palais Royal – Musée du Louvre",
+      "Louvre – Rivoli", "Châtelet", "Hôtel de Ville", "Saint-Paul", "Bastille", "Gare de Lyon", "Reuilly – Diderot", "Nation", "Château de Vincennes"],
+    st(k){ const L = this.stations; return L[Math.min(k, L.length - 1)]; },
+    // arrêts dans le monde : départ, une station par phrase, puis le terminus
+    stops(){ const s = [{ at: -20, k: 0 }]; PH.forEach((p, i) => s.push({ at: wallX(i) - 20, k: i + 1 })); s.push({ at: wallX(PH.length - 1) + 340, k: this.stations.length - 1 }); return s; },
+    outside(x0, y0, w, h){
+      ctx.save(); roundRect(x0, y0, w, h, 14); ctx.clip();
+      const g = ctx.createLinearGradient(0, y0, 0, y0 + h); g.addColorStop(0, "#2A2D3A"); g.addColorStop(1, "#3A3E4E"); ctx.fillStyle = g; ctx.fillRect(x0, y0, w, h);
+      const k = 2.2;                                                    // le décor extérieur défile plus vite que la rame
+      ctx.fillStyle = "rgba(255,226,150,.85)";                          // lampes du tunnel
+      for(let i = -1; i < W / 120 + 2; i++){ const lx = i * 120 - ((G.x * k) % 120); ctx.fillRect(lx, y0 + 18, 26, 4); }
+      ctx.fillStyle = "#4A4F60"; ctx.fillRect(x0, y0 + h - 20, w, 20);
+      this.stops().forEach(s => {                                       // quai de la station, qui arrive et s'arrête devant les fenêtres
+        const cx = (s.at - G.x) * k + W / 2, pw = 760, px = cx - pw / 2; if(px > W || px + pw < 0) return;
+        ctx.fillStyle = "#F2F1EE"; ctx.fillRect(px, y0, pw, h);
+        ctx.strokeStyle = "#DEDCD6"; ctx.lineWidth = 1; for(let tx = px; tx < px + pw; tx += 20){ ctx.beginPath(); ctx.moveTo(tx, y0); ctx.lineTo(tx, y0 + h); ctx.stroke(); }
+        for(let ty = y0; ty < y0 + h; ty += 10){ ctx.beginPath(); ctx.moveTo(px, ty); ctx.lineTo(px + pw, ty); ctx.stroke(); }
+        const name = this.st(s.k); ctx.font = "600 15px Poppins"; const tw = Math.max(150, ctx.measureText(name).width + 34);
+        [cx - 85, cx + 295].forEach(nx => { fillRR(nx - tw / 2, y0 + 24, tw, 34, 6, "#1F3F8C"); ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; roundRect(nx - tw / 2 + 3, y0 + 27, tw - 6, 28, 4); ctx.stroke();
+          ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.fillText(name, nx, y0 + 46); });
+        fillRR(cx + 70, y0 + 70, 70, 86, 6, pick(["#F2C9EB", "#9FD8C9", "#F5C58A"], s.k)); ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.fillRect(cx + 80, y0 + 82, 50, 8);   // affiche
+        ctx.fillStyle = "#B9B6AE"; ctx.fillRect(px, y0 + h - 22, pw, 22); ctx.fillStyle = "#E3C23A"; ctx.fillRect(px, y0 + h - 22, pw, 4);
+        [px + 60, px + 300, px + 520, px + 680].forEach((hx, j) => { ctx.fillStyle = pick(["#7E64E6", "#D96ECC", "#1F8A70", "#F5A623"], j + s.k);   // voyageurs sur le quai
+          ctx.beginPath(); ctx.arc(hx, y0 + h - 70, 9, 0, 7); ctx.fill(); fillRR(hx - 11, y0 + h - 60, 22, 40, 9, ctx.fillStyle); });
       });
-      // rame qui passe de temps en temps derrière le quai
-      const cyc = (G.t * 260) % 2600 - 1300, tx = W - cyc;
-      if(cyc > 0){ ctx.fillStyle = "#E7EAF0"; for(let c = 0; c < 3; c++){ const cx = tx + c * 250; fillRR(cx, gy - 120, 240, 96, 16, "#E7EAF0");
-          ctx.fillStyle = "#2E6BD9"; ctx.fillRect(cx, gy - 52, 240, 10);
-          for(let wdw = 0; wdw < 4; wdw++) fillRR(cx + 14 + wdw * 56, gy - 108, 42, 38, 8, "#A9C0DE"); } }
-      ctx.fillStyle = "#5A5F6B"; ctx.fillRect(0, gy - 22, W, 22);   // voie
+      ctx.restore();
     },
-    ground(){
-      const y = groundY(); ctx.fillStyle = "#B9B6AE"; ctx.fillRect(0, y, W, H - y);
-      ctx.fillStyle = "#F2F2F2"; ctx.fillRect(0, y, W, 10); ctx.fillStyle = "#E3C23A"; tile(30, 1, x => ctx.fillRect(x, y + 10, 18, 5));
-      tile(60, 1, x => { ctx.fillStyle = "#ACA9A1"; ctx.fillRect(x, y + 18, 2, H - y); });
+    back(){
+      const gy = groundY(), wy = 116, wh = Math.max(100, gy - 150 - wy);
+      ctx.fillStyle = "#E9ECF2"; ctx.fillRect(0, 0, W, gy);                                    // paroi de la rame
+      ctx.fillStyle = "#D7DBE4"; ctx.fillRect(0, 0, W, 36); ctx.fillStyle = "#FFFFFF"; ctx.fillRect(W * .1, 12, W * .8, 8);   // plafond et néon
+      // plan de la ligne : une pastille par station, celle où l'on va en évidence
+      const n = PH.length + 2, cur = Math.min(n - 1, G.i + (G.state === "wall" ? 1 : G.state === "done" ? n : 1)), mx0 = 30, mx1 = W - 30;
+      fillRR(14, 44, W - 28, 30, 8, "#fff"); ctx.fillStyle = "#F2C12E"; ctx.fillRect(mx0, 58, mx1 - mx0, 4);
+      for(let i = 0; i < n; i++){ const dx = mx0 + (mx1 - mx0) * i / (n - 1); ctx.fillStyle = i < cur ? "#F2C12E" : i === cur ? "#6C4FE0" : "#fff";
+        ctx.beginPath(); ctx.arc(dx, 60, i === cur ? 7 : 5, 0, 7); ctx.fill(); ctx.strokeStyle = i === cur ? "#6C4FE0" : "#F2C12E"; ctx.lineWidth = 2; ctx.stroke(); }
+      // fenêtres et portes (les portes s'ouvrent pendant l'arrêt)
+      const stopped = G.state === "wall" || G.state === "done", open = G.doorK = (G.doorK || 0) + ((stopped ? 1 : 0) - (G.doorK || 0)) * .15;
+      const dw = 120, dx = W * .62, winL = [[12, dx - 24], [dx + dw + 12, W - 12]];
+      winL.forEach(([a, b]) => { if(b - a > 40){ fillRR(a - 4, wy - 4, b - a + 8, wh + 8, 16, "#C9CED8"); this.outside(a, wy, b - a, wh); } });
+      this.outside(dx, wy - 10, dw, gy - wy + 10);                                              // par la porte, on voit le quai jusqu'en bas
+      [[dx - open * dw / 2, -1], [dx + dw / 2 + open * dw / 2, 1]].forEach(([px]) => { fillRR(px, wy - 14, dw / 2, gy - wy + 14, 6, "#C3C9D5");
+        fillRR(px + 10, wy, dw / 2 - 20, wh * .8, 10, "#2E3240"); });
+      ctx.fillStyle = "#A3ABBB"; ctx.fillRect(dx - 8, wy - 18, 8, gy - wy + 18); ctx.fillRect(dx + dw, wy - 18, 8, gy - wy + 18);
+      // annonce « Prochaine station » / « Station »
+      const label = stopped ? "Station : " : "Prochaine station : ", name = this.st(G.state === "done" ? this.stations.length - 1 : Math.min(G.i + 1, PH.length) + (G.state === "finish" ? 1 : 0));
+      fillRR(14, 80, W - 28, 26, 7, "#1C1F2B"); ctx.fillStyle = "#F5C542"; ctx.font = "600 12px Poppins"; ctx.textAlign = "center";
+      ctx.fillText(label + (G.state === "finish" ? this.st(this.stations.length - 1) : name), W / 2, 97);
+      // banquette et barres de maintien
+      fillRR(14, gy - 70, dx - 50, 22, 8, "#4C6BC9"); fillRR(18, gy - 118, dx - 58, 46, 10, "#5A79D6"); ctx.fillStyle = "#3C4250"; ctx.fillRect(30, gy - 48, 5, 48); ctx.fillRect(dx - 52, gy - 48, 5, 48);
+      ctx.fillStyle = "#B9C0CC"; ctx.fillRect(0, 38, W, 5); [W * .12, dx - 18, dx + dw + 22].forEach(px => ctx.fillRect(px, 38, 6, gy - 38));
     },
-    obstacle(x, y, w, h, done){                                       // portillon d'accès
-      const body = done ? "#E3DFF2" : "#5D6577", top = done ? "#EFEBF9" : "#6C4FE0";
-      fillRR(x - 4, y - 70, w + 8, 70, 6, body); fillRR(x - 6, y - 76, w + 12, 10, 5, top);
-      ctx.fillStyle = done ? "#fff" : "#2BD48F"; ctx.beginPath(); ctx.arc(x + w - 6, y - 60, 4, 0, 7); ctx.fill();
-      ctx.fillStyle = done ? "#F4F1FC" : "#C8344F"; fillRR(x + w / 2 - 22, y - h, 44, 26, 13, done ? "#F4F1FC" : "#C8344F");   // battants
-      ctx.fillStyle = "#fff"; ctx.fillRect(x + w / 2 - 1, y - h + 2, 2, 22);
-    } },
+    ground(){ const y = groundY(); ctx.fillStyle = "#8C93A3"; ctx.fillRect(0, y, W, H - y); ctx.fillStyle = "#A5ACBA"; ctx.fillRect(0, y, W, 5);
+      ctx.fillStyle = "rgba(255,255,255,.18)"; for(let i = 0; i < 60; i++){ ctx.fillRect((i * 67) % W, y + 10 + (i * 31) % (H - y - 14), 3, 3); } },
+    obstacle(){} },
 
   /* Gare : verrière, grand tableau des départs, horloge, TGV à quai ; sol avec ligne jaune ; valises */
   train: {
