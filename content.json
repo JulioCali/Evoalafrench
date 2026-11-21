@@ -1179,7 +1179,11 @@
        "tips": [
         {
          "title": "Dato cultural",
-         "text": "Aqui te compartimos una tabla comparativa de tallas de zapatos entre Colombia y Francia: ¡Pero no olvides medírtelos antes!"
+         "text": "Aqui te compartimos una tabla comparativa de tallas de zapatos entre Colombia y Francia: ¡Pero no olvides medírtelos antes!",
+         "link": {
+          "url": "https://nisastore.co/blogs/zapatos/tallas-de-zapatos-colombia-vs-europa",
+          "label": "Guía de tallas"
+         }
         }
        ]
       },
@@ -2922,7 +2926,11 @@
      "tips": [
       {
        "title": "Dato cultural",
-       "text": "En Francia, puedes comprar billetes de tren online (SNCF, OuiGo) o en la estación. Si tu billete no es electrónico, recuerda validarlo (composter) en las máquinas antes de subir — si no, puedes recibir una multa"
+       "text": "En Francia, puedes comprar billetes de tren online (SNCF, OuiGo) o en la estación. Si tu billete no es electrónico, recuerda validarlo (composter) en las máquinas antes de subir — si no, puedes recibir una multa",
+       "link": {
+        "url": "https://www.ouigo.com/es/",
+        "label": "Reservar un tren"
+       }
       }
      ]
     }
@@ -3509,7 +3517,11 @@
      "tips": [
       {
        "title": "Dato cultural",
-       "text": "Las líneas tienen un número y un color, pero para saber qué metro tomar, lo más importante es mirar la dirección final de la línea. Ejemplo: Línea 1 → La Défense o Château de Vincennes."
+       "text": "Las líneas tienen un número y un color, pero para saber qué metro tomar, lo más importante es mirar la dirección final de la línea. Ejemplo: Línea 1 → La Défense o Château de Vincennes.",
+       "link": {
+        "url": "https://www.ratp.fr/plan-metro",
+        "label": "Plano del metro de París"
+       }
       }
      ]
     },
@@ -3802,7 +3814,11 @@
      "tips": [
       {
        "title": "Dato cultural",
-       "text": "Dale clic aquí, para ver unas recomendaciones de visitas en Paris."
+       "text": "Dale clic aquí, para ver unas recomendaciones de visitas en Paris.",
+       "link": {
+        "url": "#p1",
+        "label": "Visitas en París"
+       }
       }
      ]
     }
@@ -4112,7 +4128,11 @@
        "tips": [
         {
          "title": "Dato cultural",
-         "text": "Si deseas comer comida francesa a buen precio, busca “un Bouillon”: un restaurante francés a buen precio, de buena calidad y rico."
+         "text": "Si deseas comer comida francesa a buen precio, busca “un Bouillon”: un restaurante francés a buen precio, de buena calidad y rico.",
+         "link": {
+          "url": "https://www.eldiario.es/canariasahora/viajarahora/destino_europa/mapa-mejores-buillons-paris-sopa-cebolla-boeuf-bourguignon-comer-barato-en-paris_1_13279493.html",
+          "label": "Bouillons en París"
+         }
         }
        ]
       },
@@ -7044,7 +7064,11 @@
        "tips": [
         {
          "title": "Dato cultural",
-         "text": "Aquí te compartimos el link de las farmacias abiertas 24h en Paris"
+         "text": "Aquí te compartimos el link de las farmacias abiertas 24h en Paris",
+         "link": {
+          "url": "https://www.sosmedecins.fr/pharmacies-de-garde",
+          "label": "Farmacias abiertas 24 h"
+         }
         }
        ]
       },
@@ -7645,7 +7669,11 @@
      "tips": [
       {
        "title": "Dato cultural",
-       "text": "Puedes buscar un médico en Doctolib, una plataforma en Francia para reservar citas médicas por internet."
+       "text": "Puedes buscar un médico en Doctolib, una plataforma en Francia para reservar citas médicas por internet.",
+       "link": {
+        "url": "https://www.doctolib.fr/",
+        "label": "Doctolib.fr"
+       }
       }
      ]
     }

@@ -432,7 +432,10 @@ function rowHTML(p, crumb){
 function tipHTML(t){
   if(t.table) return `<div class="dato"><b>💡 ${esc(t.title)}:</b><table class="dtab"><tr>${t.table.head.map(h=>`<th>${h?`<span>${esc(h)}</span>`:""}</th>`).join("")}</tr>
     ${t.table.rows.map(r=>`<tr><td>${esc(r[0])}</td>${r.slice(1).map(c=>`<td><b>${esc(c[0])}<em>${esc(c[1])}</em></b><small>${esc(c[2])}</small></td>`).join("")}</tr>`).join("")}</table></div>`;
-  return `<div class="dato"><b>💡 ${esc(t.title)}:${t.sub?` <span class="dsub">${esc(t.sub)}</span>`:""}</b>${esc(t.text)}</div>`;
+  // lien du dato (repris du PDF) : site externe dans un nouvel onglet, ou page de l'appli (#p1…)
+  const lk = t.link ? (t.link.url.startsWith("#") ? `<a class="dlink" href="${t.link.url}">${esc(t.link.label)} →</a>`
+    : `<a class="dlink" href="${esc(t.link.url)}" target="_blank" rel="noopener">${esc(t.link.label)} ↗</a>`) : "";
+  return `<div class="dato"><b>💡 ${esc(t.title)}:${t.sub?` <span class="dsub">${esc(t.sub)}</span>`:""}</b>${esc(t.text)}${lk}</div>`;
 }
 // bandeau « Toca la imagen » : affiché tant qu'on n'a pas touché « Entendido »
 const hintSeen = () => { try{ return localStorage.getItem("evoala-hint") === "1"; }catch(e){ return false; } };

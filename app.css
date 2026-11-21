@@ -661,3 +661,6 @@ svg.lock{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;s
 .tr-bub .sk.acc{color:#5940BF;font-weight:600}
 .gcont.pulse{animation:gpulse 1.2s ease-in-out 2}
 @keyframes gpulse{0%,100%{box-shadow:0 0 0 0 rgba(108,79,224,0)}50%{box-shadow:0 0 0 6px rgba(108,79,224,.28)}}
+/* lien dans un dato cultural */
+.dato .dlink{display:flex;width:fit-content;align-items:center;gap:4px;margin-top:8px;padding:6px 12px;border-radius:999px;background:#fff;border:1.5px solid var(--lavender);color:var(--violet-dark);font-weight:600;font-size:13px;text-decoration:none}
+.dato .dlink:active{background:var(--lavender-soft)}
