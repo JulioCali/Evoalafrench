@@ -945,21 +945,19 @@ const TOURS = {
   hub: {
     es:[{ t:"¡Hola! Soy Evo 👋", p:"Te muestro cómo funciona Evoala en unos segundos." },
         { sel:".feat", t:"Tu guía", p:"Esta es la Guía de supervivencia: frases para viajar a Francia, con audio y pronunciación. Toca el botón violeta para abrirla." },
-        { sel:".ggrid", t:"Otras guías", p:"Cada guía tiene su misión: empezar desde cero, preparar el DELF… Llegarán muy pronto." },
+        { sel:".ggrid", t:"Otras guías (disponibles pronto)", p:"Cada guía tiene su misión: empezar desde cero, preparar el examen oficial del DELF…" },
         { sel:".hubright .hl", t:"Idioma", p:"Aquí cambias el idioma de la aplicación: español o inglés." },
         { sel:".hubright .achip", t:"Tu cuenta", p:"Crea tu cuenta gratis para guardar tu progreso y seguirlo en otro teléfono." }],
     en:[{ t:"Hi! I'm Evo 👋", p:"Let me show you how Evoala works in a few seconds." },
         { sel:".feat", t:"Your guide", p:"This is the Survival Guide: phrases for travelling in France, with audio and pronunciation. Tap the purple button to open it." },
-        { sel:".ggrid", t:"Other guides", p:"Each guide has its own mission: starting from zero, preparing the DELF… Coming very soon." },
+        { sel:".ggrid", t:"Other guides (coming soon)", p:"Each guide has its own mission: starting from zero, preparing for the official DELF exam…" },
         { sel:".hubright .hl", t:"Language", p:"Change the app language here: Spanish or English." },
         { sel:".hubright .achip", t:"Your account", p:"Create a free account to save your progress and continue on another phone." }] },
   guia: {
-    es:[{ t:"El menú de la guía", p:"Desde aquí llegas a todos los temas del viaje. Te lo enseño rápido." },
-        { sel:".gprog", t:"Tu progreso", p:"Aquí ves cuántas frases escuchaste y practicaste. El botón de abajo te lleva directo a donde te quedaste." },
+    es:[{ sel:".gprog", t:"Tu progreso", p:"Aquí ves cuántas frases escuchaste y practicaste. El botón de abajo te lleva directo a donde te quedaste." },
         { sel:".gtiles", t:"Los temas", p:"Cada tarjeta es una situación del viaje: compras, transporte, comida, alojamiento… Toca una para ver sus frases." },
         { sel:".nav", t:"Siempre a mano", p:"Abajo vuelves a la guía, a tus listas de frases favoritas o a la Guía de Paris." }],
-    en:[{ t:"The guide menu", p:"From here you reach every travel topic. Let me show you quickly." },
-        { sel:".gprog", t:"Your progress", p:"See how many phrases you've heard and practised. The button below takes you straight back to where you left off." },
+    en:[{ sel:".gprog", t:"Your progress", p:"See how many phrases you've heard and practised. The button below takes you straight back to where you left off." },
         { sel:".gtiles", t:"The topics", p:"Each card is a travel situation: shopping, transport, food, accommodation… Tap one to see its phrases." },
         { sel:".nav", t:"Always at hand", p:"At the bottom: back to the guide, your favourite phrase lists, or the Paris Guide." }] }
 };
