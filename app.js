@@ -957,17 +957,11 @@ const TOURS = {
     es:[{ t:"El menú de la guía", p:"Desde aquí llegas a todos los temas del viaje. Te lo enseño rápido." },
         { sel:".gprog", t:"Tu progreso", p:"Aquí ves cuántas frases escuchaste y practicaste. El botón de abajo te lleva directo a donde te quedaste." },
         { sel:".gtiles", t:"Los temas", p:"Cada tarjeta es una situación del viaje: compras, transporte, comida, alojamiento… Toca una para ver sus frases." },
-        { sel:".gwide.bonus", t:"Bonus", p:"Colores, números y la ciudad: el vocabulario que sirve en todas partes." },
-        { sel:'.gwide[data-go="p1"]', t:"Guía de Paris", p:"Los lugares que visitar en París, con fotos, metro y mapa." },
-        { sel:".nav", t:"Siempre a mano", p:"Abajo vuelves a la guía, a tus listas de frases favoritas o a la Guía de Paris." },
-        { sel:".tutob", t:"¿Lo quieres ver otra vez?", p:"Toca la bombilla cuando quieras para repetir esta explicación." }],
+        { sel:".nav", t:"Siempre a mano", p:"Abajo vuelves a la guía, a tus listas de frases favoritas o a la Guía de Paris." }],
     en:[{ t:"The guide menu", p:"From here you reach every travel topic. Let me show you quickly." },
         { sel:".gprog", t:"Your progress", p:"See how many phrases you've heard and practised. The button below takes you straight back to where you left off." },
         { sel:".gtiles", t:"The topics", p:"Each card is a travel situation: shopping, transport, food, accommodation… Tap one to see its phrases." },
-        { sel:".gwide.bonus", t:"Bonus", p:"Colours, numbers and the city: vocabulary that's useful everywhere." },
-        { sel:'.gwide[data-go="p1"]', t:"Paris Guide", p:"Places to visit in Paris, with photos, metro and map." },
-        { sel:".nav", t:"Always at hand", p:"At the bottom: back to the guide, your favourite phrase lists, or the Paris Guide." },
-        { sel:".tutob", t:"Want to see it again?", p:"Tap the light bulb anytime to replay this tour." }] }
+        { sel:".nav", t:"Always at hand", p:"At the bottom: back to the guide, your favourite phrase lists, or the Paris Guide." }] }
 };
 const TOUR_UI = { es:{ next:"Siguiente", done:"¡Entendido!", skip:"Saltar" }, en:{ next:"Next", done:"Got it!", skip:"Skip" } };
 let tourOn = false;
