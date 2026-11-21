@@ -69,3 +69,8 @@ service cloud.firestore {
   }
 }
 ```
+
+## Fonds d'écran
+
+Les 15 fonds sont dans `bg/` (SVG). Ils sont dessinés par `tools/fonds.py` : pour en modifier ou en ajouter un, changer ce fichier puis lancer `python3 tools/fonds.py`, et ajouter la ligne correspondante dans `FONDOS` en haut de `app.js`.
+Le choix se fait avec le bouton palette en haut de l'écran ; il est gardé sur l'appareil et dans le compte. Les fonds « de noche » passent les textes posés sur le ciel en blanc (`body.dark` dans `app.css`).
