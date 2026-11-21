@@ -132,7 +132,7 @@ const STEPS = [
   { target:".row[data-i='0']", title:"Así se dice", text:"", dyn:() => `«${PH[0].pr}»: la sílaba en mayúsculas es la que se marca más. Toca otra vez la imagen para ocultarla.` },
   { target:".row[data-i='0'] .heart", round:true, title:"Guarda tus frases", text:"Crea tus listas de frases favoritas.", tap:t => t.closest(".row[data-i='0'] .heart"), act:() => row(0).querySelector(".heart").classList.add("on"), wait:"Toca el icono" },
   { target:"#t-card", title:"Tu turno", text:"", dyn:() => `Ahora, escucha «${PH[1].fr}» y «${PH[2].fr}».`, tap:t => t.closest(".row[data-i='1'] .spk, .row[data-i='2'] .spk"),
-    act:async t => { const i = +t.closest(".row").dataset.i; await play(i); return heard.has(1) && heard.has(2); }, wait:"Escucha las 2 frases", hand:".row[data-i='1'] .spk" },
+    act:async t => { const i = +t.closest(".row").dataset.i; await play(i); return heard.has(1) && heard.has(2); }, wait:"Escúchalas para desbloquear una sorpresa", hand:".row[data-i='1'] .spk", labAt:".row[data-i='2']" },
   { target:"#t-pslot", before:() => { document.getElementById("t-pslot").innerHTML = `<button class="pbtn pop">${MIC}Practicar</button>`; },
     title:"¡Escuchaste todo! 🎉", text:"Cuando escuchas todas las frases de una tarjeta, aparece «Practicar»: un juego para decirlas en francés. Te lo explico cuando lo abras." },
   // retour du jeu ↓
@@ -163,8 +163,9 @@ function placeHand(s){
   const r = rectOf(s.hand || s.target); if(!r) return;
   const cx = r.left + r.width / 2, tip = r.bottom - 8;               // le bout du doigt touche le bas du cercle
   hand.style.left = (cx - 18) + "px"; hand.style.top = (tip - 12) + "px";
-  const lw = hlab.offsetWidth, ly = tip + 16;
-  let lx = cx > innerWidth / 2 ? cx - 26 - lw : cx + 32;             // l'étiquette à côté de la main, du côté où il y a de la place
+  const lw = hlab.offsetWidth, ra = s.labAt && rectOf(s.labAt);
+  const ly = ra ? ra.bottom + 30 : tip + 16;                         // étiquette sous une ligne donnée (pour ne cacher aucune phrase)
+  let lx = ra ? ra.left + ra.width / 2 - lw / 2 : cx > innerWidth / 2 ? cx - 26 - lw : cx + 32;             // l'étiquette à côté de la main, du côté où il y a de la place
   lx = Math.max(8, Math.min(innerWidth - lw - 8, lx));
   hlab.style.left = lx + "px"; hlab.style.top = ly + "px";
 }
@@ -176,7 +177,7 @@ function place(s){
   const w = r.width + pad * 2, h = r.height + pad * 2;
   spot.className = "spot" + (s.tap ? " tap" : "");
   spot.style.cssText = `top:${r.top - pad}px;left:${r.left - pad}px;width:${w}px;height:${h}px;border-radius:${s.round ? Math.max(w, h) / 2 : 18}px`;
-  const below = r.bottom + pad + 14 + (s.tap && !s.hand ? 56 : 0), bh = bub.offsetHeight || 160;   // place pour la main
+  const below = r.bottom + pad + 14 + (s.tap && !s.hand ? 56 : s.labAt ? 58 : 0), bh = bub.offsetHeight || 160;   // place pour la main
   if(below + bh < innerHeight - 10){ bub.style.top = below + "px"; bub.style.bottom = ""; }
   else { bub.style.top = Math.max(10, r.top - pad - 14 - bh) + "px"; bub.style.bottom = ""; }
 }
