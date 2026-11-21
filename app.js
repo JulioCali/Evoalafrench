@@ -883,7 +883,7 @@ app.addEventListener("click", e => {
   if(sd){ heartClick(sd.dataset.sdel); return; }
   const openRow = app.querySelector(".swipe .row.open");
   if(openRow){ swipeTo(openRow, 0); return; }               // un toucher ailleurs referme le bouton « Quitar »
-  if(e.target.closest("[data-tuto]")){ openTuto(); return; }
+  if(e.target.closest("[data-tuto]")){ if(location.hash === "#guia") tour("guia", true); else openTuto(); return; }
   const pr = e.target.closest("[data-practice]");
   if(pr){ startPractice(pr.dataset.practice); return; }
   const hb = e.target.closest(".heart");
@@ -938,6 +938,80 @@ async function playRow(row){
 // précharge l'audio de la page affichée
 function preload(){ const r = app.querySelector(".row[data-audio^='snd']"); if(r) bundle(r.dataset.audio.split("#")[0]); }
 
+/* ---------- Visites guidées : le hub (choisir sa guide) et le sommaire du guide (les thèmes) ----------
+   Elles s'ouvrent une seule fois, à la première arrivée sur la page (comme le tutoriel du jeu).
+   La visite du sommaire se relance avec l'ampoule en haut de la page. */
+const TOURS = {
+  hub: {
+    es:[{ t:"¡Hola! Soy Evo 👋", p:"Te muestro cómo funciona Evoala en unos segundos." },
+        { sel:".feat", t:"Tu guía", p:"Esta es la Guía de supervivencia: frases para viajar a Francia, con audio y pronunciación. Toca el botón violeta para abrirla." },
+        { sel:".ggrid", t:"Otras guías", p:"Cada guía tiene su misión: empezar desde cero, preparar el DELF… Llegarán muy pronto." },
+        { sel:".hubright .hl", t:"Idioma", p:"Aquí cambias el idioma de la aplicación: español o inglés." },
+        { sel:".hubright .achip", t:"Tu cuenta", p:"Crea tu cuenta gratis para guardar tu progreso y seguirlo en otro teléfono." }],
+    en:[{ t:"Hi! I'm Evo 👋", p:"Let me show you how Evoala works in a few seconds." },
+        { sel:".feat", t:"Your guide", p:"This is the Survival Guide: phrases for travelling in France, with audio and pronunciation. Tap the purple button to open it." },
+        { sel:".ggrid", t:"Other guides", p:"Each guide has its own mission: starting from zero, preparing the DELF… Coming very soon." },
+        { sel:".hubright .hl", t:"Language", p:"Change the app language here: Spanish or English." },
+        { sel:".hubright .achip", t:"Your account", p:"Create a free account to save your progress and continue on another phone." }] },
+  guia: {
+    es:[{ t:"El menú de la guía", p:"Desde aquí llegas a todos los temas del viaje. Te lo enseño rápido." },
+        { sel:".gprog", t:"Tu progreso", p:"Aquí ves cuántas frases escuchaste y practicaste. El botón de abajo te lleva directo a donde te quedaste." },
+        { sel:".gtiles", t:"Los temas", p:"Cada tarjeta es una situación del viaje: compras, transporte, comida, alojamiento… Toca una para ver sus frases." },
+        { sel:".gwide.bonus", t:"Bonus", p:"Colores, números y la ciudad: el vocabulario que sirve en todas partes." },
+        { sel:'.gwide[data-go="p1"]', t:"Guía de Paris", p:"Los lugares que visitar en París, con fotos, metro y mapa." },
+        { sel:".nav", t:"Siempre a mano", p:"Abajo vuelves a la guía, a tus listas de frases favoritas o a la Guía de Paris." },
+        { sel:".tutob", t:"¿Lo quieres ver otra vez?", p:"Toca la bombilla cuando quieras para repetir esta explicación." }],
+    en:[{ t:"The guide menu", p:"From here you reach every travel topic. Let me show you quickly." },
+        { sel:".gprog", t:"Your progress", p:"See how many phrases you've heard and practised. The button below takes you straight back to where you left off." },
+        { sel:".gtiles", t:"The topics", p:"Each card is a travel situation: shopping, transport, food, accommodation… Tap one to see its phrases." },
+        { sel:".gwide.bonus", t:"Bonus", p:"Colours, numbers and the city: vocabulary that's useful everywhere." },
+        { sel:'.gwide[data-go="p1"]', t:"Paris Guide", p:"Places to visit in Paris, with photos, metro and map." },
+        { sel:".nav", t:"Always at hand", p:"At the bottom: back to the guide, your favourite phrase lists, or the Paris Guide." },
+        { sel:".tutob", t:"Want to see it again?", p:"Tap the light bulb anytime to replay this tour." }] }
+};
+const TOUR_UI = { es:{ next:"Siguiente", done:"¡Entendido!", skip:"Saltar" }, en:{ next:"Next", done:"Got it!", skip:"Skip" } };
+let tourOn = false;
+function tour(name, force){
+  const key = "evoala-tour-" + name;
+  if(tourOn) return;
+  if(!force){ try{ if(localStorage.getItem(key)) return; }catch(e){ return; } }
+  const steps = (TOURS[name][LANG] || TOURS[name].es).filter(st => !st.sel || document.querySelector(st.sel));
+  if(!steps.length) return;
+  tourOn = true;
+  const U = TOUR_UI[LANG] || TOUR_UI.es;
+  const blk = document.createElement("div"), spot = document.createElement("div"), bub = document.createElement("div");
+  blk.className = "tr-blk"; spot.className = "tr-spot none"; bub.className = "tr-bub";
+  document.body.append(blk, spot, bub);
+  let i = 0;
+  const end = () => { try{ localStorage.setItem(key, "1"); }catch(e){} [blk, spot, bub].forEach(el => el.remove()); tourOn = false; removeEventListener("resize", place); };
+  function place(){
+    const st = steps[i], el = st.sel && document.querySelector(st.sel);
+    if(!el){ spot.className = "tr-spot none"; bub.style.top = ""; bub.classList.add("mid"); return; }
+    const r = el.getBoundingClientRect(), pad = 8;
+    spot.className = "tr-spot";
+    Object.assign(spot.style, { top: r.top - pad + "px", left: r.left - pad + "px", width: r.width + pad * 2 + "px", height: r.height + pad * 2 + "px" });
+    bub.classList.remove("mid");
+    const bh = bub.offsetHeight, below = r.bottom + pad + 14;
+    bub.style.top = (below + bh < innerHeight - 10 ? below : Math.max(10, r.top - pad - 14 - bh)) + "px";
+  }
+  function show(){
+    const st = steps[i], el = st.sel && document.querySelector(st.sel), last = i === steps.length - 1;
+    bub.innerHTML = `<img src="img/ui/evo.png" alt=""><div class="bt"><b>${st.t}</b><p>${st.p}</p>
+      <div class="bf"><span class="cnt">${i + 1} / ${steps.length}</span>${last ? "" : `<button class="sk" data-trskip>${U.skip}</button>`}<button class="nx" data-trnext>${last ? U.done : U.next}</button></div></div>`;
+    if(el){
+      const r = el.getBoundingClientRect(), fixed = getComputedStyle(el).position === "fixed" || el.closest(".nav,.top");
+      if(!fixed && (r.top < 70 || r.bottom > innerHeight - 200)) scrollBy({ top: r.top - Math.max(80, (innerHeight - r.height) / 2 - 90), behavior: "instant" });
+    }
+    requestAnimationFrame(place);
+  }
+  bub.addEventListener("click", e => {
+    if(e.target.closest("[data-trskip]")) return end();
+    if(e.target.closest("[data-trnext]")){ if(i === steps.length - 1) return end(); i++; show(); }
+  });
+  addEventListener("resize", place);
+  show();
+}
+
 /* ---------- Tutoriel : à la première utilisation, et à chaque visite pour qui n'a pas de compte (« Ahora no ») ---------- */
 function openTuto(){ try{ sessionStorage.setItem("evoala-tuto-back", location.hash || "#guia"); sessionStorage.setItem("evoala-tuto-guest", window.EvoAuth && window.EvoAuth.user ? "0" : "1"); }catch(e){} location.href = "tuto.html"; }
 function maybeTuto(h, tries = 0){
@@ -974,6 +1048,8 @@ function route(){
     nav.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if(!b) return; location.hash = b.dataset.go; if(!b.dataset.go) route(); }); }
   nav.innerHTML = where === "hub" || where === "onb" ? "" : navbar(where);
   initCats(); scrollTo(0,0); preload();
+  if(where === "hub" && document.querySelector(".feat")) setTimeout(() => tour("hub"), 500);
+  else if(h === "guia") setTimeout(() => tour("guia"), 500);
 }
 addEventListener("hashchange", route);
 const contents = {};
