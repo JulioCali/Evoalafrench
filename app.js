@@ -961,6 +961,11 @@ const TOURS = {
         { sel:".gtiles", t:"The topics", p:"Each card is a travel situation: shopping, transport, food, accommodation… Tap one to see its phrases." },
         { sel:".nav", t:"Always at hand", p:"At the bottom: back to the guide, your favourite phrase lists, or the Paris Guide." }] }
 };
+// après la visite : sur le sommaire, on remonte vers « Empieza por aquí » (ou « Continuar ») et le bouton pulse un instant
+const TOUR_AFTER = {
+  guia(){ const b = document.querySelector(".gcont"); if(!b) return;
+    b.scrollIntoView({ block: "center", behavior: "smooth" }); b.classList.remove("pulse"); void b.offsetWidth; b.classList.add("pulse"); setTimeout(() => b.classList.remove("pulse"), 2600); }
+};
 const TOUR_UI = { es:{ next:"Siguiente", done:"¡Entendido!", skip:"Saltar" }, en:{ next:"Next", done:"Got it!", skip:"Skip" } };
 let tourOn = false;
 function tour(name, force){
@@ -975,7 +980,7 @@ function tour(name, force){
   blk.className = "tr-blk"; spot.className = "tr-spot none"; bub.className = "tr-bub";
   document.body.append(blk, spot, bub);
   let i = 0;
-  const end = () => { try{ localStorage.setItem(key, "1"); }catch(e){} [blk, spot, bub].forEach(el => el.remove()); tourOn = false; removeEventListener("resize", place); };
+  const end = () => { try{ localStorage.setItem(key, "1"); }catch(e){} [blk, spot, bub].forEach(el => el.remove()); tourOn = false; removeEventListener("resize", place); TOUR_AFTER[name]?.(); };
   function place(){
     const st = steps[i], el = st.sel && document.querySelector(st.sel);
     if(!el){ spot.className = "tr-spot none"; bub.style.top = ""; bub.classList.add("mid"); return; }
