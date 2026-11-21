@@ -239,11 +239,9 @@ function drawWalls(){
     const sx = wallX(i) - G.x + evoX() + 70; if(sx < -80 || sx > W + 80) return;
     const done = i < G.i, shake = i === G.i ? Math.sin(G.wallShake * 40) * G.wallShake * 8 : 0;
     const w = 46, h = 96, x = sx + shake;
-    roundRect(x, y - h, w, h, 8); ctx.fillStyle = done ? "#C9BFF5" : "#6C4FE0"; ctx.fill();
-    ctx.strokeStyle = done ? "rgba(255,255,255,.5)" : "rgba(255,255,255,.28)"; ctx.lineWidth = 2;
-    for(let r = 1; r < 4; r++){ ctx.beginPath(); ctx.moveTo(x + 4, y - h + r * 24); ctx.lineTo(x + w - 4, y - h + r * 24); ctx.stroke();
-      const o = r % 2 ? w / 2 : w / 4; ctx.beginPath(); ctx.moveTo(x + o, y - h + (r - 1) * 24 + 2); ctx.lineTo(x + o, y - h + r * 24 - 2); ctx.stroke(); }
-    ctx.fillStyle = "#fff"; ctx.font = "600 14px Poppins"; ctx.textAlign = "center"; ctx.fillText(done ? "✓" : String(i + 1), x + w / 2, y - h - 10);
+    ctx.save(); TH.obstacle(x, y, w, h, done); ctx.restore();
+    ctx.fillStyle = done ? "#1F8A70" : "#6C4FE0"; ctx.beginPath(); ctx.arc(x + w / 2, y - h - 16, 11, 0, 7); ctx.fill();   // pastille numérotée
+    ctx.fillStyle = "#fff"; ctx.font = "600 13px Poppins"; ctx.textAlign = "center"; ctx.fillText(done ? "✓" : String(i + 1), x + w / 2, y - h - 11.5);
   });
   // drapeau d'arrivée
   const fx = wallX(PH.length - 1) + 360 - G.x + evoX(); if(fx < W + 60){
@@ -251,7 +249,186 @@ function drawWalls(){
     [["#1E4FB5",0],["#fff",1],["#EF3340",2]].forEach(([c, k]) => { ctx.fillStyle = c; ctx.fillRect(fx + 4 + k * 18, y - 120, 18, 36); });
   }
 }
-function drawFrame(dt){ drawSky(); drawSkyline(); drawRoof(); drawWalls(); drawEvo(dt); drawParts(dt); }
+/* ---------- Décors selon la page (le fond et les obstacles suivent le thème) ----------
+   roofs : toits de Paris (par défaut) · shop : boutique de vêtements · resto : bistrot · metro : station de métro · train : gare
+   Pour ajouter un décor : une entrée dans THEMES (back = fond qui défile lentement, ground = sol, obstacle = ce qu'Evo saute)
+   et la page correspondante dans THEME_OF (section / onglet, comme les adresses de l'appli). */
+const THEME_OF = { s1t0: "shop", s2t2: "train", s3t1: "metro", s4t0: "resto" };
+const THEME = (() => { const m = String(SET && SET.back || "").match(/^s(\d+)t(\d+)/); return (m && THEME_OF[`s${m[1]}t${m[2]}`]) || "roofs"; })();
+// répète un motif tous les `step` pixels, avec un numéro stable pour varier les éléments
+function tile(step, speed, fn){ const off = G.x * speed; for(let k = -1; k < W / step + 2; k++){ const x = k * step - (off % step); fn(x, Math.abs(Math.floor((k * step + off) / step))); } }
+const pick = (arr, n) => arr[n % arr.length];
+function fillRR(x, y, w, h, r, c){ roundRect(x, y, w, h, r); ctx.fillStyle = c; ctx.fill(); }
+const THEMES = {
+  roofs: { back(){ drawSky(); drawSkyline(); }, ground: () => drawRoof(),
+    obstacle(x, y, w, h, done){
+      roundRect(x, y - h, w, h, 8); ctx.fillStyle = done ? "#C9BFF5" : "#6C4FE0"; ctx.fill();
+      ctx.strokeStyle = done ? "rgba(255,255,255,.5)" : "rgba(255,255,255,.28)"; ctx.lineWidth = 2;
+      for(let r = 1; r < 4; r++){ ctx.beginPath(); ctx.moveTo(x + 4, y - h + r * 24); ctx.lineTo(x + w - 4, y - h + r * 24); ctx.stroke();
+        const o = r % 2 ? w / 2 : w / 4; ctx.beginPath(); ctx.moveTo(x + o, y - h + (r - 1) * 24 + 2); ctx.lineTo(x + o, y - h + r * 24 - 2); ctx.stroke(); }
+    } },
+
+  /* Boutique de vêtements : papier peint rayé, portants, mannequins, cabines ; parquet ; piles de boîtes */
+  shop: {
+    back(){
+      const gy = groundY();
+      ctx.fillStyle = "#FBF3EA"; ctx.fillRect(0, 0, W, gy);
+      tile(36, .3, x => { ctx.fillStyle = "#F4E6DA"; ctx.fillRect(x, 0, 16, gy); });
+      ctx.fillStyle = "#E9D6C6"; ctx.fillRect(0, gy - 26, W, 26); ctx.fillStyle = "#DEC6B3"; ctx.fillRect(0, gy - 28, W, 3);   // plinthe
+      tile(260, .3, (x, n) => {
+        const kind = n % 3;
+        if(kind === 0){                                               // portant avec vêtements
+          ctx.fillStyle = "#9A8F86"; ctx.fillRect(x, gy - 150, 150, 4); ctx.fillRect(x + 4, gy - 150, 3, 124); ctx.fillRect(x + 143, gy - 150, 3, 124);
+          for(let i = 0; i < 6; i++){ const cx = x + 16 + i * 22, c = pick(["#C9BFF5", "#F2C9EB", "#9FD8C9", "#F5C58A", "#B7C8F2", "#E8A1A1"], n + i);
+            ctx.strokeStyle = "#9A8F86"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx, gy - 146); ctx.lineTo(cx, gy - 140); ctx.stroke();
+            ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(cx - 12, gy - 136); ctx.lineTo(cx, gy - 141); ctx.lineTo(cx + 12, gy - 136); ctx.lineTo(cx + 9, gy - (i % 2 ? 80 : 95)); ctx.lineTo(cx - 9, gy - (i % 2 ? 80 : 95)); ctx.closePath(); ctx.fill(); }
+        } else if(kind === 1){                                        // mannequin
+          const cx = x + 70; ctx.fillStyle = "#E3D2C3";
+          ctx.beginPath(); ctx.arc(cx, gy - 168, 11, 0, 7); ctx.fill();
+          ctx.fillStyle = pick(["#6C4FE0", "#D96ECC", "#1F8A70"], n);
+          ctx.beginPath(); ctx.moveTo(cx - 22, gy - 150); ctx.lineTo(cx + 22, gy - 150); ctx.lineTo(cx + 30, gy - 70); ctx.lineTo(cx - 30, gy - 70); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = "#9A8F86"; ctx.fillRect(cx - 2, gy - 70, 4, 44); ctx.fillRect(cx - 18, gy - 30, 36, 4);
+        } else {                                                      // cabine d'essayage
+          ctx.fillStyle = "#C9A98F"; ctx.fillRect(x + 10, gy - 190, 120, 6);
+          ctx.fillStyle = "#B55D73";
+          for(let i = 0; i < 6; i++){ ctx.beginPath(); ctx.ellipse(x + 20 + i * 20, gy - 105, 11, 82, 0, 0, 7); ctx.fill(); }
+          ctx.fillStyle = "#B55D73"; ctx.font = "600 12px Poppins"; ctx.textAlign = "center"; ctx.fillText("CABINE", x + 70, gy - 196);
+        }
+      });
+    },
+    ground(){
+      const y = groundY(); ctx.fillStyle = "#D8B48E"; ctx.fillRect(0, y, W, H - y);
+      ctx.fillStyle = "#C79F78"; for(let r = 0; r < 6; r++) ctx.fillRect(0, y + 10 + r * 16, W, 2);
+      tile(90, 1, (x, n) => { for(let r = 0; r < 6; r++){ ctx.fillStyle = "#C79F78"; ctx.fillRect(x + (r % 2) * 45 + (n % 3) * 7, y + r * 16, 2, 12); } });
+      ctx.fillStyle = "#E6C7A6"; ctx.fillRect(0, y, W, 4);
+    },
+    obstacle(x, y, w, h, done){                                       // pile de boîtes de la boutique
+      const cols = done ? ["#E7DDF9", "#F2E9FB", "#E7DDF9"] : ["#6C4FE0", "#D96ECC", "#7E64E6"];
+      const bx = [[x - 6, 40, w + 12], [x, 32, w], [x + 6, 24, w - 12]]; let yy = y;
+      bx.forEach(([bx0, bh, bw], i) => { yy -= bh; fillRR(bx0, yy, bw, bh - 2, 5, cols[i]);
+        ctx.fillStyle = done ? "rgba(255,255,255,.6)" : "rgba(255,255,255,.55)"; ctx.fillRect(bx0 + bw / 2 - 3, yy, 6, bh - 2); });
+      ctx.strokeStyle = done ? "#CFC6EE" : "#F5C58A"; ctx.lineWidth = 3; ctx.beginPath();                       // nœud
+      ctx.ellipse(x + w / 2 - 7, yy - 4, 7, 4, -.5, 0, 7); ctx.ellipse(x + w / 2 + 7, yy - 4, 7, 4, .5, 0, 7); ctx.stroke();
+    } },
+
+  /* Bistrot : boiseries, miroirs, ardoise du menu, suspensions ; carrelage en damier ; chariot avec cloche */
+  resto: {
+    back(){
+      const gy = groundY();
+      ctx.fillStyle = "#FFF6E6"; ctx.fillRect(0, 0, W, gy);
+      ctx.fillStyle = "#7A2E3A"; ctx.fillRect(0, gy - 90, W, 90); ctx.fillStyle = "#5E2230"; ctx.fillRect(0, gy - 94, W, 6);  // boiserie basse
+      tile(70, .3, x => { ctx.strokeStyle = "rgba(255,255,255,.15)"; ctx.lineWidth = 2; ctx.strokeRect(x + 8, gy - 80, 54, 66); });
+      tile(300, .3, (x, n) => {
+        if(n % 2){                                                    // ardoise du menu
+          fillRR(x + 30, gy - 250, 120, 120, 8, "#8A6A4F"); ctx.fillStyle = "#2F3A36"; ctx.fillRect(x + 38, gy - 242, 104, 104);
+          ctx.fillStyle = "#F4F1E8"; ctx.font = "600 13px Poppins"; ctx.textAlign = "center"; ctx.fillText(EN ? "MENU" : "MENÚ", x + 90, gy - 220);
+          ctx.font = "11px Poppins"; ["Soupe 7 €", "Steak 18 €", "Crème brûlée"].forEach((s, i) => ctx.fillText(s, x + 90, gy - 198 + i * 18));
+        } else {                                                      // miroir doré
+          fillRR(x + 40, gy - 260, 110, 140, 50, "#E2B85C"); fillRR(x + 46, gy - 254, 98, 128, 46, "#EDE7F7");
+          ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.fillRect(x + 66, gy - 236, 6, 80);
+        }
+        ctx.strokeStyle = "#5E2230"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x + 230, 0); ctx.lineTo(x + 230, gy - 300); ctx.stroke();   // suspension
+        ctx.fillStyle = "#1F8A70"; ctx.beginPath(); ctx.moveTo(x + 212, gy - 280); ctx.lineTo(x + 248, gy - 280); ctx.lineTo(x + 238, gy - 300); ctx.lineTo(x + 222, gy - 300); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "rgba(255,214,120,.35)"; ctx.beginPath(); ctx.arc(x + 230, gy - 276, 14, 0, 7); ctx.fill();
+      });
+      tile(230, .55, (x, n) => {                                      // tables et chaises bistrot
+        const cx = x + 100, ty = gy - 62;
+        ctx.fillStyle = "#FFFFFF"; ctx.beginPath(); ctx.ellipse(cx, ty, 38, 7, 0, 0, 7); ctx.fill();
+        ctx.fillStyle = "#3C3C46"; ctx.fillRect(cx - 2, ty, 4, 58); ctx.fillRect(cx - 16, gy - 5, 32, 4);
+        [-1, 1].forEach(s => { const sx = cx + s * 50; ctx.strokeStyle = "#B8834F"; ctx.lineWidth = 4;
+          ctx.beginPath(); ctx.moveTo(sx, gy - 2); ctx.lineTo(sx, gy - 48); ctx.moveTo(sx - 14 * s, gy - 2); ctx.lineTo(sx - 14 * s, gy - 30); ctx.moveTo(sx, gy - 30); ctx.lineTo(sx - 18 * s, gy - 30); ctx.stroke(); });
+        ctx.fillStyle = pick(["#D96ECC", "#F5A623", "#6C4FE0"], n); ctx.fillRect(cx - 3, ty - 14, 6, 12);   // petit vase
+      });
+    },
+    ground(){
+      const y = groundY(), s = 22; ctx.fillStyle = "#F4EFE6"; ctx.fillRect(0, y, W, H - y);
+      tile(s * 2, 1, x => { ctx.fillStyle = "#3E3A48"; for(let r = 0; r * s < H - y; r++) ctx.fillRect(x + (r % 2) * s, y + r * s, s, s); });
+      ctx.fillStyle = "#5E2230"; ctx.fillRect(0, y, W, 4);
+    },
+    obstacle(x, y, w, h, done){                                       // chariot de service avec cloche
+      const c = done ? "#D9D2EE" : "#6C4FE0", m = done ? "#ECE8F6" : "#C9CED8";
+      ctx.fillStyle = c; ctx.fillRect(x - 8, y - 46, w + 16, 6); ctx.fillRect(x - 8, y - 14, w + 16, 5);
+      ctx.fillRect(x - 6, y - 46, 4, 38); ctx.fillRect(x + w + 2, y - 46, 4, 38);
+      [x - 2, x + w - 2].forEach(wx => { ctx.fillStyle = "#3C3C46"; ctx.beginPath(); ctx.arc(wx + 2, y - 4, 4, 0, 7); ctx.fill(); });
+      ctx.fillStyle = m; ctx.beginPath(); ctx.ellipse(x + w / 2, y - 48, w / 2 + 6, 4, 0, 0, 7); ctx.fill();          // plateau
+      ctx.beginPath(); ctx.moveTo(x - 4, y - 50); ctx.quadraticCurveTo(x - 2, y - h + 2, x + w / 2, y - h + 4); ctx.quadraticCurveTo(x + w + 2, y - h + 2, x + w + 4, y - 50); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = done ? "#fff" : "#EEF0F4"; ctx.beginPath(); ctx.arc(x + w / 2, y - h + 2, 5, 0, 7); ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,.6)"; ctx.fillRect(x + 6, y - 82, 4, 22);
+    } },
+
+  /* Station de métro : carrelage blanc, plaque bleue, plans, rame qui passe ; quai ; portillons */
+  metro: {
+    back(){
+      const gy = groundY();
+      ctx.fillStyle = "#F2F1EE"; ctx.fillRect(0, 0, W, gy);
+      ctx.strokeStyle = "#DEDCD6"; ctx.lineWidth = 1;                // carreaux biseautés
+      tile(24, .3, x => { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, gy); ctx.stroke(); });
+      for(let r = 0; r * 12 < gy; r++){ ctx.beginPath(); ctx.moveTo(0, r * 12); ctx.lineTo(W, r * 12); ctx.stroke(); }
+      ctx.fillStyle = "#E7E3DA"; ctx.beginPath(); ctx.ellipse(W / 2, 0, W * .9, 70, 0, 0, Math.PI); ctx.fill();   // voûte
+      tile(340, .3, (x, n) => {
+        fillRR(x + 30, gy - 230, 150, 34, 6, "#1F3F8C"); ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; roundRect(x + 33, gy - 227, 144, 28, 4); ctx.stroke();
+        ctx.fillStyle = "#fff"; ctx.font = "600 15px Poppins"; ctx.textAlign = "center"; ctx.fillText(pick(["Concorde", "Châtelet", "Bastille", "Opéra"], n), x + 105, gy - 207);
+        fillRR(x + 210, gy - 250, 90, 120, 6, "#fff"); ctx.strokeStyle = "#9AA3B5"; ctx.lineWidth = 2; roundRect(x + 210, gy - 250, 90, 120, 6); ctx.stroke();   // plan du métro
+        ["#F2C12E", "#2E6BD9", "#D63B5C", "#1F8A70", "#9B59D0"].forEach((c, i) => { ctx.strokeStyle = c; ctx.lineWidth = 3; ctx.beginPath();
+          ctx.moveTo(x + 218, gy - 236 + i * 20); ctx.bezierCurveTo(x + 245, gy - 250 + i * 26, x + 265, gy - 200 + i * 6, x + 292, gy - 226 + i * 18); ctx.stroke(); });
+        ctx.fillStyle = "#0A4A2F"; fillRR(x + 40, gy - 150, 26, 26, 13, "#0A4A2F"); ctx.fillStyle = "#fff"; ctx.font = "700 15px Poppins"; ctx.fillText("M", x + 53, gy - 132);
+      });
+      // rame qui passe de temps en temps derrière le quai
+      const cyc = (G.t * 260) % 2600 - 1300, tx = W - cyc;
+      if(cyc > 0){ ctx.fillStyle = "#E7EAF0"; for(let c = 0; c < 3; c++){ const cx = tx + c * 250; fillRR(cx, gy - 120, 240, 96, 16, "#E7EAF0");
+          ctx.fillStyle = "#2E6BD9"; ctx.fillRect(cx, gy - 52, 240, 10);
+          for(let wdw = 0; wdw < 4; wdw++) fillRR(cx + 14 + wdw * 56, gy - 108, 42, 38, 8, "#A9C0DE"); } }
+      ctx.fillStyle = "#5A5F6B"; ctx.fillRect(0, gy - 22, W, 22);   // voie
+    },
+    ground(){
+      const y = groundY(); ctx.fillStyle = "#B9B6AE"; ctx.fillRect(0, y, W, H - y);
+      ctx.fillStyle = "#F2F2F2"; ctx.fillRect(0, y, W, 10); ctx.fillStyle = "#E3C23A"; tile(30, 1, x => ctx.fillRect(x, y + 10, 18, 5));
+      tile(60, 1, x => { ctx.fillStyle = "#ACA9A1"; ctx.fillRect(x, y + 18, 2, H - y); });
+    },
+    obstacle(x, y, w, h, done){                                       // portillon d'accès
+      const body = done ? "#E3DFF2" : "#5D6577", top = done ? "#EFEBF9" : "#6C4FE0";
+      fillRR(x - 4, y - 70, w + 8, 70, 6, body); fillRR(x - 6, y - 76, w + 12, 10, 5, top);
+      ctx.fillStyle = done ? "#fff" : "#2BD48F"; ctx.beginPath(); ctx.arc(x + w - 6, y - 60, 4, 0, 7); ctx.fill();
+      ctx.fillStyle = done ? "#F4F1FC" : "#C8344F"; fillRR(x + w / 2 - 22, y - h, 44, 26, 13, done ? "#F4F1FC" : "#C8344F");   // battants
+      ctx.fillStyle = "#fff"; ctx.fillRect(x + w / 2 - 1, y - h + 2, 2, 22);
+    } },
+
+  /* Gare : verrière, grand tableau des départs, horloge, TGV à quai ; sol avec ligne jaune ; valises */
+  train: {
+    back(){
+      const gy = groundY();
+      const g = ctx.createLinearGradient(0, 0, 0, gy); g.addColorStop(0, "#DCE8F7"); g.addColorStop(1, "#F5F3FB"); ctx.fillStyle = g; ctx.fillRect(0, 0, W, gy);
+      tile(160, .15, x => { ctx.strokeStyle = "#7D8AA8"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x, gy - 140); ctx.lineTo(x, 70);
+        ctx.quadraticCurveTo(x + 80, -10, x + 160, 70); ctx.stroke(); ctx.lineWidth = 1; for(let i = 1; i < 4; i++){ ctx.beginPath(); ctx.moveTo(x + i * 40, 22); ctx.lineTo(x + i * 40, 70); ctx.stroke(); } });
+      tile(420, .3, (x, n) => {
+        fillRR(x + 20, gy - 300, 200, 92, 8, "#1C1F2B"); ctx.fillStyle = "#F5C542"; ctx.font = "600 11px Poppins"; ctx.textAlign = "left";
+        [["TGV 14:05", "Lyon"], ["TER 14:20", "Rouen"], ["TGV 14:42", "Marseille"], ["IC 15:10", "Bordeaux"]].forEach(([a, b], i) => { ctx.fillText(a, x + 32, gy - 276 + i * 20); ctx.fillText(b, x + 130, gy - 276 + i * 20); });
+        ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(x + 320, gy - 260, 26, 0, 7); ctx.fill(); ctx.strokeStyle = "#1C1F2B"; ctx.lineWidth = 3; ctx.stroke();   // horloge
+        ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(x + 320, gy - 260); ctx.lineTo(x + 320, gy - 278); ctx.moveTo(x + 320, gy - 260); ctx.lineTo(x + 333, gy - 255); ctx.stroke();
+        ctx.fillStyle = "#1C1F2B"; ctx.fillRect(x + 318, gy - 300, 4, 14);
+      });
+      tile(300, .5, (x, n) => {                                       // TGV à quai
+        fillRR(x, gy - 112, 296, 86, 18, "#F7F8FB"); ctx.fillStyle = "#3B4A8F"; ctx.fillRect(x, gy - 56, 296, 14);
+        ctx.fillStyle = "#6C4FE0"; ctx.fillRect(x, gy - 42, 296, 4);
+        for(let w2 = 0; w2 < 5; w2++) fillRR(x + 16 + w2 * 56, gy - 100, 44, 30, 8, "#9FB4D6");
+      });
+    },
+    ground(){
+      const y = groundY(); ctx.fillStyle = "#C9C6CF"; ctx.fillRect(0, y, W, H - y);
+      ctx.fillStyle = "#F2C12E"; ctx.fillRect(0, y + 8, W, 5); ctx.fillStyle = "#DAD7DF"; ctx.fillRect(0, y, W, 8);
+      tile(80, 1, x => { ctx.fillStyle = "#BDBAC4"; ctx.fillRect(x, y + 13, 2, H - y); });
+    },
+    obstacle(x, y, w, h, done){                                       // valises empilées
+      const a = done ? "#E7DDF9" : "#6C4FE0", b = done ? "#F3EEFB" : "#F5A623", c = done ? "#EDE8F8" : "#1F8A70";
+      fillRR(x - 8, y - 50, w + 16, 48, 8, a); ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(x + 4, y - 48, 4, 44); ctx.fillRect(x + w - 8, y - 48, 4, 44);
+      ctx.fillStyle = "#3C3C46"; [x - 2, x + w - 6].forEach(wx => { ctx.beginPath(); ctx.arc(wx + 4, y - 1, 3.5, 0, 7); ctx.fill(); });
+      fillRR(x - 2, y - 84, w + 4, 34, 7, b); ctx.strokeStyle = b; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x + w / 2 - 9, y - 84); ctx.lineTo(x + w / 2 - 9, y - 92); ctx.lineTo(x + w / 2 + 9, y - 92); ctx.lineTo(x + w / 2 + 9, y - 84); ctx.stroke();
+      fillRR(x + w / 2 + 6, y - 74, 12, 16, 3, c);                    // étiquette
+    } }
+};
+const TH = THEMES[THEME];
+
+function drawFrame(dt){ ctx.save(); TH.back(); ctx.restore(); ctx.save(); TH.ground(); ctx.restore(); drawWalls(); drawEvo(dt); drawParts(dt); }
 function drawEvo(dt){
   const y0 = groundY(), size = 78; let x = evoX(), y = y0 - size, rot = 0;
   // rebond et inclinaison lissés : à l'arrêt, Evo se pose en douceur au lieu de « sauter » d'une pose à l'autre
