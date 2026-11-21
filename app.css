@@ -659,3 +659,4 @@ svg.lock{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;s
 .tr-bub.mini img{width:38px}
 .tr-bub.mini .bf{margin-top:2px}
 .tr-bub .sk.acc{color:#5940BF;font-weight:600}
+#tr-box{position:fixed;z-index:82;pointer-events:none;display:none;border:2px solid #6C4FE0;border-radius:999px;background:transparent;transition:top .4s ease,left .4s ease}

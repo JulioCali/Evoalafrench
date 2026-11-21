@@ -1018,7 +1018,7 @@ const PT_TXT = {
        img:"Tocar la imagen te muestra cómo se lee la frase.", tapImg:"Toca la imagen",
        sayT:"Así se dice", say:pr => `«${pr}»: la sílaba en mayúsculas es la que se marca más. Toca otra vez la imagen para ocultarla.`,
        heart:"Crea tus listas de frases favoritas.",
-       turn:(a, b) => `Ahora, escucha «${a}» y «${b}».`, turnLab:"Escúchalas para desbloquear una sorpresa",
+       turn:() => "Para desbloquear una sorpresa.", turnLab:"Escucha las dos frases",
        prT:"¡Escuchaste todo! 🎉", pr:"Se desbloqueó «Practicar»: un juego para decir las frases en francés. Se queda aquí, y te lo explico cuando lo abras.",
        navT:"Tu menú", nav:"Abajo tienes la guía, tus listas y la Guía de París.",
        listsT:"Mis listas", lists:"Aquí encuentras las frases que guardaste con el corazón.",
@@ -1033,7 +1033,7 @@ const PT_TXT = {
        img:"Tapping the picture shows you how to read the phrase.", tapImg:"Tap the picture",
        sayT:"How to say it", say:pr => `“${pr}”: the syllable in capitals is the stressed one. Tap the picture again to hide it.`,
        heart:"Create your lists of favourite phrases.",
-       turn:(a, b) => `Now listen to “${a}” and “${b}”.`, turnLab:"Listen to them to unlock a surprise",
+       turn:() => "To unlock a surprise.", turnLab:"Listen to both phrases",
        prT:"You heard everything! 🎉", pr:"“Practise” is unlocked: a game to say the phrases in French. It stays here, and I'll explain it when you open it.",
        navT:"Your menu", nav:"At the bottom: the guide, your lists and the Paris Guide.",
        listsT:"My lists", lists:"Find the phrases you saved with the heart here.",
@@ -1065,7 +1065,7 @@ function pageTuto(){
     { el: f(0, ".ic"), text: T.img, wait: T.tapImg, act: () => { const es = ptRow(0).querySelector(".es"); if(!es.classList.contains("showpr")) ptRow(0).querySelector(".ic").click(); } },
     { el: () => ptRow(0), title: T.sayT, text: T.say(ptRow(0).querySelector(".es").dataset.pr || "") },
     { el: f(0, ".heart"), round: true, text: T.heart, wait: T.tapIcon, act: () => ptRow(0).querySelector(".heart").classList.add("on") },
-    { el: () => document.querySelector('.card[data-g="0"]'), text: T.turn(ptRow(1).dataset.key, ptRow(2).dataset.key), wait: T.turnLab, hand: f(1, ".spk"), labAt: () => ptRow(2),
+    { el: () => document.querySelector('.card[data-g="0"]'), text: T.turn(ptRow(1).dataset.key, ptRow(2).dataset.key), wait: T.turnLab, hand: f(1, ".spk"), labAt: () => ptRow(2), box: () => [ptRow(1).querySelector(".spk"), ptRow(2).querySelector(".spk")],
       hit: t => t.closest('.card[data-g="0"] .row') && [ptRow(1), ptRow(2)].includes(t.closest(".row")),
       act: async t => { await ptListen(t.closest(".row")); return [0, 1, 2].every(i => ptRow(i).classList.contains("heard")); } },
     { el: () => document.querySelector('.card[data-g="0"] .pslot'), title: T.prT, text: T.pr, before: () => refreshPractice(true) },
@@ -1074,15 +1074,15 @@ function pageTuto(){
     { el: () => document.querySelector('.nav [data-go="p1"]'), round: true, title: T.parisT, text: T.paris },
     { title: T.endT, text: T.end, next: T.go, end: true }
   ];
-  const blk = document.createElement("div"), spot = document.createElement("div"), bub = document.createElement("div"), hand = document.createElement("div"), lab = document.createElement("div");
-  blk.className = "tr-blk"; spot.className = "tr-spot none"; bub.className = "tr-bub"; hand.id = "tr-hand"; lab.id = "tr-lab";
+  const blk = document.createElement("div"), spot = document.createElement("div"), bub = document.createElement("div"), hand = document.createElement("div"), lab = document.createElement("div"), box = document.createElement("div");
+  blk.className = "tr-blk"; spot.className = "tr-spot none"; bub.className = "tr-bub"; hand.id = "tr-hand"; lab.id = "tr-lab"; box.id = "tr-box";
   hand.innerHTML = `<svg viewBox="-4 -8 52 66"><g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path class="ray" d="M18 -6V-1M8.5 -2l3 3.5M27.5 -2l-3 3.5M3 8h5M28 8h5"/></g><path d="M14 31V10a4 4 0 0 1 8 0v15v-1.5a4 4 0 0 1 8 0V27v-1a4 4 0 0 1 8 0v3.5a3.5 3.5 0 0 1 7 0V42c0 8-6 14-14 14h-6c-5 0-8-2.5-11-6.5L5.2 40.6a3.6 3.6 0 0 1 5.4-4.8L14 39.5Z" fill="#fff" stroke="#2E2550" stroke-width="2.6" stroke-linejoin="round"/><path d="M22 25v5M30 26.5v4M38 28.5v3.5" stroke="#2E2550" stroke-width="2.2" stroke-linecap="round"/></svg>`;
-  document.body.append(blk, spot, bub, hand, lab);
+  document.body.append(blk, spot, bub, box, hand, lab);
   let k = 0, busy = false;
   const count = () => k >= 1 && k < S.length - 1 ? `${k} / ${S.length - 2}` : "";
   function finish(goBack){
     try{ localStorage.setItem("evoala-tuto", "1"); }catch(e){}
-    [blk, spot, bub, hand, lab].forEach(el => el.remove()); document.body.classList.remove("pt-tap"); ptOn = false;
+    [blk, spot, bub, box, hand, lab].forEach(el => el.remove()); document.body.classList.remove("pt-tap"); ptOn = false;
     removeEventListener("resize", place); removeEventListener("scroll", place);
     // on reste sur la page : le bouton « Practicar » débloqué y est visible
   }
@@ -1094,6 +1094,10 @@ function pageTuto(){
     spot.className = "tr-spot" + (s.act ? " tap" : "");
     Object.assign(spot.style, { top: r.top - pad + "px", left: r.left - pad + "px", width: w + "px", height: h + "px", borderRadius: (s.round ? Math.max(w, h) / 2 : 18) + "px" });
     bub.classList.remove("mid");
+    box.style.display = s.box ? "block" : "none";               // contour violet autour des zones à toucher
+    if(s.box){ const rs = s.box().map(ptRect).filter(Boolean), p2 = 7;
+      const l = Math.min(...rs.map(q => q.left)), t2 = Math.min(...rs.map(q => q.top)), rr = Math.max(...rs.map(q => q.right)), b2 = Math.max(...rs.map(q => q.bottom));
+      Object.assign(box.style, { left: l - p2 + "px", top: t2 - p2 + "px", width: rr - l + p2 * 2 + "px", height: b2 - t2 + p2 * 2 + "px" }); }
     if(s.act){                                                    // main qui tape + étiquette, juste sous la zone à toucher
       const hr = ptRect(s.hand ? s.hand() : el), cx = hr.left + hr.width / 2, tip = hr.bottom - 8;
       hand.style.left = (cx - 18) + "px"; hand.style.top = (tip - 12) + "px";
