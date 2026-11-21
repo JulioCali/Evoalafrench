@@ -1025,6 +1025,14 @@ function lev(a, b){ const m = a.length, n = b.length, d = Array.from({length: m 
 const score = (said, target) => { const a = norm(said), b = norm(target); if(!a) return 0; return 1 - lev(a, b) / Math.max(a.length, b.length); };
 const MIME = ["audio/mp4", "audio/webm;codecs=opus", "audio/webm", "audio/ogg"].find(t => window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || "";
 let stream = null, mrec = null, chunks = [], vad = null, heardVoice = false;
+// Sur iPhone, tant que le micro reste ouvert, le téléphone passe en mode « appel » : le son sort très bas
+// (par l'écouteur) et les audios ne se lancent plus seuls. On coupe donc le micro dès la fin de chaque enregistrement.
+function releaseMic(){
+  try{ if(stream) stream.getTracks().forEach(t => t.stop()); }catch(e){}
+  stream = null;
+  try{ if(actx && actx.state === "running") actx.suspend(); }catch(e){}
+}
+document.addEventListener("visibilitychange", () => { if(document.hidden && !(mrec && mrec.state === "recording")) releaseMic(); });
 async function getStream(){ if(stream && stream.active) return stream; stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); return stream; }
 function watchSilence(st){
   const a = ac(), src = a.createMediaStreamSource(st), an = a.createAnalyser(); an.fftSize = 1024; src.connect(an);
@@ -1056,7 +1064,7 @@ function junk(said, target){
   return false;
 }
 async function check(){
-  cancelAnimationFrame(vad); setMic("wait");
+  cancelAnimationFrame(vad); setMic("wait"); releaseMic();
   const blob = new Blob(chunks, { type: (mrec && mrec.mimeType) || MIME || "audio/mp4" });
   let said = "";
   try{ const r = await fetch("/api/stt", { method: "POST", headers: { "content-type": blob.type }, body: blob }); const d = await r.json(); if(!r.ok) throw new Error(d.error || r.status); said = d.text || ""; }
