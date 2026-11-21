@@ -78,50 +78,6 @@ const ICON = {
 
 let C, UI, player;
 
-/* ---------- Fonds d'écran (dossier bg/, dessinés par tools/fonds.py) ---------- */
-const FONDOS = [
-  {k:"",es:"Sin fondo",en:"No background"},
-  {k:"paris-jour",es:"Paris de día",en:"Paris by day"},
-  {k:"paris-noche",es:"Paris de noche",en:"Paris by night"},
-  {k:"marseille-jour",es:"Marseille de día",en:"Marseille by day"},
-  {k:"marseille-noche",es:"Marseille de noche",en:"Marseille by night"},
-  {k:"lyon-jour",es:"Lyon de día",en:"Lyon by day"},
-  {k:"lyon-noche",es:"Lyon de noche",en:"Lyon by night"},
-  {k:"montreal-jour",es:"Montréal de día",en:"Montréal by day"},
-  {k:"montreal-noche",es:"Montréal de noche",en:"Montréal by night"},
-  {k:"kinshasa-jour",es:"Kinshasa de día",en:"Kinshasa by day"},
-  {k:"kinshasa-noche",es:"Kinshasa de noche",en:"Kinshasa by night"},
-  {k:"alger-jour",es:"Alger de día",en:"Algiers by day"},
-  {k:"alger-noche",es:"Alger de noche",en:"Algiers by night"},
-  {k:"provence",es:"Campos de lavanda",en:"Lavender fields"},
-  {k:"dakar",es:"Atardecer en Dakar",en:"Sunset in Dakar"},
-  {k:"bruxelles-noche",es:"Bruselas de noche",en:"Brussels by night"}
-];
-let BG = ""; try{ BG = localStorage.getItem("evoala-bg") || ""; }catch(e){}
-function applyBg(k, save){
-  if(!FONDOS.some(f => f.k === k)) k = "";
-  BG = k; try{ localStorage.setItem("evoala-bg", k); }catch(e){}
-  let el = document.getElementById("bgl");
-  if(!el){ el = document.createElement("div"); el.id = "bgl"; el.setAttribute("aria-hidden", "true"); document.body.prepend(el); }
-  el.style.backgroundImage = k ? `url(bg/${k}.svg)` : "";
-  document.body.classList.toggle("hasbg", !!k);
-  document.body.classList.toggle("dark", /noche/.test(k));
-  if(save) window.EvoAuth?.save({ bg: k });
-}
-function openBgSheet(){
-  const L = LANG === "en" ? { t:"Choose your background", s:"It changes behind the whole app." } : { t:"Elige tu fondo", s:"Cambia detrás de toda la aplicación." };
-  const sh = document.createElement("div"); sh.className = "sheet bgsheet";
-  sh.innerHTML = `<div class="shov" data-bgclose></div><div class="shp" role="dialog" aria-label="${L.t}"><div class="grab"></div><h3>${L.t}</h3><p class="bgsub">${L.s}</p>
-    <div class="bggrid">${FONDOS.map(f => `<button class="bgt${f.k === BG ? " on" : ""}" data-bgset="${f.k}">${f.k ? `<img src="bg/${f.k}.svg" alt="" loading="lazy">` : `<span class="bgnone"></span>`}<span>${esc(f[LANG] || f.es)}</span></button>`).join("")}</div></div>`;
-  document.body.appendChild(sh); requestAnimationFrame(() => sh.classList.add("open"));
-  const close = () => { sh.classList.remove("open"); setTimeout(() => sh.remove(), 260); };
-  sh.addEventListener("click", e => {
-    const b = e.target.closest("[data-bgset]");
-    if(b){ applyBg(b.dataset.bgset, true); sh.querySelectorAll(".bgt").forEach(x => x.classList.toggle("on", x === b)); setTimeout(close, 180); return; }
-    if(e.target.closest("[data-bgclose]")) close();
-  });
-}
-
 /* ---------- Vente (Hotmart) ----------
    CHECKOUT : le lien de paiement Hotmart du guide (pay.hotmart.com/…). Vide = bouton « Muy pronto ».
    L'acheteur se connecte ensuite avec le même e-mail : le serveur (worker.js) lui envoie alors tout le contenu. */
@@ -165,7 +121,7 @@ function lockPanel(intro, labels){
   if(!u) foot = `<p class="lhave">${lk("have")} <button data-lgo="entrar">${lk("login")}</button></p>
       ${AUTH_ON ? `<p class="lfree"><button data-lgo="cuenta">${lk("orFree")}</button></p>` : ""}`;
   else if(acc.user && !acc.verified && !(u.emailVerified)) foot = `<div class="lver"><b>${lk("verT")}</b><p>${lk("verS")(mail)}</p>
-      <div class="lvrow"><button class="lbtn on" data-lverified>${lk("verDone")}</button><button class="lbtn" data-lresend>${lk("verAgain")}</button></div></div>`;
+      <div class="lrow"><button class="lbtn on" data-lverified>${lk("verDone")}</button><button class="lbtn" data-lresend>${lk("verAgain")}</button></div></div>`;
   else foot = `<p class="lsame">${lk("same")(mail)}</p><button class="lbtn wide" data-lcheck>${lk("done")}</button>`;
   return `<section class="lockp"><span class="lico">${LOCK}</span><h2>${lk("title")}</h2>
     <p>${intro}</p>
@@ -195,7 +151,6 @@ async function checkPurchase(btn){
   if(c && !(c._acc && c._acc.pro)) toast(c._acc && c._acc.user && !c._acc.verified ? lk("verNo") : lk("notYet"));
 }
 const app = document.getElementById("app");
-applyBg(BG);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const slug = n => n.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ /g,"-").toLowerCase();
 const mi = (name, cls="mi") => `<i class="${cls}" style="-webkit-mask-image:url('img/ui/${slug(name)}.png');mask-image:url('img/ui/${slug(name)}.png')"></i>`;
@@ -318,7 +273,6 @@ function onAuth(u){
       if(d && Array.isArray(d.lists)){ lists.put(d.lists, false); refreshHearts(); if(/^#lista/.test(location.hash)) route(); }
       else if(lists.all().length) window.EvoAuth.save({ lists: lists.all() });
       if(d && d.lang && d.lang !== LANG) setLang(d.lang, true);
-      if(d && typeof d.bg === "string" && d.bg !== BG) applyBg(d.bg);
       else if(!location.hash) route();
       if(!d) window.EvoAuth.save({ lang: LANG, last: store.get() || null });
     });
@@ -454,7 +408,7 @@ function home(){
 function topbar(where){
   const toHub = where === "ghub";
   return `<div class="top"><button class="home" data-go="${toHub ? "" : "guia"}"${toHub ? " data-home" : ""} aria-label="${toHub ? t("allGuides") : t("home")}">${ICON.home}</button>
-    <img class="logo" src="img/ui/logo.webp" alt="evoala"><span class="tsp"></span><button class="bgb" data-bgpick aria-label="${LANG === "en" ? "Background" : "Fondo"}"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.5-.2-.8-.4-1.1-.3-.3-.4-.6-.4-1 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5C21 6.4 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.3"/><circle cx="10" cy="7" r="1.3"/><circle cx="14.5" cy="7" r="1.3"/></svg></button>${where === "guide" || where === "ghub" ? `<button class="tutob" data-tuto aria-label="${t("tuto")}">${ICON.bulb}</button>` : ""}${langToggle("hl sm")}</div>`;
+    <img class="logo" src="img/ui/logo.webp" alt="evoala"><span class="tsp"></span>${where === "guide" || where === "ghub" ? `<button class="tutob" data-tuto aria-label="${t("tuto")}">${ICON.bulb}</button>` : ""}${langToggle("hl sm")}</div>`;
 }
 // barre du bas : Guía / Paris / Bonus, sur toutes les pages
 function navbar(where){
@@ -904,7 +858,6 @@ app.addEventListener("click", e => {
   const go = e.target.closest("[data-go]");
   if(go?.hasAttribute("data-cat")){ try{ localStorage.setItem("evoala-cat","1"); }catch(_){} }
   if(go){ if(go.dataset.go || go.classList.contains("home") || go.hasAttribute("data-home")){ location.hash = go.dataset.go; if(!go.dataset.go) route(); } return; }
-  if(e.target.closest("[data-bgpick]")){ openBgSheet(); return; }
   if(e.target.closest("[data-buy]")){
     if(!CHECKOUT){ toast(lk("soon")); return; }
     const u = window.EvoAuth && window.EvoAuth.user;

@@ -622,36 +622,9 @@ svg.lock{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;s
 .lver b{display:block;color:#7A5200 !important;margin-bottom:4px}
 .lver p{font-size:13px !important;margin-bottom:10px !important}
 .lver p b{display:inline;color:#7A5200 !important}
-.lvrow{display:flex;gap:8px;flex-wrap:wrap}
-.lvrow .lbtn{flex:1}
+.lrow{display:flex;gap:8px;flex-wrap:wrap}
+.lrow .lbtn{flex:1}
 .gwide .wlock{width:26px;height:26px;border-radius:50%;background:var(--lavender-soft);color:var(--violet-dark);display:flex;align-items:center;justify-content:center;flex:none;margin-right:2px}
 .gwide .wlock svg.lock{margin:0;width:13px;height:13px}
 .cat.shut svg.lock{width:13px;height:13px;margin:0 0 0 -2px;color:#9A90B8}
 .cat.shut.on svg.lock{color:#fff;opacity:.85}
-
-/* ---------- Fonds d'écran ---------- */
-#bgl{position:fixed;inset:0;z-index:-1;background:center bottom/cover no-repeat;pointer-events:none}
-body.hasbg{background:transparent}
-body.hasbg .top,body.hasbg .catwrap{background:rgba(255,255,255,.8);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-body.hasbg .nav{background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-.bgb{flex:none;width:38px;height:38px;border-radius:50%;background:var(--lavender-soft);display:grid;place-items:center;margin-right:6px}
-.bgb svg{width:20px;height:20px;fill:none;stroke:var(--violet-dark);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.bgb svg circle{fill:var(--violet-dark);stroke:none}
-.bgsheet h3{margin-top:6px}
-.bgsub{margin:2px 0 14px;font-size:13px;color:var(--gray)}
-.bggrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.bgt{display:flex;flex-direction:column;gap:6px;align-items:stretch;text-align:center;font-size:12px;color:var(--ink);line-height:1.25}
-.bgt img,.bgt .bgnone{width:100%;aspect-ratio:9/14;object-fit:cover;object-position:bottom;border-radius:14px;border:2px solid var(--card-border);display:block;background:#fff}
-.bgt .bgnone{background:repeating-linear-gradient(45deg,#fff 0 10px,#F6F5FC 10px 20px)}
-.bgt.on img,.bgt.on .bgnone{border-color:var(--violet);box-shadow:0 0 0 3px var(--lavender-soft)}
-.bgt.on span:last-child{color:var(--violet-dark);font-weight:600}
-body.hasbg .card,body.hasbg .lcard,body.hasbg .lnewbig,body.hasbg .gtile,body.hasbg .gwide{background:#fff}
-body.hasbg .ptabs{background:rgba(255,255,255,.8);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
-body.hasbg .hubright .achip,body.hasbg .logo{background:#fff;border-radius:999px}
-body.hasbg img.logo{padding:2px 8px;box-sizing:content-box}
-/* fonds de nuit : les textes posés directement sur le ciel passent en clair */
-body.dark .hero>div>h1,body.dark .hero>div>p,body.dark .ghead b,body.dark .ghead span,body.dark .gtitle small,body.dark .gtitle b,
-body.dark .gch,body.dark p.intro,body.dark .ptitle b,body.dark .ptitle small,body.dark .ltitle b,body.dark .ltitle small,body.dark .ltip,body.dark button.up{color:#fff}
-body.dark .hero>div>h1 span{color:#C9BEFF}
-body.dark .gtitle small,body.dark .ptitle small,body.dark .ltitle small,body.dark p.intro,body.dark .ghead span,body.dark .hero>div>p,body.dark .hero>div>p span{color:#DCD6F7}
-body.dark button.up{background:rgba(255,255,255,.14)}
