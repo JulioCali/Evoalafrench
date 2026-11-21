@@ -107,6 +107,12 @@
   .lv .tx{flex:1}
   .lv .go2{height:34px;padding:0 14px;border-radius:999px;background:#6C4FE0;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center}
   .lv .done{font-size:13px;font-weight:600;color:#1F8A70}
+  /* niveau terminé : « Hecho » en haut à droite, bouton « recommencer » en bas à droite */
+  .lv.done{align-items:stretch}
+  .lv.done .cir{align-self:center}.lv.done .tx{align-self:center}
+  .lv .dcol{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:8px;min-height:62px}
+  .lv .again{width:34px;height:34px;border-radius:50%;background:#E6F6EE;border:1.5px solid #1F8A70;display:grid;place-items:center}
+  .lv .again svg{width:18px;height:18px;fill:none;stroke:#1F8A70;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
   .lv .lk{width:20px;height:20px;fill:none;stroke:#B5AECB;stroke-width:2.2;stroke-linecap:round}
   .cir{flex:none;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;box-sizing:border-box}
   .cir.d{background:#1F8A70;color:#fff}.cir.n{background:#6C4FE0;color:#fff}.cir.t{border:2px solid #CFC8EA;color:#8A7BD8}
@@ -176,12 +182,12 @@ const T = EN ? { help:"Say it in French so Evo jumps the wall", mic:"Tap to say 
     ok:"Great job!", almost:"Almost!", almostS:"Listen and try again.", no:"Evo couldn't jump.", noS:"Try again.", heard:"We heard", silent:"We couldn't hear you.", silentS:"Speak a little louder, close to the phone.",
     unclear:"We didn't understand.", unclearS:"Listen to the model and repeat slowly.", skip:"Jump with help", first:"first try", help2:"with help", practice:"with practice",
     perfect:"Perfect!",great:"Excellent!", l1:"Listen and repeat", l1s:"Read the phrase and repeat it after the audio", l2:"Put the phrase in order", l2s:"Tap the words in the right order", l3:"Say it yourself", l3s:"Say the phrase in French without seeing it",
-    play:"Play", done:"Done", nlv:"Level", lvdone:"completed!", nextL:"Level", order:"Build the phrase in French:", orderS:"Put the syllables in order:", wrong:"Not quite.", wrongS:"Listen and try again.", rep:"Listen and repeat in French", startL:"3 levels", e1:"Great! Now put the phrases in order.", e2:"You can build them. Ready to say them without seeing them?", e3:"You master these phrases. Bravo!", tutoBack:"Continue", lvl3:"Level 3",  bravo:"Bravo!", made:"You made it!", again:"Play again", back:"Back to the guide", start:"Help Evo cross Paris", startP:"Evo runs across the rooftops of Paris. In front of each wall, <b>say the phrase in French</b> and Evo will jump.", go:"Let's go!", phr:"phrases" }
+    play:"Play", done:"Done", again:"Play again", nlv:"Level", lvdone:"completed!", nextL:"Level", order:"Build the phrase in French:", orderS:"Put the syllables in order:", wrong:"Not quite.", wrongS:"Listen and try again.", rep:"Listen and repeat in French", startL:"3 levels", e1:"Great! Now put the phrases in order.", e2:"You can build them. Ready to say them without seeing them?", e3:"You master these phrases. Bravo!", tutoBack:"Continue", lvl3:"Level 3",  bravo:"Bravo!", made:"You made it!", again:"Play again", back:"Back to the guide", start:"Help Evo cross Paris", startP:"Evo runs across the rooftops of Paris. In front of each wall, <b>say the phrase in French</b> and Evo will jump.", go:"Let's go!", phr:"phrases" }
   : { help:"Dilo en francés para que Evo salte el muro", mic:"Dale clic para decirlo en francés", rec:"Te escucho… (toca para terminar)", wait:"Escuchando…", wall:"Muro", of:"de",
     ok:"¡Muy bien!", almost:"¡Casi!", almostS:"Escucha y vuelve a intentarlo.", no:"Evo no pudo saltar.", noS:"Inténtalo otra vez.", heard:"Entendimos", silent:"No te escuchamos.", silentS:"Habla un poco más fuerte, cerca del teléfono.",
     unclear:"No te entendimos.", unclearS:"Escucha el modelo y repite despacio.", skip:"Saltar con ayuda", first:"a la primera", help2:"con ayuda", practice:"con práctica",
     perfect:"¡Perfecto!",great:"¡Excelente!", l1:"Escucha y repite", l1s:"Lees la frase y la repites después del audio", l2:"Ordena la frase", l2s:"Toca las palabras en el orden correcto", l3:"Tradúcela tú", l3s:"Dices la frase en francés sin verla",
-    play:"Jugar", done:"Hecho", nlv:"Nivel", lvdone:"completado!", nextL:"Nivel", order:"Forma la frase en francés:", orderS:"Ordena las sílabas:", wrong:"Casi.", wrongS:"Escucha y vuelve a intentarlo.", rep:"Escucha y repite en francés", startL:"3 niveles", e1:"¡Muy bien! Ahora ordena las frases.", e2:"Ya sabes formarlas. ¿Te atreves a decirlas sin verlas?", e3:"Dominas estas frases. ¡Bravo!", tutoBack:"Continuar", lvl3:"Nivel 3",  bravo:"¡Bravo!", made:"¡Llegaste!", again:"Jugar otra vez", back:"Volver a la guía", start:"Ayuda a Evo a cruzar París", startP:"Evo corre por los techos de París. Delante de cada muro, <b>di la frase en francés</b> y Evo saltará.", go:"¡Vamos!", phr:"frases" };
+    play:"Jugar", done:"Hecho", again:"Volver a jugar", nlv:"Nivel", lvdone:"completado!", nextL:"Nivel", order:"Forma la frase en francés:", orderS:"Ordena las sílabas:", wrong:"Casi.", wrongS:"Escucha y vuelve a intentarlo.", rep:"Escucha y repite en francés", startL:"3 niveles", e1:"¡Muy bien! Ahora ordena las frases.", e2:"Ya sabes formarlas. ¿Te atreves a decirlas sin verlas?", e3:"Dominas estas frases. ¡Bravo!", tutoBack:"Continuar", lvl3:"Nivel 3",  bravo:"¡Bravo!", made:"¡Llegaste!", again:"Jugar otra vez", back:"Volver a la guía", start:"Ayuda a Evo a cruzar París", startP:"Evo corre por los techos de París. Delante de cada muro, <b>di la frase en francés</b> y Evo saltará.", go:"¡Vamos!", phr:"frases" };
 const $ = id => document.getElementById(id);
 // niveaux faits pour cette carte / page (0 à 3), gardés pour l'appli
 const LKEY = SET && SET.key ? SET.key : "demo";
@@ -1106,7 +1112,7 @@ function renderLevels(){
   const LOCK = '<svg class="lk" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
   $("lvls").innerHTML = [1, 2, 3].map(n => {
     const st = n <= done ? "done" : n === done + 1 ? "next" : "lock";
-    return `<button class="lv ${st}" data-lv="${n}"${st === "lock" ? " disabled" : ""}><span class="cir ${st === "done" ? "d" : st === "next" ? "n" : "t"}">${n}</span><span class="tx"><b>${T["l" + n]}</b><small>${T["l" + n + "s"]}</small></span>${st === "done" ? `<span class="done">${T.done}</span>` : st === "next" ? `<span class="go2">${T.play}</span>` : LOCK}</button>`;
+    return `<button class="lv ${st}" data-lv="${n}"${st === "lock" ? " disabled" : ""}><span class="cir ${st === "done" ? "d" : st === "next" ? "n" : "t"}">${n}</span><span class="tx"><b>${T["l" + n]}</b><small>${T["l" + n + "s"]}</small></span>${st === "done" ? `<span class="dcol"><span class="done">${T.done}</span><span class="again" aria-label="${T.again}"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></span></span>` : st === "next" ? `<span class="go2">${T.play}</span>` : LOCK}</button>`;
   }).join("");
 }
 $("lvls").onclick = e => { const b = e.target.closest(".lv"); if(!b || b.disabled) return; LV = +b.dataset.lv; ac(); unlockSfx(); $("start").hidden = true; newGame(); };
