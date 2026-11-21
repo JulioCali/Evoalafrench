@@ -1112,7 +1112,7 @@ function renderLevels(){
   const LOCK = '<svg class="lk" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
   $("lvls").innerHTML = [1, 2, 3].map(n => {
     const st = n <= done ? "done" : n === done + 1 ? "next" : "lock";
-    return `<button class="lv ${st}" data-lv="${n}"${st === "lock" ? " disabled" : ""}><span class="cir ${st === "done" ? "d" : st === "next" ? "n" : "t"}">${n}</span><span class="tx"><b>${T["l" + n]}</b><small>${T["l" + n + "s"]}</small></span>${st === "done" ? `<span class="dcol"><span class="done">${T.done}</span><span class="again" aria-label="${T.again}"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></span></span>` : st === "next" ? `<span class="go2">${T.play}</span>` : LOCK}</button>`;
+    return `<button class="lv ${st}" data-lv="${n}"${st === "lock" ? " disabled" : ""}><span class="cir ${st === "done" ? "d" : st === "next" ? "n" : "t"}">${n}</span><span class="tx"><b>${T["l" + n]}</b><small>${T["l" + n + "s"]}</small></span>${st === "done" ? `<span class="dcol"><span class="done">${T.done}</span><span class="again" aria-label="${T.again}"><svg viewBox="0 0 24 24"><path d="M19.5 12A7.5 7.5 0 1 1 13.9 4.8"/><path d="M9.6 7.4L13.9 4.8L11.2 1.5"/></svg></span></span>` : st === "next" ? `<span class="go2">${T.play}</span>` : LOCK}</button>`;
   }).join("");
 }
 $("lvls").onclick = e => { const b = e.target.closest(".lv"); if(!b || b.disabled) return; LV = +b.dataset.lv; ac(); unlockSfx(); $("start").hidden = true; newGame(); };
