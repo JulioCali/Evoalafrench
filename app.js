@@ -1005,7 +1005,132 @@ function tour(name, force){
 }
 
 /* ---------- Tutoriel : à la première utilisation, et à chaque visite pour qui n'a pas de compte (« Ahora no ») ---------- */
-function openTuto(){ try{ sessionStorage.setItem("evoala-tuto-back", location.hash || "#guia"); sessionStorage.setItem("evoala-tuto-guest", window.EvoAuth && window.EvoAuth.user ? "0" : "1"); }catch(e){} location.href = "tuto.html"; }
+/* ---------- Tutoriel de la page, sur la vraie page Esenciales › Indispensables (Bonjour, Bonsoir, Salut) ----------
+   À la première utilisation, et à chaque visite pour qui n'a pas de compte (« Ahora no »).
+   Il fait vraiment écouter les 3 phrases : le bouton « Practicar » se débloque et reste sur la page. */
+const PT_TXT = {
+  es:{ introT:"Así funciona la guía", intro:"Te enseño a usarla en 30 segundos, con las tres primeras frases.", again:"¡Hola de nuevo! Crea tu cuenta gratis para guardar tu progreso y tus listas, y no volver a ver este tutorial.",
+       start:"Empezar", skip:"Saltar", seeT:"Ver tutorial", acc:"Crear cuenta", next:"Siguiente",
+       catsT:"Las categorías", cats:"Aquí eliges lo que quieres aprender: saludos, compras, transporte… Desliza para ver más.",
+       tabsT:"Los temas", tabs:"Cada categoría tiene varios temas. Toca uno para cambiar de página.",
+       spk:"Este icono te permite escuchar la pronunciación.", tapIcon:"Toca el icono",
+       goodT:"¡Muy bien!", good:"El círculo verde alrededor del altavoz te recuerda que ya escuchaste esta frase.",
+       img:"Tocar la imagen te muestra cómo se lee la frase.", tapImg:"Toca la imagen",
+       sayT:"Así se dice", say:pr => `«${pr}»: la sílaba en mayúsculas es la que se marca más. Toca otra vez la imagen para ocultarla.`,
+       heart:"Crea tus listas de frases favoritas.",
+       turn:(a, b) => `Ahora, escucha «${a}» y «${b}».`, turnLab:"Escúchalas para desbloquear una sorpresa",
+       prT:"¡Escuchaste todo! 🎉", pr:"Se desbloqueó «Practicar»: un juego para decir las frases en francés. Se queda aquí, y te lo explico cuando lo abras.",
+       navT:"Tu menú", nav:"Abajo tienes la guía, tus listas y la Guía de París.",
+       listsT:"Mis listas", lists:"Aquí encuentras las frases que guardaste con el corazón.",
+       parisT:"La Guía de París 🗼", paris:"¿Vas a París? Aquí tienes los lugares que no te puedes perder, con consejos prácticos.",
+       endT:"¡Listo para viajar! 🇫🇷", end:"Ahora explora la guía a tu ritmo. ¡Bon voyage!", go:"¡Vamos!" },
+  en:{ introT:"How the guide works", intro:"Let me show you how to use it in 30 seconds, with the first three phrases.", again:"Welcome back! Create a free account to save your progress and lists, and skip this tutorial next time.",
+       start:"Start", skip:"Skip", seeT:"See tutorial", acc:"Create account", next:"Next",
+       catsT:"Categories", cats:"Choose what you want to learn here: greetings, shopping, transport… Swipe to see more.",
+       tabsT:"Topics", tabs:"Each category has several topics. Tap one to change page.",
+       spk:"This icon lets you hear the pronunciation.", tapIcon:"Tap the icon",
+       goodT:"Well done!", good:"The green ring around the speaker reminds you that you've already heard this phrase.",
+       img:"Tapping the picture shows you how to read the phrase.", tapImg:"Tap the picture",
+       sayT:"How to say it", say:pr => `“${pr}”: the syllable in capitals is the stressed one. Tap the picture again to hide it.`,
+       heart:"Create your lists of favourite phrases.",
+       turn:(a, b) => `Now listen to “${a}” and “${b}”.`, turnLab:"Listen to them to unlock a surprise",
+       prT:"You heard everything! 🎉", pr:"“Practise” is unlocked: a game to say the phrases in French. It stays here, and I'll explain it when you open it.",
+       navT:"Your menu", nav:"At the bottom: the guide, your lists and the Paris Guide.",
+       listsT:"My lists", lists:"Find the phrases you saved with the heart here.",
+       parisT:"The Paris Guide 🗼", paris:"Going to Paris? Here are the places you can't miss, with practical tips.",
+       endT:"Ready to travel! 🇫🇷", end:"Now explore the guide at your own pace. Bon voyage!", go:"Let's go!" }
+};
+let ptOn = false, ptPending = false, ptBack = "";
+const ptRow = i => document.querySelectorAll('.card[data-g="0"] .row')[i];
+function ptRect(el){ return el ? el.getBoundingClientRect() : null; }
+async function ptListen(row){ if(!row) return; if(!row.classList.contains("heard")) await playRow(row); else playRow(row); }
+function openTuto(){
+  try{ sessionStorage.setItem("evoala-tuto-s", "1"); }catch(e){}
+  ptBack = location.hash.slice(1) || "guia";
+  if(location.hash !== "#s0t0"){ ptPending = true; location.hash = "s0t0"; }
+  else setTimeout(pageTuto, 300);
+}
+function pageTuto(){
+  if(ptOn || !ptRow(2)) return;
+  ptOn = true;
+  const T = PT_TXT[LANG] || PT_TXT.es, guest = !(window.EvoAuth && window.EvoAuth.user);
+  let again = false; try{ const n = +(localStorage.getItem("evoala-tuto-count") || 0) + 1; localStorage.setItem("evoala-tuto-count", String(n)); again = guest && n >= 2; }catch(e){}
+  const f = (i, q) => () => ptRow(i)?.querySelector(q);
+  const S = [
+    { title: T.introT, text: again ? T.again : T.intro, next: T.start, skip: true, account: again },
+    { el: () => document.querySelector(".catwrap"), title: T.catsT, text: T.cats },
+    { el: () => document.querySelector(".ptabs"), title: T.tabsT, text: T.tabs },
+    { el: f(0, ".spk"), round: true, text: T.spk, wait: T.tapIcon, act: () => ptListen(ptRow(0)) },
+    { el: () => ptRow(0), title: T.goodT, text: T.good },
+    { el: f(0, ".ic"), text: T.img, wait: T.tapImg, act: () => { const es = ptRow(0).querySelector(".es"); if(!es.classList.contains("showpr")) ptRow(0).querySelector(".ic").click(); } },
+    { el: () => ptRow(0), title: T.sayT, text: T.say(ptRow(0).querySelector(".es").dataset.pr || "") },
+    { el: f(0, ".heart"), round: true, text: T.heart, wait: T.tapIcon, act: () => ptRow(0).querySelector(".heart").classList.add("on") },
+    { el: () => document.querySelector('.card[data-g="0"]'), text: T.turn(ptRow(1).dataset.key, ptRow(2).dataset.key), wait: T.turnLab, hand: f(1, ".spk"), labAt: () => ptRow(2),
+      hit: t => t.closest('.card[data-g="0"] .row') && [ptRow(1), ptRow(2)].includes(t.closest(".row")),
+      act: async t => { await ptListen(t.closest(".row")); return [0, 1, 2].every(i => ptRow(i).classList.contains("heard")); } },
+    { el: () => document.querySelector('.card[data-g="0"] .pslot'), title: T.prT, text: T.pr, before: () => refreshPractice(true) },
+    { el: () => document.querySelector(".nav"), title: T.navT, text: T.nav },
+    { el: () => document.querySelector('.nav [data-go="listas"]'), round: true, title: T.listsT, text: T.lists },
+    { el: () => document.querySelector('.nav [data-go="p1"]'), round: true, title: T.parisT, text: T.paris },
+    { title: T.endT, text: T.end, next: T.go, end: true }
+  ];
+  const blk = document.createElement("div"), spot = document.createElement("div"), bub = document.createElement("div"), hand = document.createElement("div"), lab = document.createElement("div");
+  blk.className = "tr-blk"; spot.className = "tr-spot none"; bub.className = "tr-bub"; hand.id = "tr-hand"; lab.id = "tr-lab";
+  hand.innerHTML = `<svg viewBox="-4 -8 52 66"><g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path class="ray" d="M18 -6V-1M8.5 -2l3 3.5M27.5 -2l-3 3.5M3 8h5M28 8h5"/></g><path d="M14 31V10a4 4 0 0 1 8 0v15v-1.5a4 4 0 0 1 8 0V27v-1a4 4 0 0 1 8 0v3.5a3.5 3.5 0 0 1 7 0V42c0 8-6 14-14 14h-6c-5 0-8-2.5-11-6.5L5.2 40.6a3.6 3.6 0 0 1 5.4-4.8L14 39.5Z" fill="#fff" stroke="#2E2550" stroke-width="2.6" stroke-linejoin="round"/><path d="M22 25v5M30 26.5v4M38 28.5v3.5" stroke="#2E2550" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+  document.body.append(blk, spot, bub, hand, lab);
+  let k = 0, busy = false;
+  const count = () => k >= 1 && k < S.length - 1 ? `${k} / ${S.length - 2}` : "";
+  function finish(goBack){
+    try{ localStorage.setItem("evoala-tuto", "1"); }catch(e){}
+    [blk, spot, bub, hand, lab].forEach(el => el.remove()); document.body.classList.remove("pt-tap"); ptOn = false;
+    removeEventListener("resize", place); removeEventListener("scroll", place);
+    // on reste sur la page : le bouton « Practicar » débloqué y est visible
+  }
+  function place(){
+    const s = S[k], el = s.el && s.el(), r = ptRect(el);
+    document.body.classList.toggle("pt-tap", !!s.act);
+    if(!r){ spot.className = "tr-spot none"; bub.classList.add("mid"); bub.style.top = ""; return; }
+    const pad = s.round ? 8 : 6, w = r.width + pad * 2, h = r.height + pad * 2;
+    spot.className = "tr-spot" + (s.act ? " tap" : "");
+    Object.assign(spot.style, { top: r.top - pad + "px", left: r.left - pad + "px", width: w + "px", height: h + "px", borderRadius: (s.round ? Math.max(w, h) / 2 : 18) + "px" });
+    bub.classList.remove("mid");
+    if(s.act){                                                    // main qui tape + étiquette, juste sous la zone à toucher
+      const hr = ptRect(s.hand ? s.hand() : el), cx = hr.left + hr.width / 2, tip = hr.bottom - 8;
+      hand.style.left = (cx - 18) + "px"; hand.style.top = (tip - 12) + "px";
+      const ra = s.labAt && ptRect(s.labAt()), lw = lab.offsetWidth, ly = ra ? ra.bottom + 30 : tip + 16;
+      let lx = ra ? ra.left + ra.width / 2 - lw / 2 : cx > innerWidth / 2 ? cx - 26 - lw : cx + 32;
+      lab.style.left = Math.max(8, Math.min(innerWidth - lw - 8, lx)) + "px"; lab.style.top = ly + "px";
+    }
+    const bh = bub.offsetHeight || 140, below = r.bottom + pad + 14 + (s.act && !s.hand ? 56 : s.labAt ? 58 : 0);
+    bub.style.top = (below + bh < innerHeight - 10 ? below : Math.max(10, r.top - pad - 14 - bh)) + "px";
+  }
+  function show(){
+    const s = S[k]; if(s.before) s.before();
+    const el = s.el && s.el();
+    if(el && !el.closest(".nav")) el.scrollIntoView({ block: "center", behavior: "smooth" });
+    bub.classList.toggle("mini", !!s.act);
+    lab.textContent = s.wait || "";
+    bub.innerHTML = `<img src="img/ui/evo.png" alt=""><div class="bt">${s.act ? "" : `<b>${s.title}</b>`}<p>${s.text}</p>
+      <div class="bf"><span class="cnt">${count()}</span>${s.skip && !s.account ? `<button class="sk" data-ptskip>${T.skip}</button>` : ""}${s.account ? `<button class="sk acc" data-ptnext>${T.seeT}</button><button class="nx" data-ptacc>${T.acc}</button>`
+        : s.act ? "" : `<button class="nx" data-ptnext>${s.next || T.next}</button>`}</div></div>`;
+    place(); setTimeout(place, el ? 420 : 0);
+  }
+  bub.addEventListener("click", e => {
+    if(e.target.closest("[data-ptskip]")) return finish(true);
+    if(e.target.closest("[data-ptacc]")){ finish(false); location.hash = "cuenta"; return; }
+    if(e.target.closest("[data-ptnext]")){ if(S[k].end) return finish(true); k++; show(); }
+  });
+  blk.addEventListener("click", async e => {                      // on ne laisse passer que le toucher sur la zone demandée
+    const s = S[k]; if(!s.act || busy) return;
+    const r = ptRect(s.el()); if(!r || e.clientX < r.left - 10 || e.clientX > r.right + 10 || e.clientY < r.top - 10 || e.clientY > r.bottom + 10) return;
+    blk.style.pointerEvents = "none"; const t = document.elementFromPoint(e.clientX, e.clientY); blk.style.pointerEvents = "";
+    if(s.hit && !(t && s.hit(t))) return;
+    busy = true; const done = await s.act(t); busy = false;
+    if(done !== false){ k++; show(); }
+  });
+  addEventListener("resize", place); addEventListener("scroll", place, { passive: true });
+  show();
+}
 function maybeTuto(h, tries = 0){
   if(!/^s\d/.test(h)) return;                                  // on voit d'abord le hub et ses thèmes ; le tuto s'ouvre au premier thème choisi
   let doneS = false, done = false; try{ doneS = !!sessionStorage.getItem("evoala-tuto-s"); done = !!localStorage.getItem("evoala-tuto"); }catch(e){}
@@ -1015,11 +1140,11 @@ function maybeTuto(h, tries = 0){
   if(A && !A.disabled && !A.ready && tries < 24){ setTimeout(() => maybeTuto(location.hash.slice(1), tries + 1), 250); return; }
   const loggedIn = !!(A && A.user);
   if(loggedIn && done) return;                                   // avec un compte : une seule fois
-  openTuto();
+  openTuto(); return location.hash !== "#" + h;
 }
 function route(){
   const h = location.hash.slice(1);
-  maybeTuto(h);
+  if(maybeTuto(h)) return;
   delete app.dataset.list; PVIEW = null; if(QPLAY) stopQueue(); closeSheet();
   let m;
   let where = "home";
@@ -1040,6 +1165,7 @@ function route(){
     nav.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if(!b) return; location.hash = b.dataset.go; if(!b.dataset.go) route(); }); }
   nav.innerHTML = where === "hub" || where === "onb" ? "" : navbar(where);
   initCats(); scrollTo(0,0); preload();
+  if(ptPending && h === "s0t0"){ ptPending = false; setTimeout(pageTuto, 500); }
   if(where === "hub" && document.querySelector(".feat")) setTimeout(() => tour("hub"), 500);
   else if(h === "guia") setTimeout(() => tour("guia"), 500);
 }
