@@ -13,6 +13,10 @@
    - FIREBASE_SA         : la clé de service Firebase (le fichier JSON en entier)
    - HOTMART_PRODUCT_ID  : (facultatif) l'ID du produit Hotmart, pour ignorer les autres produits */
 
+// Protection du contenu : false = pause (tout le monde a le guide complet, comme avant la vente).
+// Remettre true pour réactiver les cadenas ; le reste de la configuration (pages gratuites, Hotmart) ne change pas.
+const LOCKS_ON = false;
+
 const PROJECT = "evoalafrench-db460";
 const FS = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents`;
 // pages gratuites : section / onglet / sous-page, comme les adresses de l'appli (#s0t0, #s4t0p0…)
@@ -45,6 +49,7 @@ function claims(tok){
 }
 const seenTok = new Map();                                    // jeton -> { acc, until } (quelques minutes, pour ne pas interroger Firestore à chaque audio)
 async function access(req){
+  if(!LOCKS_ON) return { user: !!tokenOf(req), verified: true, pro: true, paused: true };
   const tok = tokenOf(req), none = { user: false, verified: false, pro: false };
   if(!tok) return none;
   const c = claims(tok);
