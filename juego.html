@@ -321,7 +321,7 @@ const THEMES = {
       tile(300, .3, (x, n) => {
         if(n % 2){                                                    // ardoise du menu
           fillRR(x + 30, gy - 250, 120, 120, 8, "#8A6A4F"); ctx.fillStyle = "#2F3A36"; ctx.fillRect(x + 38, gy - 242, 104, 104);
-          ctx.fillStyle = "#F4F1E8"; ctx.font = "600 13px Poppins"; ctx.textAlign = "center"; ctx.fillText(EN ? "MENU" : "MENÚ", x + 90, gy - 220);
+          ctx.fillStyle = "#F4F1E8"; ctx.font = "600 13px Poppins"; ctx.textAlign = "center"; ctx.fillText("MENU", x + 90, gy - 220);
           ctx.font = "11px Poppins"; ["Soupe 7 €", "Steak 18 €", "Crème brûlée"].forEach((s, i) => ctx.fillText(s, x + 90, gy - 198 + i * 18));
         } else {                                                      // miroir doré
           fillRR(x + 40, gy - 260, 110, 140, 50, "#E2B85C"); fillRR(x + 46, gy - 254, 98, 128, 46, "#EDE7F7");
