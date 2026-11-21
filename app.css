@@ -633,7 +633,7 @@ svg.lock{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;s
 .tr-blk{position:fixed;inset:0;z-index:80}
 .tr-spot{position:fixed;z-index:81;border-radius:18px;pointer-events:none;box-shadow:0 0 0 9999px rgba(22,14,48,.68);transition:top .4s ease,left .4s ease,width .4s ease,height .4s ease}
 .tr-spot.none{width:0!important;height:0!important;top:50%!important;left:50%!important}
-.tr-bub{position:fixed;z-index:82;left:14px;right:14px;max-width:420px;margin:0 auto;background:#fff;border-radius:22px;padding:14px 16px 14px 14px;box-shadow:0 14px 40px rgba(0,0,0,.25);display:flex;gap:12px;align-items:flex-start;transition:top .4s ease}
+.tr-bub{position:fixed;z-index:82;transition:opacity .25s,top .4s ease;left:14px;right:14px;max-width:420px;margin:0 auto;background:#fff;border-radius:22px;padding:14px 16px 14px 14px;box-shadow:0 14px 40px rgba(0,0,0,.25);display:flex;gap:12px;align-items:flex-start}
 .tr-bub.mid{top:50%;transform:translateY(-50%)}
 .tr-bub img{width:54px;height:auto;flex:none;animation:trevo 1.6s ease-in-out infinite}
 @keyframes trevo{50%{transform:translateY(-4px) rotate(-5deg)}}

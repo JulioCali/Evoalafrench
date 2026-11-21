@@ -995,18 +995,21 @@ function tour(name, force){
     const st = steps[i], el = st.sel && document.querySelector(st.sel), last = i === steps.length - 1;
     bub.innerHTML = `<img src="img/ui/evo.png" alt=""><div class="bt"><b>${st.t}</b><p>${st.p}</p>
       <div class="bf"><span class="cnt">${i + 1} / ${steps.length}</span>${last ? "" : `<button class="sk" data-trskip>${U.skip}</button>`}<button class="nx" data-trnext>${last ? U.done : U.next}</button></div></div>`;
+    let moved = false;
     if(el){
       const r = el.getBoundingClientRect(), fixed = getComputedStyle(el).position === "fixed" || el.closest(".nav,.top");
-      if(!fixed && (r.top < 70 || r.bottom > innerHeight - 200)) scrollBy({ top: r.top - Math.max(80, (innerHeight - r.height) / 2 - 90), behavior: "instant" });
+      const dy = r.top - Math.max(80, (innerHeight - r.height) / 2 - 90);
+      if(!fixed && (r.top < 70 || r.bottom > innerHeight - 200) && Math.abs(dy) > 4){ moved = true; scrollBy({ top: dy, behavior: "smooth" }); }
     }
-    requestAnimationFrame(place);
+    if(moved){ bub.style.opacity = "0"; spot.className = "tr-spot none"; setTimeout(() => { place(); bub.style.opacity = ""; }, 700); }   // on voit l'écran défiler, puis la bulle
+    else requestAnimationFrame(place);
   }
   bub.addEventListener("click", e => {
     if(e.target.closest("[data-trskip]")) return end();
     if(e.target.closest("[data-trnext]")){ if(i === steps.length - 1) return end(); i++; show(); }
   });
-  addEventListener("resize", place);
-  show();
+  addEventListener("resize", place); addEventListener("load", place, { once: true });
+  show(); setTimeout(place, 400);
 }
 
 /* ---------- Tutoriel : à la première utilisation, et à chaque visite pour qui n'a pas de compte (« Ahora no ») ---------- */
@@ -1070,12 +1073,12 @@ function pageTuto(){
     { el: f(0, ".ic"), text: T.img, wait: T.tapImg, act: () => { const es = ptRow(0).querySelector(".es"); if(!es.classList.contains("showpr")) ptRow(0).querySelector(".ic").click(); } },
     { el: () => ptRow(0), title: T.sayT, text: T.say(ptRow(0).querySelector(".es").dataset.pr || "") },
     { el: f(0, ".heart"), round: true, text: T.heart, wait: T.tapIcon, act: () => ptRow(0).querySelector(".heart").classList.add("on") },
+    { el: () => document.querySelector('.nav [data-go="listas"]'), round: true, title: T.listsT, text: T.lists },
     { el: () => document.querySelector('.card[data-g="0"]'), text: T.turn(ptRow(1).dataset.key, ptRow(2).dataset.key), wait: T.turnLab, hands: [f(1, ".spk"), f(2, ".spk")], labAt: () => ptRow(2),
       hit: t => t.closest('.card[data-g="0"] .row') && [ptRow(1), ptRow(2)].includes(t.closest(".row")),
       act: async t => { await ptListen(t.closest(".row")); return [0, 1, 2].every(i => ptRow(i).classList.contains("heard")); } },
     { el: () => document.querySelector('.card[data-g="0"] .pslot'), title: T.prT, text: T.pr, before: () => refreshPractice(true) },
     { el: () => document.querySelector(".nav"), title: T.navT, text: T.nav },
-    { el: () => document.querySelector('.nav [data-go="listas"]'), round: true, title: T.listsT, text: T.lists },
     { el: () => document.querySelector('.nav [data-go="p1"]'), round: true, title: T.parisT, text: T.paris },
     { title: T.endT, text: T.end, next: T.go, end: true }
   ];
@@ -1103,8 +1106,9 @@ function pageTuto(){
       // main inclinée vers la gauche : le doigt touche le bas à droite de l'icône, sans cacher celle d'en dessous
       const hr = ptRect(s.hands ? s.hands[handI % s.hands.length]() : el), cx = hr.left + hr.width / 2, tx = hr.right - hr.width * .22, tip = hr.bottom - hr.height * .2;
       hand.style.left = (tx - 13) + "px"; hand.style.top = (tip - 8) + "px";
-      const ra = s.labAt && ptRect(s.labAt()), lw = lab.offsetWidth, ly = ra ? ra.bottom + 30 : tip + 10;
-      let lx = ra ? ra.left + ra.width / 2 - lw / 2 : cx > innerWidth / 2 ? cx - 22 - lw : cx + 26;
+      const ra = s.labAt && ptRect(s.labAt()), lw = lab.offsetWidth, left = cx < innerWidth / 2;
+      const ly = ra ? ra.bottom + 30 : left ? tip - lab.offsetHeight / 2 + 2 : tip + 10;   // à gauche de l'écran : étiquette à droite de la main, à sa hauteur
+      let lx = ra ? ra.left + ra.width / 2 - lw / 2 : left ? tx + 36 : cx - 22 - lw;
       lab.style.left = Math.max(8, Math.min(innerWidth - lw - 8, lx)) + "px"; lab.style.top = ly + "px";
     }
     const bh = bub.offsetHeight || 140, below = r.bottom + pad + 14 + (s.act && !s.hands ? 48 : s.labAt ? 58 : 0);
@@ -1174,7 +1178,7 @@ function route(){
   nav.innerHTML = where === "hub" || where === "onb" ? "" : navbar(where);
   initCats(); scrollTo(0,0); preload();
   if(ptPending && h === "s0t0"){ ptPending = false; setTimeout(pageTuto, 500); }
-  if(where === "hub" && document.querySelector(".feat")) setTimeout(() => tour("hub"), 500);
+  if(where === "hub" && document.querySelector(".feat")) tour("hub");
   else if(h === "guia") setTimeout(() => tour("guia"), 500);
 }
 addEventListener("hashchange", route);
