@@ -650,13 +650,12 @@ svg.lock{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;s
 #tr-hand,#tr-lab{position:fixed;z-index:83;pointer-events:none;display:none;transition:top .4s ease,left .4s ease}
 .pt-tap #tr-hand,.pt-tap #tr-lab{display:block}
 #tr-hand{width:30px;filter:drop-shadow(0 3px 5px rgba(0,0,0,.3));animation:trtap 1.1s ease-in-out infinite}
-#tr-hand svg{display:block;width:30px;height:auto}
+#tr-hand svg{display:block;width:30px;height:auto;transform:rotate(-32deg);transform-origin:12.7px 8.1px}
 #tr-hand .ray{animation:trray 1.1s ease-in-out infinite}
-@keyframes trtap{0%,100%{transform:translateY(5px)}50%{transform:translateY(0) scale(.94)}}
+@keyframes trtap{0%,100%{transform:translate(4px,5px)}50%{transform:translate(0,0) scale(.94)}}
 @keyframes trray{0%,40%{opacity:0}55%,80%{opacity:1}100%{opacity:0}}
 #tr-lab{background:#6C4FE0;color:#fff;font-weight:600;font-size:14px;padding:7px 13px;border-radius:999px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.28)}
 .tr-bub.mini{padding:10px 14px 10px 10px;gap:10px;align-items:center;max-width:360px;border-radius:18px}
 .tr-bub.mini img{width:38px}
 .tr-bub.mini .bf{margin-top:2px}
 .tr-bub .sk.acc{color:#5940BF;font-weight:600}
-#tr-box{position:fixed;z-index:82;pointer-events:none;display:none;border:2px solid #6C4FE0;border-radius:999px;background:transparent;transition:top .4s ease,left .4s ease}

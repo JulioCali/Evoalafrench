@@ -1065,7 +1065,7 @@ function pageTuto(){
     { el: f(0, ".ic"), text: T.img, wait: T.tapImg, act: () => { const es = ptRow(0).querySelector(".es"); if(!es.classList.contains("showpr")) ptRow(0).querySelector(".ic").click(); } },
     { el: () => ptRow(0), title: T.sayT, text: T.say(ptRow(0).querySelector(".es").dataset.pr || "") },
     { el: f(0, ".heart"), round: true, text: T.heart, wait: T.tapIcon, act: () => ptRow(0).querySelector(".heart").classList.add("on") },
-    { el: () => document.querySelector('.card[data-g="0"]'), text: T.turn(ptRow(1).dataset.key, ptRow(2).dataset.key), wait: T.turnLab, hand: f(1, ".spk"), labAt: () => ptRow(2), box: () => [ptRow(1).querySelector(".spk"), ptRow(2).querySelector(".spk")],
+    { el: () => document.querySelector('.card[data-g="0"]'), text: T.turn(ptRow(1).dataset.key, ptRow(2).dataset.key), wait: T.turnLab, hands: [f(1, ".spk"), f(2, ".spk")], labAt: () => ptRow(2),
       hit: t => t.closest('.card[data-g="0"] .row') && [ptRow(1), ptRow(2)].includes(t.closest(".row")),
       act: async t => { await ptListen(t.closest(".row")); return [0, 1, 2].every(i => ptRow(i).classList.contains("heard")); } },
     { el: () => document.querySelector('.card[data-g="0"] .pslot'), title: T.prT, text: T.pr, before: () => refreshPractice(true) },
@@ -1074,15 +1074,15 @@ function pageTuto(){
     { el: () => document.querySelector('.nav [data-go="p1"]'), round: true, title: T.parisT, text: T.paris },
     { title: T.endT, text: T.end, next: T.go, end: true }
   ];
-  const blk = document.createElement("div"), spot = document.createElement("div"), bub = document.createElement("div"), hand = document.createElement("div"), lab = document.createElement("div"), box = document.createElement("div");
-  blk.className = "tr-blk"; spot.className = "tr-spot none"; bub.className = "tr-bub"; hand.id = "tr-hand"; lab.id = "tr-lab"; box.id = "tr-box";
+  const blk = document.createElement("div"), spot = document.createElement("div"), bub = document.createElement("div"), hand = document.createElement("div"), lab = document.createElement("div");
+  blk.className = "tr-blk"; spot.className = "tr-spot none"; bub.className = "tr-bub"; hand.id = "tr-hand"; lab.id = "tr-lab";
   hand.innerHTML = `<svg viewBox="-4 -8 52 66"><g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path class="ray" d="M18 -6V-1M8.5 -2l3 3.5M27.5 -2l-3 3.5M3 8h5M28 8h5"/></g><path d="M14 31V10a4 4 0 0 1 8 0v15v-1.5a4 4 0 0 1 8 0V27v-1a4 4 0 0 1 8 0v3.5a3.5 3.5 0 0 1 7 0V42c0 8-6 14-14 14h-6c-5 0-8-2.5-11-6.5L5.2 40.6a3.6 3.6 0 0 1 5.4-4.8L14 39.5Z" fill="#fff" stroke="#2E2550" stroke-width="2.6" stroke-linejoin="round"/><path d="M22 25v5M30 26.5v4M38 28.5v3.5" stroke="#2E2550" stroke-width="2.2" stroke-linecap="round"/></svg>`;
-  document.body.append(blk, spot, bub, box, hand, lab);
-  let k = 0, busy = false;
+  document.body.append(blk, spot, bub, hand, lab);
+  let k = 0, busy = false, handI = 0, handT = null;
   const count = () => k >= 1 && k < S.length - 1 ? `${k} / ${S.length - 2}` : "";
   function finish(goBack){
     try{ localStorage.setItem("evoala-tuto", "1"); }catch(e){}
-    [blk, spot, bub, box, hand, lab].forEach(el => el.remove()); document.body.classList.remove("pt-tap"); ptOn = false;
+    [blk, spot, bub, hand, lab].forEach(el => el.remove()); document.body.classList.remove("pt-tap"); ptOn = false; clearInterval(handT);
     removeEventListener("resize", place); removeEventListener("scroll", place);
     // on reste sur la page : le bouton « Practicar » débloqué y est visible
   }
@@ -1094,18 +1094,15 @@ function pageTuto(){
     spot.className = "tr-spot" + (s.act ? " tap" : "");
     Object.assign(spot.style, { top: r.top - pad + "px", left: r.left - pad + "px", width: w + "px", height: h + "px", borderRadius: (s.round ? Math.max(w, h) / 2 : 18) + "px" });
     bub.classList.remove("mid");
-    box.style.display = s.box ? "block" : "none";               // contour violet autour des zones à toucher
-    if(s.box){ const rs = s.box().map(ptRect).filter(Boolean), p2 = 7;
-      const l = Math.min(...rs.map(q => q.left)), t2 = Math.min(...rs.map(q => q.top)), rr = Math.max(...rs.map(q => q.right)), b2 = Math.max(...rs.map(q => q.bottom));
-      Object.assign(box.style, { left: l - p2 + "px", top: t2 - p2 + "px", width: rr - l + p2 * 2 + "px", height: b2 - t2 + p2 * 2 + "px" }); }
     if(s.act){                                                    // main qui tape + étiquette, juste sous la zone à toucher
-      const hr = ptRect(s.hand ? s.hand() : el), cx = hr.left + hr.width / 2, tip = hr.bottom - 8;
-      hand.style.left = (cx - 13) + "px"; hand.style.top = (tip - 8) + "px";
+      // main inclinée vers la gauche : le doigt touche le bas à droite de l'icône, sans cacher celle d'en dessous
+      const hr = ptRect(s.hands ? s.hands[handI % s.hands.length]() : el), cx = hr.left + hr.width / 2, tx = hr.right - hr.width * .22, tip = hr.bottom - hr.height * .2;
+      hand.style.left = (tx - 13) + "px"; hand.style.top = (tip - 8) + "px";
       const ra = s.labAt && ptRect(s.labAt()), lw = lab.offsetWidth, ly = ra ? ra.bottom + 30 : tip + 10;
       let lx = ra ? ra.left + ra.width / 2 - lw / 2 : cx > innerWidth / 2 ? cx - 22 - lw : cx + 26;
       lab.style.left = Math.max(8, Math.min(innerWidth - lw - 8, lx)) + "px"; lab.style.top = ly + "px";
     }
-    const bh = bub.offsetHeight || 140, below = r.bottom + pad + 14 + (s.act && !s.hand ? 48 : s.labAt ? 58 : 0);
+    const bh = bub.offsetHeight || 140, below = r.bottom + pad + 14 + (s.act && !s.hands ? 48 : s.labAt ? 58 : 0);
     bub.style.top = (below + bh < innerHeight - 10 ? below : Math.max(10, r.top - pad - 14 - bh)) + "px";
   }
   function show(){
@@ -1114,6 +1111,8 @@ function pageTuto(){
     if(el && !el.closest(".nav")) el.scrollIntoView({ block: "center", behavior: "smooth" });
     bub.classList.toggle("mini", !!s.act);
     lab.textContent = s.wait || "";
+    clearInterval(handT); handI = 0;
+    if(s.hands) handT = setInterval(() => { handI++; place(); }, 1400);   // la main tape une icône, puis descend taper la suivante
     bub.innerHTML = `<img src="img/ui/evo.png" alt=""><div class="bt">${s.act ? "" : `<b>${s.title}</b>`}<p>${s.text}</p>
       <div class="bf"><span class="cnt">${count()}</span>${s.skip && !s.account ? `<button class="sk" data-ptskip>${T.skip}</button>` : ""}${s.account ? `<button class="sk acc" data-ptnext>${T.seeT}</button><button class="nx" data-ptacc>${T.acc}</button>`
         : s.act ? "" : `<button class="nx" data-ptnext>${s.next || T.next}</button>`}</div></div>`;
