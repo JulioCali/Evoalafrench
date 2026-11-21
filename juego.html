@@ -253,7 +253,11 @@ function drawWalls(){
    roofs : toits de Paris (par défaut) · shop : boutique de vêtements · resto : bistrot · metro : station de métro · train : gare
    Pour ajouter un décor : une entrée dans THEMES (back = fond qui défile lentement, ground = sol, obstacle = ce qu'Evo saute)
    et la page correspondante dans THEME_OF (section / onglet, comme les adresses de l'appli). */
-const THEME_OF = { s1t0: "shop", s2t2: "train", s3t1: "metro", s4t0: "resto" };
+const THEME_OF = { s0t0: "street", s0t1: "roofs", s0t2: "square", s1t0: "shop", s1t1: "souvenirs", s1t2: "library",
+  s2t0: "plane", s2t1: "boulevard", s2t2: "train", s3t0: "signs", s3t1: "metro", s3t2: "cinema",
+  s4t0: "resto", s4t1: "cafe", s4t2: "bakery", s4t3: "market", s5t0: "hotel", s5t1: "flat",
+  s6t0: "emergency", s6t1: "pharmacy", s6t2: "doctor", s7t0: "terrace", s7t1: "viewpoint", s7t2: "weather", s7t3: "prices",
+  s8t0: "colors", s8t1: "numbers", s8t2: "district" };
 const THEME = (() => { const m = String(SET && SET.back || "").match(/^s(\d+)t(\d+)/); return (m && THEME_OF[`s${m[1]}t${m[2]}`]) || "roofs"; })();
 // répète un motif tous les `step` pixels, avec un numéro stable pour varier les éléments
 function tile(step, speed, fn){ const off = G.x * speed; for(let k = -1; k < W / step + 2; k++){ const x = k * step - (off % step); fn(x, Math.abs(Math.floor((k * step + off) / step))); } }
@@ -426,7 +430,345 @@ const THEMES = {
       fillRR(x + w / 2 + 6, y - 74, 12, 16, 3, c);                    // étiquette
     } }
 };
-const TH = THEMES[THEME];
+/* ---------- Les autres décors (un par onglet du guide) ---------- */
+// outils communs : ciel, façades parisiennes, sols, murs intérieurs
+function skyG(a, b){ const g = ctx.createLinearGradient(0, 0, 0, groundY()); g.addColorStop(0, a); g.addColorStop(1, b); ctx.fillStyle = g; ctx.fillRect(0, 0, W, groundY()); }
+function clouds(c = "rgba(255,255,255,.85)", speed = .08){ ctx.fillStyle = c;
+  for(let k = 0; k < 4; k++){ const cx = ((k * 260 - G.x * speed) % (W + 300) + W + 300) % (W + 300) - 150, cy = 60 + (k % 2) * 40;
+    ctx.beginPath(); ctx.ellipse(cx, cy, 46, 16, 0, 0, 7); ctx.ellipse(cx + 30, cy - 10, 30, 16, 0, 0, 7); ctx.ellipse(cx - 28, cy - 4, 24, 12, 0, 0, 7); ctx.fill(); } }
+function wall(c, stripe){ const gy = groundY(); ctx.fillStyle = c; ctx.fillRect(0, 0, W, gy);
+  if(stripe) tile(36, .3, x => { ctx.fillStyle = stripe; ctx.fillRect(x, 0, 14, gy); }); }
+function baseboard(c, h = 22){ const gy = groundY(); ctx.fillStyle = c; ctx.fillRect(0, gy - h, W, h); ctx.fillStyle = "rgba(0,0,0,.08)"; ctx.fillRect(0, gy - h - 3, W, 3); }
+const SHOPC = ["#2E5E4E", "#7A2E3A", "#2F3F7A", "#8A5A2B", "#5B3F8C", "#1F6F7A"];
+// façades haussmanniennes ; shop(x, w, n, base) dessine éventuellement une devanture au rez-de-chaussée
+function facades(speed, opt = {}){
+  const gy = groundY(), step = opt.step || 150;
+  tile(step, speed, (x, n) => {
+    const w = step - 6, h = (opt.h || 250) + (n * 37) % 60, top = gy - h, col = opt.colors ? pick(opt.colors, n) : pick(["#F3E6D3", "#EFE1CC", "#F6EADB"], n);
+    ctx.fillStyle = col; ctx.fillRect(x, top, w, h);
+    ctx.fillStyle = opt.roof || "#8E97AB"; ctx.beginPath(); ctx.moveTo(x - 3, top); ctx.lineTo(x + 8, top - 22); ctx.lineTo(x + w - 8, top - 22); ctx.lineTo(x + w + 3, top); ctx.fill();
+    ctx.fillStyle = "#C98A6B"; ctx.fillRect(x + 18, top - 34, 12, 14);
+    for(let r = 0; r < 3; r++) for(let c = 0; c < 3; c++){ const wx = x + 14 + c * ((w - 28) / 3), wy = top + 20 + r * 52;
+      if(wy > gy - 120) continue;
+      ctx.fillStyle = opt.win || "#A9BDD9"; ctx.fillRect(wx, wy, 22, 34); ctx.fillStyle = "rgba(255,255,255,.5)"; ctx.fillRect(wx + 10, wy, 2, 34);
+      if(r === 1){ ctx.fillStyle = "#3C3C46"; ctx.fillRect(wx - 4, wy + 34, 30, 3); for(let b = 0; b < 5; b++) ctx.fillRect(wx - 3 + b * 7, wy + 26, 1.5, 9); } }
+    if(opt.shop) opt.shop(x, w, n, gy); else { ctx.fillStyle = pick(SHOPC, n); ctx.fillRect(x + 8, gy - 86, w - 16, 86); ctx.fillStyle = "#CFE0EE"; ctx.fillRect(x + 16, gy - 70, w - 32, 54); }
+  });
+}
+function shopFront(x, w, gy, color, label, awning){
+  ctx.fillStyle = color; ctx.fillRect(x + 6, gy - 92, w - 12, 92);
+  ctx.fillStyle = "#DCEAF4"; ctx.fillRect(x + 14, gy - 62, w - 28, 50);
+  if(awning){ for(let i = 0; i < 6; i++){ ctx.fillStyle = i % 2 ? "#fff" : awning; ctx.beginPath(); const sx = x + 6 + i * (w - 12) / 6, sw = (w - 12) / 6;
+    ctx.moveTo(sx, gy - 78); ctx.lineTo(sx + sw, gy - 78); ctx.lineTo(sx + sw, gy - 66); ctx.quadraticCurveTo(sx + sw / 2, gy - 58, sx, gy - 66); ctx.fill(); } }
+  if(label){ ctx.fillStyle = "#fff"; ctx.font = "600 11px Poppins"; ctx.textAlign = "center"; ctx.fillText(label, x + w / 2, gy - 80); }
+}
+function lamp(x, gy, h = 150){ ctx.fillStyle = "#2E3440"; ctx.fillRect(x - 2, gy - h, 4, h); ctx.fillRect(x - 8, gy - 4, 16, 4);
+  ctx.beginPath(); ctx.moveTo(x - 9, gy - h); ctx.lineTo(x + 9, gy - h); ctx.lineTo(x + 6, gy - h - 16); ctx.lineTo(x - 6, gy - h - 16); ctx.fill(); ctx.fillStyle = "#FFE7A3"; ctx.fillRect(x - 5, gy - h - 13, 10, 10); }
+function tree(x, gy, s = 1){ ctx.fillStyle = "#8A6A4F"; ctx.fillRect(x - 3 * s, gy - 70 * s, 6 * s, 70 * s); ctx.fillStyle = "#8FBF8A";
+  ctx.beginPath(); ctx.arc(x, gy - 92 * s, 30 * s, 0, 7); ctx.arc(x - 22 * s, gy - 76 * s, 20 * s, 0, 7); ctx.arc(x + 22 * s, gy - 76 * s, 20 * s, 0, 7); ctx.fill(); }
+function shelves(x, w, gy, rows, item){ for(let r = 0; r < rows; r++){ const sy = gy - 40 - r * 50; ctx.fillStyle = "#B8956F"; ctx.fillRect(x, sy, w, 5); item(x, sy, w, r); }
+  ctx.fillStyle = "#A4835F"; ctx.fillRect(x - 4, gy - 40 - rows * 50 + 10, 5, rows * 50 + 30); ctx.fillRect(x + w - 1, gy - 40 - rows * 50 + 10, 5, rows * 50 + 30); }
+// sols
+const GROUND = {
+  pave(){ const y = groundY(); ctx.fillStyle = "#D9D4CC"; ctx.fillRect(0, y, W, H - y); ctx.fillStyle = "#C2BCB2"; ctx.fillRect(0, y, W, 5);
+    tile(70, 1, x => { ctx.fillStyle = "#C9C3B9"; ctx.fillRect(x, y + 5, 2, 40); }); ctx.fillStyle = "#C9C3B9"; ctx.fillRect(0, y + 45, W, 2);
+    ctx.fillStyle = "#9A958C"; ctx.fillRect(0, y + 47, W, H - y); },
+  road(){ const y = groundY(); ctx.fillStyle = "#D9D4CC"; ctx.fillRect(0, y, W, 14); ctx.fillStyle = "#B3ADA3"; ctx.fillRect(0, y + 14, W, 5);
+    ctx.fillStyle = "#5D6170"; ctx.fillRect(0, y + 19, W, H - y); ctx.fillStyle = "#F4F1E8"; tile(80, 1, x => ctx.fillRect(x, y + 52, 40, 5)); },
+  cobble(){ const y = groundY(); ctx.fillStyle = "#B9B1A6"; ctx.fillRect(0, y, W, H - y);
+    tile(26, 1, (x, n) => { for(let r = 0; r * 14 < H - y; r++){ ctx.fillStyle = (n + r) % 3 ? "#A9A094" : "#C4BCB1"; roundRect(x + (r % 2) * 13, y + 4 + r * 14, 22, 11, 4); ctx.fill(); } }); },
+  parquet(){ THEMES.shop.ground(); },
+  tiles(a, b, s = 22){ const y = groundY(); ctx.fillStyle = a; ctx.fillRect(0, y, W, H - y);
+    tile(s * 2, 1, x => { ctx.fillStyle = b; for(let r = 0; r * s < H - y; r++) ctx.fillRect(x + (r % 2) * s, y + r * s, s, s); }); },
+  plain(c, line){ const y = groundY(); ctx.fillStyle = c; ctx.fillRect(0, y, W, H - y); if(line){ ctx.fillStyle = line; tile(60, 1, x => ctx.fillRect(x, y, 2, H - y)); ctx.fillRect(0, y, W, 3); } },
+  carpet(c, motif){ const y = groundY(); ctx.fillStyle = c; ctx.fillRect(0, y, W, H - y); ctx.fillStyle = motif;
+    tile(40, 1, x => { for(let r = 0; r * 20 < H - y; r++){ ctx.beginPath(); ctx.arc(x + (r % 2) * 20 + 10, y + 12 + r * 20, 3, 0, 7); ctx.fill(); } }); }
+};
+const dim = (done, c, d = "#E7E1F7") => done ? d : c;
+
+Object.assign(THEMES, {
+  /* Indispensables : rue avec terrasses ; jardinière fleurie */
+  street: { back(){ skyG("#CFE3F7", "#F6F1FB"); clouds(); facades(.3, { shop: (x, w, n, gy) => shopFront(x, w, gy, pick(SHOPC, n), pick(["CAFÉ", "BISTROT", "TABAC", "CAFÉ"], n), pick(["#C8344F", "#1F8A70", "#2F3F7A"], n)) });
+      tile(210, .55, (x, n) => { const gy = groundY(); lamp(x + 20, gy, 170); [0, 1].forEach(t => { const tx = x + 90 + t * 60; ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.ellipse(tx, gy - 42, 16, 4, 0, 0, 7); ctx.fill(); ctx.fillStyle = "#3C3C46"; ctx.fillRect(tx - 1.5, gy - 42, 3, 42); ctx.strokeStyle = "#B8834F"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(tx + 20, gy); ctx.lineTo(tx + 20, gy - 34); ctx.moveTo(tx + 20, gy - 22); ctx.lineTo(tx + 32, gy - 22); ctx.lineTo(tx + 32, gy); ctx.stroke(); }); }); },
+    ground: () => GROUND.pave(),
+    obstacle(x, y, w, h, done){ fillRR(x - 8, y - 46, w + 16, 46, 6, dim(done, "#6C4FE0")); ctx.fillStyle = "rgba(255,255,255,.25)"; ctx.fillRect(x - 8, y - 46, w + 16, 6);
+      const fl = done ? ["#F3EEFB"] : ["#F2C9EB", "#F5A623", "#FFFFFF", "#D96ECC"];
+      ctx.fillStyle = dim(done, "#5FAF6E", "#EDE8F8"); ctx.beginPath(); ctx.ellipse(x + w / 2, y - 60, w / 2 + 8, 22, 0, 0, 7); ctx.fill();
+      for(let i = 0; i < 7; i++){ ctx.fillStyle = pick(fl, i); ctx.beginPath(); ctx.arc(x - 2 + i * 8, y - 66 - (i % 3) * 9, 6, 0, 7); ctx.fill(); } } },
+
+  /* Salvavidas : place avec colonne Morris, panneau « i », arbres ; fontaine Wallace */
+  square: { back(){ skyG("#D6E9F5", "#F7F4FB"); clouds(); facades(.2, { h: 220 });
+      tile(260, .5, (x, n) => { const gy = groundY(); tree(x + 30, gy, 1.1);
+        ctx.fillStyle = "#2F5A47"; ctx.fillRect(x + 110, gy - 130, 40, 130); ctx.beginPath(); ctx.ellipse(x + 130, gy - 132, 24, 10, 0, 0, 7); ctx.fill(); ctx.beginPath(); ctx.moveTo(x + 108, gy - 136); ctx.quadraticCurveTo(x + 130, gy - 170, x + 152, gy - 136); ctx.fill();
+        fillRR(x + 114, gy - 120, 32, 70, 3, pick(["#F2C9EB", "#F5C58A", "#C9BFF5"], n));
+        ctx.fillStyle = "#2F3F7A"; ctx.fillRect(x + 200, gy - 110, 4, 110); fillRR(x + 182, gy - 150, 40, 44, 6, "#2F3F7A"); ctx.fillStyle = "#fff"; ctx.font = "700 24px Poppins"; ctx.textAlign = "center"; ctx.fillText("i", x + 202, gy - 118); }); },
+    ground: () => GROUND.cobble(),
+    obstacle(x, y, w, h, done){ const c = dim(done, "#2F6B4F"); ctx.fillStyle = c;
+      ctx.fillRect(x - 6, y - 10, w + 12, 10); ctx.fillRect(x + 2, y - 22, w - 4, 12);
+      [x + 4, x + w / 2 - 3, x + w - 10].forEach(cx => { ctx.beginPath(); ctx.ellipse(cx + 3, y - 50, 4, 28, 0, 0, 7); ctx.fill(); });
+      ctx.beginPath(); ctx.moveTo(x - 4, y - 76); ctx.lineTo(x + w + 4, y - 76); ctx.lineTo(x + w / 2, y - h + 2); ctx.closePath(); ctx.fill(); ctx.fillRect(x - 6, y - 80, w + 12, 6);
+      ctx.fillStyle = done ? "#fff" : "#9FD3F0"; ctx.fillRect(x + w / 2 - 1.5, y - 74, 3, 52); } },
+
+  /* Recuerdos : boutique de souvenirs ; tourniquet de cartes postales */
+  souvenirs: { back(){ wall("#FFF4F0", "#FBE8E2"); baseboard("#E8C9BE");
+      tile(240, .3, (x, n) => { const gy = groundY(); shelves(x + 10, 190, gy, 3, (sx, sy, sw, r) => {
+        for(let i = 0; i < 6; i++){ const ix = sx + 12 + i * 30;
+          if(r === 0){ ctx.fillStyle = pick(["#fff", "#F2C9EB", "#C9BFF5"], i + n); fillRR(ix, sy - 24, 20, 24, 4, ctx.fillStyle); ctx.fillStyle = "#C8344F"; ctx.font = "700 7px Poppins"; ctx.textAlign = "center"; ctx.fillText("PARIS", ix + 10, sy - 10); }
+          else if(r === 1){ ctx.fillStyle = pick(["#9A8AE0", "#E2B85C", "#6C4FE0"], i); ctx.beginPath(); ctx.moveTo(ix + 10, sy - 38); ctx.lineTo(ix + 2, sy); ctx.lineTo(ix + 18, sy); ctx.closePath(); ctx.fill(); }
+          else { ctx.fillStyle = pick(["#2F2F3A", "#C8344F", "#2F3F7A"], i); ctx.beginPath(); ctx.ellipse(ix + 10, sy - 6, 13, 6, 0, Math.PI, 0); ctx.fill(); ctx.fillRect(ix + 9, sy - 15, 2, 4); } } }); });
+      ctx.fillStyle = "#C8344F"; ctx.font = "600 14px Poppins"; ctx.textAlign = "center"; tile(480, .3, x => ctx.fillText("SOUVENIRS DE PARIS", x + 240, 40)); },
+    ground: () => GROUND.tiles("#F1E6DD", "#E6D7CB", 26),
+    obstacle(x, y, w, h, done){ ctx.fillStyle = dim(done, "#5D6577"); ctx.fillRect(x + w / 2 - 2, y - h + 6, 4, h - 6); ctx.fillRect(x - 4, y - 5, w + 8, 5);
+      for(let r = 0; r < 3; r++) for(let c = 0; c < 2; c++){ const px = x - 6 + c * (w / 2 + 6), py = y - h + 8 + r * 26;
+        fillRR(px, py, w / 2, 22, 3, done ? "#F3EEFB" : pick(["#9FD3F0", "#F5C58A", "#F2C9EB", "#B7E3C6", "#C9BFF5", "#FFE29A"], r * 2 + c));
+        if(!done){ ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.fillRect(px + 3, py + 15, w / 2 - 6, 3); } } } },
+
+  /* Cultura : librairie ; pile de livres */
+  library: { back(){ wall("#F8F1E4"); baseboard("#B8956F", 26);
+      tile(200, .3, (x, n) => { const gy = groundY(); shelves(x + 6, 180, gy, 4, (sx, sy, sw, r) => { let bx = sx + 6, k = 0;
+        while(bx < sx + sw - 12){ const bw = 8 + ((n + r + k) * 7) % 9, bh = 26 + ((n * 3 + k) * 5) % 14; ctx.fillStyle = pick(["#6C4FE0", "#C8344F", "#1F8A70", "#F5A623", "#2F3F7A", "#D96ECC", "#8A5A2B"], n + r * 3 + k); ctx.fillRect(bx, sy - bh, bw, bh); bx += bw + 1; k++; } }); });
+      ctx.fillStyle = "#2F3F7A"; ctx.font = "600 14px Poppins"; ctx.textAlign = "center"; tile(400, .3, x => ctx.fillText("LIBRAIRIE · LIVRES · MUSIQUE", x + 200, 38)); },
+    ground: () => GROUND.parquet(),
+    obstacle(x, y, w, h, done){ let yy = y; [[56, 18], [50, 16], [58, 20], [48, 14], [52, 18]].forEach(([bw, bh], i) => { yy -= bh;
+      const bx = x + w / 2 - bw / 2 + (i % 2 ? 4 : -3); fillRR(bx, yy, bw, bh - 1, 3, done ? "#EFEAFA" : pick(["#6C4FE0", "#F5A623", "#1F8A70", "#C8344F", "#2F3F7A"], i));
+      ctx.fillStyle = done ? "#fff" : "#FDF8EE"; ctx.fillRect(bx + bw - 6, yy + 2, 4, bh - 5); }); } },
+
+  /* En el avión : cabine (hublots, coffres à bagages) ; chariot repas */
+  plane: { back(){ const gy = groundY(); ctx.fillStyle = "#EEF1F6"; ctx.fillRect(0, 0, W, gy);
+      ctx.fillStyle = "#DDE2EB"; ctx.fillRect(0, 0, W, 90); ctx.fillStyle = "#C9D0DC"; ctx.fillRect(0, 88, W, 4);
+      tile(110, .3, x => { ctx.strokeStyle = "#C9D0DC"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, 10); ctx.lineTo(x, 88); ctx.stroke(); });
+      tile(110, .3, (x, n) => { fillRR(x + 30, 150, 50, 74, 25, "#C9D0DC"); const g = ctx.createLinearGradient(0, 156, 0, 218); g.addColorStop(0, "#8FC3F0"); g.addColorStop(1, "#DDEFFC");
+        roundRect(x + 36, 156, 38, 62, 19); ctx.fillStyle = g; ctx.fill(); ctx.fillStyle = "#fff"; const cx = x + 55 + ((G.t * 20 + n * 13) % 30) - 15; ctx.beginPath(); ctx.ellipse(cx, 190, 10, 4, 0, 0, 7); ctx.fill(); });
+      tile(90, .55, (x, n) => { fillRR(x + 10, gy - 120, 50, 110, 12, "#3B4A8F"); fillRR(x + 6, gy - 50, 64, 22, 8, "#33407D"); fillRR(x + 14, gy - 116, 42, 12, 6, "#fff"); }); },
+    ground: () => GROUND.carpet("#5B6A9E", "#6E7DB0"),
+    obstacle(x, y, w, h, done){ fillRR(x - 6, y - h + 10, w + 12, h - 16, 6, dim(done, "#C9CED8", "#F1EEF8")); ctx.fillStyle = dim(done, "#6C4FE0"); ctx.fillRect(x - 6, y - h + 10, w + 12, 8);
+      ctx.fillStyle = "rgba(0,0,0,.12)"; for(let r = 1; r < 4; r++) ctx.fillRect(x - 2, y - h + 14 + r * 18, w + 4, 2);
+      ctx.fillStyle = dim(done, "#F5A623", "#fff"); ctx.fillRect(x + 4, y - h + 2, 10, 10); ctx.fillStyle = dim(done, "#D96ECC", "#fff"); ctx.fillRect(x + w - 16, y - h, 8, 12);
+      ctx.fillStyle = "#3C3C46"; [x, x + w - 8].forEach(wx => { ctx.beginPath(); ctx.arc(wx + 4, y - 3, 3.5, 0, 7); ctx.fill(); }); } },
+
+  /* En el taxi : boulevard, taxis garés ; cônes de chantier */
+  boulevard: { back(){ skyG("#D9E8F6", "#F7F3FB"); clouds(); facades(.2, { h: 240 });
+      tile(260, .55, (x, n) => { const gy = groundY(); lamp(x + 10, gy, 170); tree(x + 220, gy, .9);
+        const tx = x + 60; fillRR(tx, gy - 34, 120, 26, 10, pick(["#F7F8FB", "#2F2F3A", "#F7F8FB"], n)); fillRR(tx + 24, gy - 54, 70, 24, 10, pick(["#F7F8FB", "#2F2F3A", "#F7F8FB"], n));
+        ctx.fillStyle = "#9FB4D6"; ctx.fillRect(tx + 32, gy - 50, 24, 14); ctx.fillRect(tx + 62, gy - 50, 24, 14);
+        fillRR(tx + 48, gy - 62, 24, 8, 3, "#3CC37A"); ctx.fillStyle = "#fff"; ctx.font = "700 6px Poppins"; ctx.textAlign = "center"; ctx.fillText("TAXI", tx + 60, gy - 56);
+        ctx.fillStyle = "#2E3440"; [tx + 24, tx + 96].forEach(wx => { ctx.beginPath(); ctx.arc(wx, gy - 8, 9, 0, 7); ctx.fill(); }); }); },
+    ground: () => GROUND.road(),
+    obstacle(x, y, w, h, done){ [[x - 8, 70], [x + 20, 92]].forEach(([cx, ch]) => { const c = dim(done, "#F26B2E");
+      ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(cx + 2, y - 6); ctx.lineTo(cx + 15, y - ch); ctx.lineTo(cx + 19, y - ch); ctx.lineTo(cx + 32, y - 6); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = done ? "#fff" : "#FFFFFF"; ctx.fillRect(cx + 9, y - ch * .62, 16, 6); ctx.fillRect(cx + 12, y - ch * .85, 10, 5);
+      ctx.fillStyle = dim(done, "#3C3C46", "#E7E1F7"); ctx.fillRect(cx - 2, y - 7, 38, 7); }); } },
+
+  /* El camino : carrefour, panneaux de direction ; barrière de travaux */
+  signs: { back(){ skyG("#D3E6F6", "#F8F3FB"); clouds(); facades(.2, { h: 230 });
+      tile(340, .5, (x, n) => { const gy = groundY(); ctx.fillStyle = "#3C4250"; ctx.fillRect(x + 60, gy - 210, 5, 210);
+        [["← Louvre", -1, "#2F3F7A"], ["Opéra →", 1, "#2F3F7A"], ["← Gare du Nord", -1, "#1F6F7A"]].forEach(([t, d, c], i) => { const sy = gy - 205 + i * 30, sx = d < 0 ? x - 30 : x + 65;
+          ctx.fillStyle = c; ctx.beginPath(); if(d < 0){ ctx.moveTo(x + 60, sy); ctx.lineTo(sx + 12, sy); ctx.lineTo(sx, sy + 11); ctx.lineTo(sx + 12, sy + 22); ctx.lineTo(x + 60, sy + 22); }
+          else { ctx.moveTo(x + 65, sy); ctx.lineTo(sx + 88, sy); ctx.lineTo(sx + 100, sy + 11); ctx.lineTo(sx + 88, sy + 22); ctx.lineTo(x + 65, sy + 22); } ctx.fill();
+          ctx.fillStyle = "#fff"; ctx.font = "600 10px Poppins"; ctx.textAlign = "center"; ctx.fillText(t.replace(/[←→] ?| ?[←→]/g, ""), d < 0 ? (sx + x + 60) / 2 + 4 : (x + 65 + sx + 100) / 2 - 4, sy + 15); });
+        fillRR(x + 140, gy - 150, 80, 26, 4, "#2F4FA2"); ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.5; roundRect(x + 143, gy - 147, 74, 20, 3); ctx.stroke();
+        ctx.fillStyle = "#fff"; ctx.font = "600 9px Poppins"; ctx.fillText(pick(["RUE DE RIVOLI", "RUE DU BAC", "BD ST-MICHEL"], n), x + 180, gy - 133); }); },
+    ground: () => GROUND.pave(),
+    obstacle(x, y, w, h, done){ const r = dim(done, "#D63B3B"), wt = done ? "#fff" : "#FFFFFF";
+      ctx.fillStyle = dim(done, "#3C3C46"); ctx.fillRect(x - 4, y - 70, 5, 70); ctx.fillRect(x + w - 1, y - 70, 5, 70); ctx.fillRect(x - 10, y - 4, 18, 4); ctx.fillRect(x + w - 7, y - 4, 18, 4);
+      [y - 72, y - 40].forEach(by => { ctx.fillStyle = wt; ctx.fillRect(x - 8, by, w + 16, 18); ctx.fillStyle = r; for(let i = 0; i < 4; i++){ ctx.beginPath(); const sx = x - 8 + i * 16; ctx.moveTo(sx, by + 18); ctx.lineTo(sx + 8, by); ctx.lineTo(sx + 14, by); ctx.lineTo(sx + 6, by + 18); ctx.fill(); } });
+      ctx.fillStyle = dim(done, "#F5A623"); ctx.beginPath(); ctx.arc(x + w / 2, y - 84, 7, 0, 7); ctx.fill(); } },
+
+  /* Salidas : cinéma et musée ; potelets avec cordon */
+  cinema: { back(){ skyG("#E3DDF6", "#FBF6EE"); clouds("rgba(255,255,255,.7)");
+      facades(.3, { step: 220, h: 260, shop: (x, w, n, gy) => { if(n % 2){
+          ctx.fillStyle = "#3B2A5E"; ctx.fillRect(x + 6, gy - 120, w - 12, 120); fillRR(x + 20, gy - 150, w - 40, 34, 6, "#F5C542"); ctx.fillStyle = "#3B2A5E"; ctx.font = "700 15px Poppins"; ctx.textAlign = "center"; ctx.fillText("CINÉMA", x + w / 2, gy - 127);
+          for(let i = 0; i < 3; i++) fillRR(x + 22 + i * 58, gy - 100, 44, 62, 4, pick(["#D96ECC", "#1F8A70", "#F26B2E"], i + n));
+          for(let i = 0; i < 9; i++){ ctx.fillStyle = "#FFE7A3"; ctx.beginPath(); ctx.arc(x + 24 + i * ((w - 48) / 8), gy - 152, 2.5, 0, 7); ctx.fill(); } }
+        else { ctx.fillStyle = "#EDE5D6"; ctx.fillRect(x + 6, gy - 130, w - 12, 130); ctx.fillStyle = "#D8CDB9"; ctx.beginPath(); ctx.moveTo(x, gy - 130); ctx.lineTo(x + w / 2, gy - 170); ctx.lineTo(x + w, gy - 130); ctx.fill();
+          for(let i = 0; i < 5; i++){ ctx.fillStyle = "#F8F3EA"; ctx.fillRect(x + 22 + i * ((w - 50) / 4), gy - 120, 12, 110); }
+          ctx.fillStyle = "#6C5B45"; ctx.font = "600 11px Poppins"; ctx.textAlign = "center"; ctx.fillText("MUSÉE", x + w / 2, gy - 140); } } }); },
+    ground: () => GROUND.pave(),
+    obstacle(x, y, w, h, done){ const p = dim(done, "#C9A24A", "#EFE9F8"); [x - 6, x + w].forEach(px => { ctx.fillStyle = p; ctx.fillRect(px, y - 74, 6, 74); ctx.beginPath(); ctx.arc(px + 3, y - 78, 6, 0, 7); ctx.fill(); ctx.fillRect(px - 6, y - 5, 18, 5); });
+      ctx.strokeStyle = dim(done, "#C8344F"); ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(x - 2, y - 68); ctx.quadraticCurveTo(x + w / 2, y - 40, x + w + 4, y - 68); ctx.stroke();
+      fillRR(x + 4, y - h, w - 8, 18, 4, dim(done, "#3B2A5E")); ctx.fillStyle = "#fff"; ctx.font = "600 8px Poppins"; ctx.textAlign = "center"; ctx.fillText("ENTRÉE", x + w / 2, y - h + 12); } },
+
+  /* El café : comptoir en zinc, machine à expresso ; pile de chaises de terrasse */
+  cafe: { back(){ wall("#F6EBDD"); const gy = groundY();
+      ctx.fillStyle = "#2E5E4E"; ctx.fillRect(0, gy - 70, W, 70); ctx.fillStyle = "#A8B0B8"; ctx.fillRect(0, gy - 78, W, 10);   // comptoir en zinc
+      tile(260, .3, (x, n) => { shelves(x + 20, 120, gy - 120, 2, (sx, sy) => { for(let i = 0; i < 5; i++){ ctx.fillStyle = pick(["#6E9E5E", "#C8344F", "#E2B85C", "#2F3F7A"], i + n); ctx.fillRect(sx + 10 + i * 22, sy - 30, 9, 30); ctx.fillRect(sx + 12 + i * 22, sy - 38, 5, 8); } });
+        fillRR(x + 160, gy - 130, 70, 52, 8, "#B9C0C8"); fillRR(x + 166, gy - 140, 58, 12, 4, "#8E969F"); ctx.fillStyle = "#3C3C46"; ctx.fillRect(x + 178, gy - 98, 8, 10); ctx.fillRect(x + 204, gy - 98, 8, 10);
+        fillRR(x + 175, gy - 88, 14, 10, 3, "#fff"); fillRR(x + 30, 40, 110, 70, 6, "#2F3A36"); ctx.fillStyle = "#F4F1E8"; ctx.font = "600 11px Poppins"; ctx.textAlign = "center";
+        ctx.fillText("Café 2,50 €", x + 85, 66); ctx.fillText("Crème 4 €", x + 85, 84); ctx.fillText("Croissant 1,40 €", x + 85, 102); }); },
+    ground: () => GROUND.tiles("#F4EFE6", "#D9CFC0", 18),
+    obstacle(x, y, w, h, done){ for(let i = 0; i < 4; i++){ const cy = y - i * 20, c = dim(done, i % 2 ? "#B8834F" : "#A87545");
+      ctx.strokeStyle = c; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x, cy); ctx.lineTo(x + 6, cy - 30); ctx.moveTo(x + w, cy); ctx.lineTo(x + w - 6, cy - 30); ctx.stroke();
+      fillRR(x - 4, cy - 34, w + 8, 7, 3, dim(done, pick(["#C8344F", "#2F3F7A", "#1F8A70", "#F5A623"], i))); } ctx.strokeStyle = dim(done, "#A87545"); ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x + 6, y - 94); ctx.quadraticCurveTo(x + w / 2, y - h - 8, x + w - 6, y - 94); ctx.stroke(); } },
+
+  /* La panadería : vitrine de baguettes et croissants ; panier de baguettes */
+  bakery: { back(){ wall("#FFF5E6", "#FCEBD3"); const gy = groundY();
+      tile(300, .3, (x, n) => { fillRR(x + 20, 30, 260, 34, 6, "#7A2E3A"); ctx.fillStyle = "#F5D28A"; ctx.font = "700 16px Poppins"; ctx.textAlign = "center"; ctx.fillText("BOULANGERIE", x + 150, 53);
+        shelves(x + 30, 150, gy - 70, 2, (sx, sy, sw, r) => { for(let i = 0; i < 6; i++){ ctx.fillStyle = "#D99A4E"; if(r) { ctx.save(); ctx.translate(sx + 12 + i * 24, sy - 14); ctx.rotate(-1.2); fillRR(-28, -5, 56, 10, 5, "#D99A4E"); ctx.restore(); }
+          else { ctx.beginPath(); ctx.ellipse(sx + 14 + i * 24, sy - 7, 10, 7, 0, Math.PI, 0); ctx.fill(); ctx.fillStyle = "#C07F3A"; ctx.fillRect(sx + 10 + i * 24, sy - 9, 2, 6); ctx.fillRect(sx + 16 + i * 24, sy - 9, 2, 6); } } }); });
+      ctx.fillStyle = "#E9D9C4"; ctx.fillRect(0, gy - 70, W, 70); ctx.fillStyle = "rgba(220,234,244,.8)"; ctx.fillRect(0, gy - 112, W, 42);   // vitrine réfrigérée
+      tile(70, .3, (x, n) => { [0, 1, 2].forEach(i => { ctx.fillStyle = pick(["#E8A1A1", "#F5D28A", "#7A4E2D", "#F2C9EB"], n + i); ctx.beginPath(); ctx.arc(x + 14 + i * 20, gy - 82, 8, Math.PI, 0); ctx.fill(); }); });
+      ctx.fillStyle = "#B8956F"; ctx.fillRect(0, gy - 72, W, 4); },
+    ground: () => GROUND.tiles("#F3E6D3", "#E7D3B8", 24),
+    obstacle(x, y, w, h, done){ for(let i = 0; i < 5; i++){ ctx.save(); ctx.translate(x + 6 + i * 9, y - 46); ctx.rotate(-.25 + i * .12); fillRR(-5, -48, 11, 70, 5, dim(done, "#D99A4E", "#F3EEFB"));
+        ctx.fillStyle = dim(done, "#B9772F", "#E7E1F7"); for(let k = 0; k < 4; k++) ctx.fillRect(-3, -40 + k * 14, 6, 2); ctx.restore(); }
+      fillRR(x - 8, y - 46, w + 16, 46, 8, dim(done, "#A9773F")); ctx.strokeStyle = "rgba(255,255,255,.3)"; ctx.lineWidth = 2;
+      for(let r = 1; r < 4; r++){ ctx.beginPath(); ctx.moveTo(x - 6, y - 46 + r * 11); ctx.lineTo(x + w + 6, y - 46 + r * 11); ctx.stroke(); } } },
+
+  /* El mercado : étals sous auvents rayés ; cagettes de fruits */
+  market: { back(){ skyG("#D6EAF5", "#FBF6EC"); clouds(); facades(.15, { h: 230 });
+      tile(200, .5, (x, n) => { const gy = groundY(), c = pick(["#C8344F", "#1F8A70", "#2F3F7A", "#F5A623"], n);
+        ctx.fillStyle = "#6E5A48"; ctx.fillRect(x + 12, gy - 150, 4, 150); ctx.fillRect(x + 184, gy - 150, 4, 150);
+        for(let i = 0; i < 8; i++){ ctx.fillStyle = i % 2 ? "#fff" : c; ctx.beginPath(); ctx.moveTo(x + 6 + i * 24, gy - 165); ctx.lineTo(x + 30 + i * 24, gy - 165); ctx.lineTo(x + 30 + i * 24, gy - 142); ctx.quadraticCurveTo(x + 18 + i * 24, gy - 134, x + 6 + i * 24, gy - 142); ctx.fill(); }
+        ctx.fillStyle = "#B8956F"; ctx.fillRect(x + 8, gy - 60, 184, 60);
+        for(let i = 0; i < 4; i++){ const fc = pick(["#E84A4A", "#F5A623", "#7DBA4F", "#9B59D0", "#F2C12E"], n + i); fillRR(x + 14 + i * 44, gy - 78, 40, 20, 3, "#8A6A4F");
+          ctx.fillStyle = fc; for(let k = 0; k < 4; k++){ ctx.beginPath(); ctx.arc(x + 20 + i * 44 + k * 9, gy - 80, 5.5, 0, 7); ctx.fill(); } }
+        fillRR(x + 80, gy - 128, 44, 22, 4, "#2F3A36"); ctx.fillStyle = "#fff"; ctx.font = "600 9px Poppins"; ctx.textAlign = "center"; ctx.fillText(pick(["2 € le kg", "3 € le kg", "1,50 €"], n), x + 102, gy - 113); }); },
+    ground: () => GROUND.cobble(),
+    obstacle(x, y, w, h, done){ let yy = y; [0, 1, 2].forEach(i => { yy -= 30; fillRR(x - 8 + (i % 2) * 4, yy, w + 12, 28, 3, dim(done, "#C49A6C"));
+      ctx.fillStyle = dim(done, "#A47A4E", "#F1ECF9"); ctx.fillRect(x - 6 + (i % 2) * 4, yy + 10, w + 8, 3);
+      ctx.fillStyle = done ? "#F7F4FC" : pick(["#E84A4A", "#F5A623", "#7DBA4F"], i); for(let k = 0; k < 5; k++){ ctx.beginPath(); ctx.arc(x - 2 + (i % 2) * 4 + k * 11, yy - 2, 5.5, 0, 7); ctx.fill(); } }); } },
+
+  /* En el hotel : couloir avec portes numérotées ; chariot à bagages */
+  hotel: { back(){ wall("#F4ECF6", "#EDE2F1"); baseboard("#7E6A8F");
+      tile(160, .3, (x, n) => { const gy = groundY(); fillRR(x + 40, gy - 170, 74, 170, 4, "#8A5A3C"); ctx.fillStyle = "#7A4E33"; ctx.fillRect(x + 48, gy - 160, 58, 70); ctx.fillRect(x + 48, gy - 82, 58, 70);
+        ctx.fillStyle = "#E2B85C"; ctx.beginPath(); ctx.arc(x + 100, gy - 86, 4, 0, 7); ctx.fill(); fillRR(x + 63, gy - 194, 28, 16, 3, "#E2B85C");
+        ctx.fillStyle = "#5B3F2C"; ctx.font = "700 10px Poppins"; ctx.textAlign = "center"; ctx.fillText(String(101 + n), x + 77, gy - 182);
+        ctx.fillStyle = "#E2B85C"; ctx.fillRect(x + 136, gy - 200, 4, 18); ctx.fillStyle = "#FFE7A3"; ctx.beginPath(); ctx.moveTo(x + 128, gy - 182); ctx.lineTo(x + 148, gy - 182); ctx.lineTo(x + 144, gy - 200); ctx.lineTo(x + 132, gy - 200); ctx.fill(); }); },
+    ground: () => GROUND.carpet("#8E3B4F", "#A85466"),
+    obstacle(x, y, w, h, done){ const g = dim(done, "#D4A93F"); ctx.fillStyle = g; ctx.fillRect(x - 8, y - 10, w + 16, 6); ctx.fillRect(x - 6, y - h + 4, 4, h - 10); ctx.fillRect(x + w + 2, y - h + 4, 4, h - 10);
+      ctx.beginPath(); ctx.arc(x + w / 2, y - h + 6, w / 2 + 4, Math.PI, 0); ctx.lineWidth = 4; ctx.strokeStyle = g; ctx.stroke();
+      fillRR(x, y - 46, w, 36, 6, dim(done, "#6C4FE0")); fillRR(x + 6, y - 72, w - 12, 26, 5, dim(done, "#1F8A70")); fillRR(x + 10, y - 86, w - 20, 14, 4, dim(done, "#F2C9EB"));
+      ctx.fillStyle = "#3C3C46"; [x - 6, x + w + 2].forEach(wx => { ctx.beginPath(); ctx.arc(wx + 2, y - 3, 4, 0, 7); ctx.fill(); }); } },
+
+  /* En el Airbnb : salon avec fenêtre sur les toits ; pile de coussins */
+  flat: { back(){ wall("#F7F2EC"); baseboard("#fff", 18); const gy = groundY();
+      tile(320, .3, (x, n) => { fillRR(x + 30, gy - 260, 110, 150, 4, "#fff"); const g = ctx.createLinearGradient(0, gy - 252, 0, gy - 118); g.addColorStop(0, "#BFD9F2"); g.addColorStop(1, "#F2E8F7"); ctx.fillStyle = g; ctx.fillRect(x + 36, gy - 254, 98, 138);
+        ctx.fillStyle = "#9AA3BF"; for(let i = 0; i < 4; i++){ ctx.fillRect(x + 38 + i * 24, gy - 150 - (i * 13) % 26, 22, 40); } ctx.fillStyle = "#fff"; ctx.fillRect(x + 83, gy - 254, 4, 138); ctx.fillRect(x + 36, gy - 188, 98, 4);
+        ctx.fillStyle = "#3C3C46"; for(let i = 0; i < 9; i++) ctx.fillRect(x + 34 + i * 12, gy - 122, 2, 16); ctx.fillRect(x + 32, gy - 108, 106, 3);
+        fillRR(x + 170, gy - 70, 120, 50, 14, "#9B8BD9"); fillRR(x + 160, gy - 92, 140, 32, 14, "#8A79CC"); fillRR(x + 178, gy - 64, 30, 22, 6, "#F5C58A");
+        ctx.fillStyle = "#3C3C46"; ctx.fillRect(x + 168, gy - 22, 4, 22); ctx.fillRect(x + 288, gy - 22, 4, 22);
+        fillRR(x + 296, gy - 60, 26, 30, 6, "#D88C6A"); ctx.fillStyle = "#6FA86A"; [[-8, 0], [0, -10], [8, -2]].forEach(([dx, dy]) => { ctx.beginPath(); ctx.ellipse(x + 309 + dx, gy - 78 + dy, 6, 16, dx / 20, 0, 7); ctx.fill(); }); }); },
+    ground: () => GROUND.parquet(),
+    obstacle(x, y, w, h, done){ let yy = y; [[w + 18, 26], [w + 8, 24], [w + 14, 24], [w, 22]].forEach(([cw, ch], i) => { yy -= ch;
+      fillRR(x + w / 2 - cw / 2, yy, cw, ch - 1, 11, done ? "#F1ECFA" : pick(["#6C4FE0", "#F5C58A", "#9FD8C9", "#F2C9EB"], i));
+      ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(x + w / 2 - 2, yy + 4, 4, ch - 9); }); } },
+
+  /* Emergencias : rue avec ambulance et camion de pompiers (dessin doux) ; trousse de secours */
+  emergency: { back(){ skyG("#DCEAF6", "#F8F4FB"); clouds(); facades(.2, { h: 240 });
+      tile(380, .5, (x, n) => { const gy = groundY(); lamp(x + 10, gy, 170);
+        if(n % 2){ fillRR(x + 60, gy - 70, 150, 60, 10, "#fff"); fillRR(x + 170, gy - 54, 50, 44, 10, "#fff"); ctx.fillStyle = "#F26B2E"; ctx.fillRect(x + 60, gy - 40, 160, 8);
+          ctx.fillStyle = "#9FB4D6"; ctx.fillRect(x + 182, gy - 48, 30, 16); ctx.fillStyle = "#2F7AD9"; fillRR(x + 120, gy - 80, 20, 10, 4, "#2F7AD9");
+          ctx.fillStyle = "#3CA06A"; ctx.fillRect(x + 100, gy - 64, 8, 22); ctx.fillRect(x + 93, gy - 57, 22, 8); }
+        else { fillRR(x + 50, gy - 74, 190, 64, 8, "#D63B3B"); fillRR(x + 196, gy - 60, 50, 50, 8, "#D63B3B"); ctx.fillStyle = "#9FB4D6"; ctx.fillRect(x + 208, gy - 54, 30, 16);
+          ctx.fillStyle = "#C9CED8"; ctx.fillRect(x + 60, gy - 86, 130, 6); for(let i = 0; i < 8; i++) ctx.fillRect(x + 66 + i * 16, gy - 92, 3, 12); fillRR(x + 120, gy - 82, 20, 8, 3, "#2F7AD9"); }
+        ctx.fillStyle = "#2E3440"; [x + 90, x + 210].forEach(wx => { ctx.beginPath(); ctx.arc(wx, gy - 8, 10, 0, 7); ctx.fill(); }); }); },
+    ground: () => GROUND.road(),
+    obstacle(x, y, w, h, done){ fillRR(x - 8, y - 66, w + 16, 66, 10, dim(done, "#fff", "#F4F1FC")); ctx.strokeStyle = dim(done, "#D63B3B"); ctx.lineWidth = 3; roundRect(x - 8, y - 66, w + 16, 66, 10); ctx.stroke();
+      ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x + 8, y - 66); ctx.lineTo(x + 8, y - 80); ctx.lineTo(x + w - 8, y - 80); ctx.lineTo(x + w - 8, y - 66); ctx.stroke();
+      ctx.fillStyle = dim(done, "#D63B3B"); ctx.fillRect(x + w / 2 - 6, y - 52, 12, 36); ctx.fillRect(x + w / 2 - 18, y - 40, 36, 12); } },
+
+  /* En la farmacia : rayons, croix verte ; panier rempli de boîtes */
+  pharmacy: { back(){ wall("#F3FAF6"); baseboard("#CFE5D8"); const gy = groundY();
+      tile(260, .3, (x, n) => { shelves(x + 10, 170, gy, 3, (sx, sy, sw, r) => { for(let i = 0; i < 7; i++){ fillRR(sx + 8 + i * 23, sy - 26 + (i % 2) * 4, 18, 26 - (i % 2) * 4, 3, pick(["#fff", "#D8F0E3", "#E0E9FA", "#FCE4EC", "#FFF1D6"], i + r + n));
+          ctx.fillStyle = pick(["#3CA06A", "#2F7AD9", "#D96ECC"], i + r); ctx.fillRect(sx + 10 + i * 23, sy - 16, 14, 3); } });
+        if(n % 2 === 0){ ctx.fillStyle = "#2BB673"; const cx = x + 220, cy = 70; ctx.fillRect(cx - 9, cy - 28, 18, 56); ctx.fillRect(cx - 28, cy - 9, 56, 18); ctx.fillStyle = "rgba(43,182,115,.18)"; ctx.beginPath(); ctx.arc(cx, cy, 42, 0, 7); ctx.fill(); } });
+      ctx.fillStyle = "#2BB673"; ctx.font = "700 14px Poppins"; ctx.textAlign = "center"; tile(520, .3, x => ctx.fillText("PHARMACIE", x + 120, 40)); },
+    ground: () => GROUND.tiles("#FFFFFF", "#EEF4F0", 26),
+    obstacle(x, y, w, h, done){ for(let i = 0; i < 5; i++) fillRR(x - 2 + i * 10, y - 70 - (i % 3) * 10, 14, 30 + (i % 3) * 10, 3, done ? "#F7F4FC" : pick(["#fff", "#D8F0E3", "#E0E9FA", "#FCE4EC", "#FFF1D6"], i));
+      fillRR(x - 8, y - 50, w + 16, 50, 6, dim(done, "#2BB673")); ctx.fillStyle = "rgba(255,255,255,.3)"; for(let i = 0; i < 5; i++) ctx.fillRect(x - 2 + i * 12, y - 44, 5, 38);
+      ctx.strokeStyle = dim(done, "#1E8C57"); ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(x, y - 50); ctx.quadraticCurveTo(x + w / 2, y - h - 4, x + w, y - 50); ctx.stroke(); } },
+
+  /* Con el doctor : salle d'attente ; grande plante en pot */
+  doctor: { back(){ wall("#F2F6FB", "#E9F0F8"); baseboard("#C9D6E6"); const gy = groundY();
+      tile(300, .3, (x, n) => { fillRR(x + 20, gy - 180, 80, 180, 4, "#E7EEF6"); ctx.strokeStyle = "#B9C7D8"; ctx.lineWidth = 3; ctx.strokeRect(x + 20, gy - 180, 80, 180); fillRR(x + 30, gy - 210, 60, 20, 4, "#2F7AD9");
+        ctx.fillStyle = "#fff"; ctx.font = "600 9px Poppins"; ctx.textAlign = "center"; ctx.fillText("CABINET", x + 60, gy - 196); ctx.fillStyle = "#8E9AAD"; ctx.beginPath(); ctx.arc(x + 90, gy - 90, 4, 0, 7); ctx.fill();
+        for(let i = 0; i < 3; i++){ const cx = x + 130 + i * 44; fillRR(cx, gy - 48, 36, 10, 4, "#6C9BD2"); fillRR(cx + 2, gy - 84, 32, 38, 6, "#7FA8DA"); ctx.fillStyle = "#3C4250"; ctx.fillRect(cx + 4, gy - 38, 3, 38); ctx.fillRect(cx + 29, gy - 38, 3, 38); }
+        fillRR(x + 150, gy - 230, 90, 110, 4, "#fff"); ctx.fillStyle = "#3CA06A"; ctx.fillRect(x + 160, gy - 218, 70, 8); ctx.fillStyle = "#C9D6E6"; for(let i = 0; i < 5; i++) ctx.fillRect(x + 160, gy - 200 + i * 14, 60 - (i % 2) * 18, 5); }); },
+    ground: () => GROUND.plain("#DDE6EE", "#CFD9E3"),
+    obstacle(x, y, w, h, done){ ctx.fillStyle = dim(done, "#6FA86A", "#EEE9F9");
+      [[-14, -4, -.5], [0, -10, 0], [14, -2, .5], [-8, 4, -.3], [8, 6, .3]].forEach(([dx, dy, a]) => { ctx.beginPath(); ctx.ellipse(x + w / 2 + dx, y - 70 + dy, 8, 26, a, 0, 7); ctx.fill(); });
+      ctx.fillStyle = dim(done, "#D88C6A"); ctx.beginPath(); ctx.moveTo(x - 4, y - 44); ctx.lineTo(x + w + 4, y - 44); ctx.lineTo(x + w - 4, y); ctx.lineTo(x + 4, y); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = dim(done, "#C27756", "#F4F0FC"); ctx.fillRect(x - 6, y - 48, w + 12, 8); } },
+
+  /* Opiniones › Comida : façade de restaurant avec terrasse ; chevalet « plat du jour » */
+  terrace: { back(){ skyG("#FBE3D3", "#FDF6EE"); clouds("rgba(255,255,255,.8)");
+      facades(.3, { shop: (x, w, n, gy) => shopFront(x, w, gy, pick(["#7A2E3A", "#2E5E4E", "#2F3F7A"], n), pick(["RESTAURANT", "BRASSERIE", "LE PETIT ZINC"], n), pick(["#C8344F", "#1F8A70", "#F5A623"], n)) });
+      tile(180, .55, (x, n) => { const gy = groundY(), tx = x + 60; ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.ellipse(tx, gy - 44, 26, 5, 0, 0, 7); ctx.fill(); ctx.fillStyle = "#3C3C46"; ctx.fillRect(tx - 2, gy - 44, 4, 44);
+        ctx.fillStyle = "#F4F1E8"; ctx.beginPath(); ctx.ellipse(tx - 10, gy - 48, 7, 2.5, 0, 0, 7); ctx.ellipse(tx + 10, gy - 48, 7, 2.5, 0, 0, 7); ctx.fill(); ctx.fillStyle = "#C8344F"; ctx.fillRect(tx - 1, gy - 60, 3, 12); }); },
+    ground: () => GROUND.pave(),
+    obstacle(x, y, w, h, done){ ctx.fillStyle = dim(done, "#8A6A4F"); ctx.save(); ctx.beginPath(); ctx.moveTo(x - 6, y); ctx.lineTo(x + w / 2 - 4, y - h + 4); ctx.lineTo(x + w / 2 + 4, y - h + 4); ctx.lineTo(x + w + 6, y); ctx.lineTo(x + w - 2, y); ctx.lineTo(x + w / 2, y - h + 16); ctx.lineTo(x + 2, y); ctx.closePath(); ctx.fill(); ctx.restore();
+      fillRR(x - 2, y - 84, w + 4, 64, 4, dim(done, "#2F3A36", "#F1ECFA")); if(!done){ ctx.fillStyle = "#F4F1E8"; ctx.font = "600 8px Poppins"; ctx.textAlign = "center"; ctx.fillText("PLAT DU", x + w / 2, y - 66); ctx.fillText("JOUR", x + w / 2, y - 56); ctx.font = "9px Poppins"; ctx.fillText("15 €", x + w / 2, y - 38); } } },
+
+  /* Lugares : belvédère avec vue sur Paris ; longue-vue */
+  viewpoint: { back(){ skyG("#BFD9F2", "#FBEFE6"); clouds(); const gy = groundY();
+      ctx.fillStyle = "#CFC6F2"; ctx.beginPath(); ctx.moveTo(0, gy - 150); ctx.quadraticCurveTo(W * .3, gy - 200, W * .6, gy - 160); ctx.quadraticCurveTo(W * .85, gy - 130, W, gy - 170); ctx.lineTo(W, gy); ctx.lineTo(0, gy); ctx.fill();   // collines lointaines
+      tile(60, .08, (x, n) => { ctx.fillStyle = n % 2 ? "#B7AAEA" : "#A99BE4"; const hh = 50 + (n * 23) % 70; ctx.fillRect(x, gy - 90 - hh, 52, hh + 90);
+        ctx.beginPath(); ctx.moveTo(x - 3, gy - 90 - hh); ctx.lineTo(x + 26, gy - 104 - hh); ctx.lineTo(x + 55, gy - 90 - hh); ctx.fill(); });
+      const sc = ((1100 - G.x * .1) % (W + 700) + W + 700) % (W + 700) - 200;            // Sacré-Cœur au loin
+      ctx.fillStyle = "#F1EEFB"; ctx.fillRect(sc - 30, gy - 200, 60, 40); ctx.beginPath(); ctx.ellipse(sc, gy - 200, 18, 26, 0, Math.PI, 0); ctx.fill(); ctx.fillRect(sc - 2, gy - 238, 4, 14);
+      ctx.beginPath(); ctx.ellipse(sc - 22, gy - 190, 8, 14, 0, Math.PI, 0); ctx.ellipse(sc + 22, gy - 190, 8, 14, 0, Math.PI, 0); ctx.fill();
+      const ex = ((520 - G.x * .1) % (W + 700) + W + 700) % (W + 700) - 200; ctx.strokeStyle = "#9A8AE0"; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(ex - 30, gy - 90); ctx.quadraticCurveTo(ex - 8, gy - 140, ex - 3, gy - 220); ctx.lineTo(ex, gy - 245); ctx.lineTo(ex + 3, gy - 220); ctx.quadraticCurveTo(ex + 8, gy - 140, ex + 30, gy - 90); ctx.stroke();
+      ctx.fillStyle = "#E3DBC8"; ctx.fillRect(0, gy - 90, W, 90); ctx.fillStyle = "#D2C8B2"; ctx.fillRect(0, gy - 94, W, 8);   // muret
+      tile(30, .5, x => { ctx.fillStyle = "#3C4250"; ctx.fillRect(x, gy - 140, 3, 50); }); ctx.fillStyle = "#3C4250"; ctx.fillRect(0, gy - 142, W, 4); },
+    ground: () => GROUND.tiles("#E8E0CF", "#DCD2BD", 30),
+    obstacle(x, y, w, h, done){ const c = dim(done, "#3F7A6A"); ctx.fillStyle = c; ctx.fillRect(x + w / 2 - 4, y - 60, 8, 60); ctx.fillRect(x + 2, y - 6, w - 4, 6);
+      fillRR(x + w / 2 - 12, y - 76, 24, 20, 6, c); ctx.save(); ctx.translate(x + w / 2, y - 80); ctx.rotate(-.35); fillRR(-26, -9, 52, 18, 8, c); ctx.fillStyle = done ? "#fff" : "#9FD3F0"; ctx.beginPath(); ctx.arc(24, 0, 6, 0, 7); ctx.fill(); ctx.restore(); } },
+
+  /* Clima : le temps change pendant la course (soleil, nuages, pluie) ; parapluie ouvert */
+  weather: { back(){ const k = (Math.sin(G.x / 900) + 1) / 2, gy = groundY();   // 0 = soleil, 1 = pluie
+      const mix = (a, b) => { const p = s => [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16)); const A = p(a), B = p(b); return `rgb(${A.map((v, i) => Math.round(v + (B[i] - v) * k)).join(",")})`; };
+      skyG(mix("#9FD0F5", "#8E96AB"), mix("#FFF4E0", "#D7DAE3"));
+      ctx.globalAlpha = 1 - k; ctx.fillStyle = "#FFD27A"; ctx.beginPath(); ctx.arc(W - 70, 80, 30, 0, 7); ctx.fill(); ctx.globalAlpha = 1;
+      clouds(k > .5 ? "rgba(150,156,175,.95)" : "rgba(255,255,255,.9)", .12); facades(.25, { h: 230 });
+      if(k > .45){ ctx.strokeStyle = "rgba(120,150,210,.55)"; ctx.lineWidth = 1.5; ctx.beginPath(); for(let i = 0; i < 60; i++){ const rx = (i * 53 + G.t * 60) % W, ry = (i * 97 + G.t * 520) % gy; ctx.moveTo(rx, ry); ctx.lineTo(rx - 4, ry + 12); } ctx.stroke(); } },
+    ground(){ GROUND.pave(); const y = groundY(); tile(230, 1, (x, n) => { ctx.fillStyle = "rgba(150,180,220,.45)"; ctx.beginPath(); ctx.ellipse(x + 60 + (n % 3) * 30, y + 26, 34, 6, 0, 0, 7); ctx.fill(); }); },
+    obstacle(x, y, w, h, done){ const c = dim(done, "#D96ECC"); ctx.fillStyle = dim(done, "#3C3C46"); ctx.fillRect(x + w / 2 - 2, y - 62, 4, 60);
+      ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(x + w / 2 + 7, y - 4, 7, Math.PI, 0, true); ctx.stroke();
+      ctx.fillStyle = c; ctx.beginPath(); ctx.moveTo(x - 14, y - 60); ctx.quadraticCurveTo(x + w / 2, y - h - 18, x + w + 14, y - 60); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = done ? "#fff" : "rgba(255,255,255,.35)"; for(let i = 0; i < 3; i++){ ctx.beginPath(); ctx.moveTo(x - 14 + i * ((w + 28) / 3), y - 60); ctx.quadraticCurveTo(x - 4 + i * ((w + 28) / 3) + 10, y - h + 4, x + w / 2, y - h - 6); ctx.lineTo(x + w / 2 + 1, y - h - 4); ctx.closePath(); if(i === 1) ctx.fill(); } } },
+
+  /* Precios : vitrines avec grandes étiquettes et soldes ; pile de sacs */
+  prices: { back(){ skyG("#E2DCF6", "#FCF5EE"); clouds();
+      facades(.3, { shop: (x, w, n, gy) => { shopFront(x, w, gy, pick(["#5B3F8C", "#2F3F7A", "#7A2E3A"], n), pick(["MODE", "CHAUSSURES", "MAISON"], n));
+        fillRR(x + w / 2 - 34, gy - 60, 68, 30, 6, "#E8304E"); ctx.fillStyle = "#fff"; ctx.font = "700 13px Poppins"; ctx.textAlign = "center"; ctx.fillText(pick(["-50 %", "SOLDES", "-30 %"], n), x + w / 2, gy - 40);
+        ctx.save(); ctx.translate(x + 30, gy - 30); ctx.rotate(-.3); fillRR(-14, -9, 34, 18, 4, "#F5C542"); ctx.fillStyle = "#3C3C46"; ctx.font = "700 9px Poppins"; ctx.fillText(pick(["9,99 €", "25 €", "4 €"], n), 3, 4); ctx.restore(); } }); },
+    ground: () => GROUND.pave(),
+    obstacle(x, y, w, h, done){ [[x - 10, 58, "#6C4FE0"], [x + 14, 74, "#F2C9EB"], [x + 2, 44, "#F5A623"]].forEach(([bx, bh, c]) => { fillRR(bx, y - bh, 34, bh, 4, dim(done, c));
+      ctx.strokeStyle = dim(done, "#3C3C46", "#E0D9F3"); ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(bx + 17, y - bh, 9, Math.PI, 0); ctx.stroke(); });
+      if(!done){ ctx.save(); ctx.translate(x + 30, y - 50); ctx.rotate(.3); fillRR(-10, -7, 22, 14, 3, "#E8304E"); ctx.fillStyle = "#fff"; ctx.font = "700 7px Poppins"; ctx.textAlign = "center"; ctx.fillText("€", 1, 3); ctx.restore(); } } },
+
+  /* Colores : rue aux façades de toutes les couleurs ; pots de peinture */
+  colors: { back(){ skyG("#CFE6F6", "#FBF3EA"); clouds();
+      facades(.3, { step: 110, h: 220, colors: ["#F28B82", "#FBBC5D", "#FFE08A", "#A8D8B9", "#8EC5E8", "#C3A6E8", "#F7A8C8"], roof: "#B4553C", win: "#fff",
+        shop: (x, w, n, gy) => { ctx.fillStyle = pick(["#2E5E4E", "#7A2E3A", "#2F3F7A"], n); fillRR(x + w / 2 - 14, gy - 60, 28, 60, 12, ctx.fillStyle); } }); },
+    ground: () => GROUND.cobble(),
+    obstacle(x, y, w, h, done){ let yy = y; [["#E84A4A", w + 14], ["#2F7AD9", w + 4], ["#F5C542", w - 6]].forEach(([c, pw], i) => { yy -= 30; const px = x + w / 2 - pw / 2;
+      fillRR(px, yy, pw, 28, 4, dim(done, "#F4F2F7", "#F7F4FC")); ctx.fillStyle = dim(done, c); ctx.fillRect(px, yy, pw, 8);
+      ctx.beginPath(); ctx.moveTo(px + 8, yy + 8); ctx.quadraticCurveTo(px + 10, yy + 18, px + 13, yy + 8); ctx.fill(); }); } },
+
+  /* Números : rue avec numéros de maisons et horloge ; cubes numérotés */
+  numbers: { back(){ skyG("#D5E7F6", "#F8F3FB"); clouds();
+      facades(.3, { shop: (x, w, n, gy) => { fillRR(x + w / 2 - 22, gy - 92, 44, 92, 18, pick(["#2F3F7A", "#2E5E4E", "#7A2E3A"], n));
+        fillRR(x + w / 2 - 16, gy - 122, 32, 22, 4, "#2F4FA2"); ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.5; roundRect(x + w / 2 - 13, gy - 119, 26, 16, 3); ctx.stroke();
+        ctx.fillStyle = "#fff"; ctx.font = "700 11px Poppins"; ctx.textAlign = "center"; ctx.fillText(String(n * 2 + 1), x + w / 2, gy - 107); } });
+      tile(420, .5, x => { const gy = groundY(); ctx.fillStyle = "#3C4250"; ctx.fillRect(x + 50, gy - 190, 5, 190); ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(x + 52, gy - 205, 22, 0, 7); ctx.fill();
+        ctx.strokeStyle = "#3C4250"; ctx.lineWidth = 3; ctx.stroke(); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x + 52, gy - 205); ctx.lineTo(x + 52, gy - 220); ctx.moveTo(x + 52, gy - 205); ctx.lineTo(x + 62, gy - 200); ctx.stroke(); }); },
+    ground: () => GROUND.pave(),
+    obstacle(x, y, w, h, done){ [[x - 8, y - 32, "#6C4FE0", "1"], [x + 26, y - 32, "#F5A623", "2"], [x + 9, y - 64, "#1F8A70", "3"]].forEach(([bx, by, c, t]) => {
+      fillRR(bx, by, 30, 30, 6, dim(done, c)); ctx.fillStyle = done ? "#CFC6EE" : "#fff"; ctx.font = "700 16px Poppins"; ctx.textAlign = "center"; ctx.fillText(t, bx + 15, by + 21); }); } },
+
+  /* La ciudad : quartier avec La Poste, banque, cinéma ; boîte aux lettres jaune */
+  district: { back(){ skyG("#D3E6F6", "#F8F4FB"); clouds();
+      facades(.3, { step: 170, shop: (x, w, n, gy) => { const k = n % 4;
+        shopFront(x, w, gy, ["#F5C542", "#2F3F7A", "#3B2A5E", "#2BB673"][k], ["LA POSTE", "BANQUE", "CINÉMA", "PHARMACIE"][k]);
+        if(k === 0){ ctx.fillStyle = "#2F3F7A"; ctx.font = "700 11px Poppins"; ctx.textAlign = "center"; ctx.fillText("LA POSTE", x + w / 2, gy - 80); } } });
+      tile(300, .55, x => { lamp(x + 30, groundY(), 170); tree(x + 180, groundY(), .9); }); },
+    ground: () => GROUND.pave(),
+    obstacle(x, y, w, h, done){ const c = dim(done, "#F5C542"); ctx.fillStyle = dim(done, "#3C3C46"); ctx.fillRect(x + w / 2 - 4, y - 40, 8, 40); ctx.fillRect(x + 2, y - 4, w - 4, 4);
+      fillRR(x - 6, y - h + 4, w + 12, 58, 8, c); ctx.beginPath(); ctx.arc(x + w / 2, y - h + 14, w / 2 + 6, Math.PI, 0); ctx.fill();
+      ctx.fillStyle = dim(done, "#2F3F7A", "#E7E1F7"); ctx.fillRect(x + 4, y - h + 18, w - 8, 6); ctx.fillStyle = dim(done, "#2F3F7A", "#E7E1F7"); ctx.font = "700 7px Poppins"; ctx.textAlign = "center"; ctx.fillText("LA POSTE", x + w / 2, y - h + 40); } }
+});
+const TH = THEMES[THEME] || THEMES.roofs;
 
 function drawFrame(dt){ ctx.save(); TH.back(); ctx.restore(); ctx.save(); TH.ground(); ctx.restore(); drawWalls(); drawEvo(dt); drawParts(dt); }
 function drawEvo(dt){

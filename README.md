@@ -73,4 +73,4 @@ service cloud.firestore {
 ## Décors du jeu d'Evo (juego.html)
 
 Le décor et les obstacles suivent la page d'où l'on lance l'exercice : `THEME_OF` (page → décor) et `THEMES` dans `juego.html`.
-Décors actuels : toits de Paris (par défaut), boutique de vêtements (Compras › Ropa), bistrot (Comida › El restaurante), métro (Visitas › En el metro), gare (Transporte › En el tren).
+Il y a un décor par onglet du guide (28 au total) ; les toits de Paris servent pour Parisinas et pour « Mis listas ».
