@@ -1002,7 +1002,10 @@ function ac(){ actx ??= new (window.AudioContext || window.webkitAudioContext)()
 // bruitages (fichiers créés pour Evoala, libres de droits) joués avec <audio> : ils marchent aussi en mode silencieux
 const SFX = { jump: new Audio("snd/jump.wav"), bump: new Audio("snd/bump.wav"), win: new Audio("snd/win.wav"), ding: new Audio("snd/ding.wav") };
 // volume réglé directement dans les fichiers (sur iPhone, le volume ne se règle pas par le code)
-function unlockSfx(){ [...Object.values(SFX), MODEL].forEach(a => { a.muted = true; a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; }); }); }
+// Sur iPhone, un lecteur n'est « débloqué » que s'il a vraiment lu un son pendant un toucher.
+// MODEL n'a pas encore de son au départ : on lui donne un bruitage (joué en muet) pour le débloquer,
+// sinon l'audio de la phrase ne peut pas se lancer tout seul ensuite.
+function unlockSfx(){ if(!MODEL.src) MODEL.src = "snd/ding.wav"; [...Object.values(SFX), MODEL].forEach(a => { a.muted = true; a.play().then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; }); }); }
 function sfx(kind){ const a = SFX[kind]; if(!a) return; try{ a.currentTime = 0; a.play().catch(() => {}); }catch(e){} }
 // lecteur <audio> (et non Web Audio) : sur iPhone en mode silencieux, Web Audio est coupé mais pas <audio>
 const urls = {};
