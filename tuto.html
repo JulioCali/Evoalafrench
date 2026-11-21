@@ -35,6 +35,12 @@
   .center{top:50%!important;transform:translateY(-50%)}
   .row .pr{display:inline-block}
   .tjump{display:none}
+  /* main qui tape + étiquette, posées juste sous la zone à toucher */
+  #hand,#hlab{position:fixed;z-index:53;pointer-events:none;display:none;transition:top .45s ease,left .45s ease}
+  #hand{font-size:36px;line-height:1;filter:drop-shadow(0 3px 4px rgba(0,0,0,.35));animation:ttap 1.1s ease-in-out infinite}
+  @keyframes ttap{0%,100%{transform:translateY(8px)}50%{transform:translateY(-3px) scale(.92)}}
+  #hlab{background:#FFD27A;color:#5A3A00;font-weight:600;font-size:14px;padding:7px 13px;border-radius:999px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.28)}
+  .on-tap #hand,.on-tap #hlab{display:block}
 </style>
 </head>
 <body>
@@ -42,6 +48,8 @@
 <div class="tblock" id="blk"></div>
 <div class="spot none" id="spot"></div>
 <div class="bub" id="bub"></div>
+<div id="hand" aria-hidden="true">👆</div>
+<div id="hlab"></div>
 
 <script>
 /* ---------- La page « guide » simulée : 3 phrases simples ---------- */
@@ -111,13 +119,13 @@ const STEPS = [
   { title:"¡Hola! Soy Evo 👋", text:"", dyn:() => AGAIN ? "¡Hola de nuevo! Crea tu cuenta gratis para guardar tu progreso y tus listas, y no volver a ver este tutorial." : "Antes de empezar, te enseño a usar la guía en 30 segundos, con las tres primeras frases de este tema.", next:"Empezar", skip:true, account:true },
   { target:"#t-cats", title:"Las categorías", text:"Aquí eliges lo que quieres aprender: saludos, compras, transporte… Desliza para ver más." },
   { target:"#t-tabs", title:"Los temas", text:"Cada categoría tiene varios temas. Toca uno para cambiar de página." },
-  { target:".row[data-i='0'] .spk", round:true, title:"Escucha", text:"Toca el altavoz para escuchar la frase en francés.", tap:t => t.closest(".row[data-i='0'] .spk"), act:() => play(0), wait:"Toca el altavoz 👆" },
-  { target:".row[data-i='0']", title:"¡Muy bien!", text:"El círculo claro alrededor del altavoz te recuerda que ya escuchaste esta frase." },
-  { target:".row[data-i='0'] .ic", title:"La pronunciación", text:"Toca la imagen para ver cómo se pronuncia: la pronunciación aparece debajo de la traducción.", tap:t => t.closest(".row[data-i='0'] .ic"), act:() => showPron(0), wait:"Toca la imagen 👆" },
+  { target:".row[data-i='0'] .spk", round:true, title:"Escucha", text:"Toca el altavoz para escuchar la frase en francés.", tap:t => t.closest(".row[data-i='0'] .spk"), act:() => play(0), wait:"Toca aquí" },
+  { target:".row[data-i='0']", title:"¡Muy bien!", text:"El círculo verde alrededor del altavoz te recuerda que ya escuchaste esta frase." },
+  { target:".row[data-i='0'] .ic", title:"La pronunciación", text:"Toca la imagen para ver cómo se pronuncia: la pronunciación aparece debajo de la traducción.", tap:t => t.closest(".row[data-i='0'] .ic"), act:() => showPron(0), wait:"Toca la imagen" },
   { target:".row[data-i='0']", title:"Así se dice", text:"", dyn:() => `«${PH[0].pr}»: la sílaba en mayúsculas es la que se marca más. Toca otra vez la imagen para ocultarla.` },
-  { target:".row[data-i='0'] .heart", round:true, title:"Guarda tus frases", text:"Toca el corazón para guardar la frase en «Mis listas» y repasarla después.", tap:t => t.closest(".row[data-i='0'] .heart"), act:() => row(0).querySelector(".heart").classList.add("on"), wait:"Toca el corazón 👆" },
+  { target:".row[data-i='0'] .heart", round:true, title:"Guarda tus frases", text:"Toca el corazón para guardar la frase en «Mis listas» y repasarla después.", tap:t => t.closest(".row[data-i='0'] .heart"), act:() => row(0).querySelector(".heart").classList.add("on"), wait:"Toca aquí" },
   { target:"#t-card", title:"Tu turno", text:"", dyn:() => `Escucha las otras dos frases: «${PH[1].fr}» y «${PH[2].fr}».`, tap:t => t.closest(".row[data-i='1'] .spk, .row[data-i='2'] .spk"),
-    act:async t => { const i = +t.closest(".row").dataset.i; await play(i); return heard.has(1) && heard.has(2); }, wait:"Escucha las 2 frases 👆" },
+    act:async t => { const i = +t.closest(".row").dataset.i; await play(i); return heard.has(1) && heard.has(2); }, wait:"Escucha las 2 frases", hand:".row[data-i='1'] .spk" },
   { target:"#t-pslot", before:() => { document.getElementById("t-pslot").innerHTML = `<button class="pbtn pop">${MIC}Practicar</button>`; },
     title:"¡Escuchaste todo! 🎉", text:"Cuando escuchas todas las frases de una tarjeta, aparece «Practicar»: un juego para decirlas en francés. Te lo explico cuando lo abras." },
   // retour du jeu ↓
@@ -137,16 +145,30 @@ function show(){
   setTimeout(() => place(s), el ? 380 : 0);
   bub.innerHTML = `<img src="img/ui/evo.png" alt=""><div class="bt"><b>${s.title}</b><p>${s.dyn ? s.dyn() : s.text}</p>
     <div class="bf"><span class="cnt">${k >= 1 && k < STEPS.length - 1 ? `${k} / ${STEPS.length - 2}` : ""}</span>${s.skip ? `<button class="sk" data-skip>Saltar</button>` : ""}${s.account && AGAIN ? `<button class="sk acc" data-next>Ver tutorial</button><button class="nx" data-acc>Crear cuenta</button>`
-      : s.tap ? `<span class="wait">${s.wait}</span>` : `<button class="nx" data-next>${s.next || "Siguiente"}</button>`}</div></div>`;
+      : s.tap ? "" : `<button class="nx" data-next>${s.next || "Siguiente"}</button>`}</div></div>`;
+  document.getElementById("hlab").textContent = s.wait || "";
+}
+const hand = document.getElementById("hand"), hlab = document.getElementById("hlab");
+function placeHand(s){
+  document.body.classList.toggle("on-tap", !!s.tap);
+  if(!s.tap) return;
+  const r = rectOf(s.hand || s.target); if(!r) return;
+  const cx = r.left + r.width / 2, top = r.bottom - 14;              // la main touche le bas du cercle
+  hand.style.left = (cx - 13) + "px"; hand.style.top = top + "px";
+  const lw = hlab.offsetWidth, ly = top + 10;
+  let lx = cx > innerWidth / 2 ? cx - 26 - lw : cx + 30;             // l'étiquette à côté de la main, du côté où il y a de la place
+  lx = Math.max(8, Math.min(innerWidth - lw - 8, lx));
+  hlab.style.left = lx + "px"; hlab.style.top = ly + "px";
 }
 function place(s){
+  placeHand(s);
   const r = s.target && rectOf(s.target), pad = s.round ? 8 : 6;
   if(!r){ spot.className = "spot none"; spot.style.cssText = `top:50%;left:50%`; bub.style.top = ""; bub.style.bottom = ""; bub.classList.add("center"); return; }
   bub.classList.remove("center");
   const w = r.width + pad * 2, h = r.height + pad * 2;
   spot.className = "spot" + (s.tap ? " tap" : "");
   spot.style.cssText = `top:${r.top - pad}px;left:${r.left - pad}px;width:${w}px;height:${h}px;border-radius:${s.round ? Math.max(w, h) / 2 : 18}px`;
-  const below = r.bottom + pad + 14, bh = bub.offsetHeight || 160;
+  const below = r.bottom + pad + 14 + (s.tap && !s.hand ? 44 : 0), bh = bub.offsetHeight || 160;   // place pour la main
   if(below + bh < innerHeight - 10){ bub.style.top = below + "px"; bub.style.bottom = ""; }
   else { bub.style.top = Math.max(10, r.top - pad - 14 - bh) + "px"; bub.style.bottom = ""; }
 }
