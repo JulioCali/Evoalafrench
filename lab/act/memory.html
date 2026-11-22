@@ -19,6 +19,15 @@
   .m.bad .face{animation:sh .35s}
   @keyframes sh{25%{transform:rotateY(180deg) translateX(-5px)}75%{transform:rotateY(180deg) translateX(5px)}}
   .end{text-align:center;padding:30px 10px}
+  /* deux zones : une carte française se retourne avec une carte espagnole */
+  .zone{margin:6px 0 16px}
+  .zone h3{margin:0 0 8px;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--gray);display:flex;align-items:center;gap:8px}
+  .zone h3 i{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .zone.fr h3 i{background:var(--violet)} .zone.es h3 i{background:#F5A623}
+  .zone.es .m .back{background:linear-gradient(145deg,#F7B955,#E8902B);box-shadow:0 3px 0 #C97418}
+  /* phase de mémorisation */
+  .memo{position:sticky;top:8px;z-index:5;margin:0 auto 10px;width:fit-content;background:#1C1F2B;color:#fff;padding:8px 16px;border-radius:999px;font-weight:600;font-size:15px;display:none}
+  .memo.on{display:block}
   .end img{width:90px}
 </style>
 </head>
@@ -27,39 +36,58 @@
   <div class="top"><a class="back" href="../">‹</a><h1>Memory</h1><span class="tag">Prototipo</span></div>
   <div class="card row"><select id="theme"></select>
     <select id="size"><option value="4">4 parejas</option><option value="6" selected>6 parejas</option><option value="8">8 parejas</option></select>
+    <select id="secs"><option value="3">Memorizar 3 s</option><option value="5" selected>Memorizar 5 s</option><option value="8">Memorizar 8 s</option></select>
     <button class="btn" id="go">Nueva partida</button></div>
   <div class="bar"><span class="muted" id="info"></span><span class="muted" id="moves"></span></div>
-  <div class="board" id="board"></div>
+  <div class="memo" id="memo"></div>
+  <div id="board"></div>
 </div>
 <script src="../lab.js"></script>
 <script>
-// Memory : chaque phrase donne deux cartes (français avec son illustration, et sa traduction).
-// Retourner la carte française joue l'audio. Une paire trouvée reste ouverte en vert.
-let theme = "", open = [], moves = 0, found = 0, total = 0, lock = false;
+// Memory : les cartes françaises en haut (avec l'illustration), les traductions en bas.
+// Au début, toutes les cartes sont visibles quelques secondes pour les mémoriser, puis elles se retournent.
+// On retourne une carte française et une carte espagnole : la carte française joue l'audio.
+let theme = "", pick = { fr: null, es: null }, moves = 0, found = 0, total = 0, lock = true, timer = null;
 const $ = id => document.getElementById(id);
+const cardHTML = (c, k) => `<button class="m open" data-k="${k}" data-i="${c.i}" data-side="${c.side}"><div class="back">?</div>
+  <div class="face ${c.side}">${c.side === "fr" ? Lab.icon(c.p, 48) + c.p.fr : c.p.es}</div></button>`;
 function start(){
-  const n = +$("size").value, ph = Lab.phrases(theme, n).filter(p => p.es);
-  total = ph.length; found = 0; moves = 0; open = [];
-  const cards = Lab.shuffle(ph.flatMap((p, i) => [{ i, side: "fr", p }, { i, side: "es", p }]));
-  $("board").innerHTML = cards.map((c, k) => `<button class="m" data-k="${k}" data-i="${c.i}" data-side="${c.side}"><div class="back">?</div>
-    <div class="face ${c.side}">${c.side === "fr" ? Lab.icon(c.p, 48) + c.p.fr : c.p.es}</div></button>`).join("");
-  $("board")._cards = cards; info();
+  clearInterval(timer);
+  const n = +$("size").value, ph = Lab.phrases(theme).filter(p => p.es && p.es.trim().toLowerCase() !== p.fr.trim().toLowerCase()).slice(0, n);   // sans les phrases identiques dans les deux langues (« Un matcha »)
+  total = ph.length; found = 0; moves = 0; pick = { fr: null, es: null }; lock = true;
+  const fr = Lab.shuffle(ph.map((p, i) => ({ i, side: "fr", p }))), es = Lab.shuffle(ph.map((p, i) => ({ i, side: "es", p })));
+  $("board")._cards = [...fr, ...es];
+  $("board").innerHTML = `<div class="zone fr"><h3><i></i>Francés</h3><div class="board">${fr.map((c, k) => cardHTML(c, k)).join("")}</div></div>
+    <div class="zone es"><h3><i></i>Español</h3><div class="board">${es.map((c, k) => cardHTML(c, k + fr.length)).join("")}</div></div>`;
+  info();
+  // mémorisation : compte à rebours, puis toutes les cartes se retournent
+  let left = +$("secs").value; const memo = $("memo");
+  memo.classList.add("on"); memo.textContent = `Memoriza las cartas… ${left}`;
+  timer = setInterval(() => {
+    left--;
+    if(left > 0){ memo.textContent = `Memoriza las cartas… ${left}`; return; }
+    clearInterval(timer); memo.textContent = "¡A jugar!";
+    $("board").querySelectorAll(".m").forEach(m => m.classList.remove("open"));
+    setTimeout(() => memo.classList.remove("on"), 900); lock = false;
+  }, 1000);
 }
 function info(){ $("info").textContent = `${found} / ${total} parejas`; $("moves").textContent = `${moves} intentos`; }
 $("board").onclick = e => {
-  const b = e.target.closest(".m"); if(!b || lock || b.classList.contains("open") || b.classList.contains("done")) return;
-  b.classList.add("open"); open.push(b);
-  const c = $("board")._cards[b.dataset.k]; if(c.side === "fr") Lab.play(c.p);
-  if(open.length < 2) return;
-  moves++; const [a, d] = open;
-  if(a.dataset.i === d.dataset.i && a.dataset.side !== d.dataset.side){
+  const b = e.target.closest(".m"); if(!b || lock || b.classList.contains("done")) return;
+  const side = b.dataset.side, c = $("board")._cards[b.dataset.k];
+  if(pick[side] === b) return;
+  if(pick[side]) pick[side].classList.remove("open");          // on change d'avis : une seule carte ouverte par côté
+  pick[side] = b; b.classList.add("open"); if(side === "fr") Lab.play(c.p);
+  if(!pick.fr || !pick.es) return;
+  moves++; const a = pick.fr, d = pick.es; pick = { fr: null, es: null };
+  if(a.dataset.i === d.dataset.i){
     setTimeout(() => { a.classList.add("done"); d.classList.add("done"); a.classList.remove("open"); d.classList.remove("open"); }, 350);
-    open = []; found++; info();
-    if(found === total) setTimeout(() => { $("board").innerHTML = `<div class="card end" style="grid-column:1/-1"><img src="/img/ui/evo.png" alt=""><h2>¡Muy bien!</h2><p class="muted">${total} parejas en ${moves} intentos.</p><button class="btn" onclick="start()">Otra partida</button></div>`; }, 900);
+    found++; info();
+    if(found === total) setTimeout(() => { $("board").innerHTML = `<div class="card end"><img src="/img/ui/evo.png" alt=""><h2>¡Muy bien!</h2><p class="muted">${total} parejas en ${moves} intentos.</p><button class="btn" onclick="start()">Otra partida</button></div>`; }, 900);
   } else {
     lock = true; info();
     setTimeout(() => { a.classList.add("bad"); d.classList.add("bad"); }, 400);
-    setTimeout(() => { a.classList.remove("open", "bad"); d.classList.remove("open", "bad"); open = []; lock = false; }, 1100);
+    setTimeout(() => { a.classList.remove("open", "bad"); d.classList.remove("open", "bad"); lock = false; }, 1100);
   }
 };
 $("go").onclick = start;
