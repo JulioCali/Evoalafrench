@@ -158,6 +158,16 @@ const asset = (req, env, path) => env.ASSETS.fetch(new Request(new URL(path, req
 export default {
   async fetch(req, env){
     const url = new URL(req.url), path = cleanPath(url.pathname);
+    // Laboratoire (dossier lab/) : servi seulement sur lab.evoala.net (et l'adresse workers.dev pour l'aperçu),
+    // jamais sur app.evoala.net. Les pages du labo réutilisent /content.json, /snd/ et /img/ de l'appli.
+    const host = url.hostname, isLab = host.startsWith("lab.");
+    if(path === "/lab" || path.startsWith("/lab/")){
+      if(!isLab && !host.endsWith(".workers.dev")) return json({ error: "not found" }, 404);
+    } else if(isLab && !/^\/(content(-en)?\.json|snd\/|img\/)/.test(path)){
+      const r = await env.ASSETS.fetch(new Request(new URL("/lab" + (path === "/" ? "/" : path), req.url), { headers: req.headers }));
+      const h = new Headers(r.headers); h.set("x-robots-tag", "noindex, nofollow");
+      return new Response(r.body, { status: r.status, headers: h });
+    }
     if(path === "/api/stt") return stt(req, env);
     if(path === "/api/hotmart") return hotmart(req, env);
 

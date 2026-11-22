@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Laboratorio · Evoala</title>
+<link rel="stylesheet" href="lab.css">
+<style>
+  .hero{display:flex;gap:14px;align-items:center;margin:6px 0 22px}
+  .hero img{width:64px}
+  .hero h1{margin:0;font-size:24px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+  .act{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;transition:transform .15s}
+  .act:active{transform:scale(.98)}
+  .act .em{font-size:30px}
+  .act b{font-size:17px}
+  .act.new{border:2px dashed #CFC6F2;box-shadow:none;background:transparent;align-items:center;justify-content:center;text-align:center;color:var(--gray);min-height:150px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero"><img src="/img/ui/evo.png" alt=""><div><h1>Laboratorio</h1><div class="muted">Prototipos de actividades antes de pasarlas a la app. Privado: solo para ti.</div></div></div>
+  <div class="grid" id="grid"></div>
+</div>
+<script>
+// Liste des activités du laboratoire. Pour en ajouter une : un fichier dans act/ et une ligne ici.
+// statut : "proto" (prototype), "test" (en test), "ok" (prête pour l'appli)
+const ACTS = [
+  { href: "act/memory.html", em: "🃏", title: "Memory", desc: "Encuentra las parejas francés / español, con audio al voltear.", status: "proto" },
+  { href: "act/escucha.html", em: "🎧", title: "Escucha y elige", desc: "Oyes la frase en francés y eliges la traducción correcta.", status: "proto" }
+];
+const ST = { proto: ["Prototipo", ""], test: ["En prueba", "test"], ok: ["Lista para la app", "ok"] };
+document.getElementById("grid").innerHTML = ACTS.map(a => `<a class="card act" href="${a.href}"><span class="em">${a.em}</span><b>${a.title}</b>
+  <span class="muted">${a.desc}</span><span><span class="tag ${ST[a.status][1]}">${ST[a.status][0]}</span></span></a>`).join("")
+  + `<div class="card act new"><span class="em">＋</span><span>Próxima actividad:<br>dime tu idea</span></div>`;
+</script>
+</body>
+</html>

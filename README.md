@@ -74,3 +74,10 @@ service cloud.firestore {
 
 Le décor et les obstacles suivent la page d'où l'on lance l'exercice : `THEME_OF` (page → décor) et `THEMES` dans `juego.html`.
 Il y a un décor par onglet du guide (28 au total) ; les toits de Paris servent pour Parisinas et pour « Mis listas ».
+
+## Laboratorio (lab/)
+
+Prototypes d'activités, séparés de l'appli. Servi sur **lab.evoala.net** (et sur l'adresse workers.dev, dossier /lab/, pour l'aperçu), jamais sur app.evoala.net ; pages marquées « noindex ».
+- `lab/index.html` : la liste des activités (tableau `ACTS`, avec un statut : Prototipo / En prueba / Lista para la app).
+- `lab/lab.js` : outils communs (phrases et audios du guide, choix du thème, illustration).
+- `lab/act/` : une page par activité (Memory, Escucha y elige…).

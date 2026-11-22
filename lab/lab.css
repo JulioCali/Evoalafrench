@@ -1,0 +1,24 @@
+/* Laboratorio Evoala : styles communs (mêmes couleurs et police que l'appli) */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+:root{--violet:#6C4FE0;--violet-dark:#4A33B0;--lav:#EDE9FF;--lav2:#F6F4FF;--ink:#1A1A1A;--gray:#6E6680;--green:#1F8A70;--red:#D63B5C;--r:20px}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--lav2);color:var(--ink);font-family:Poppins,system-ui,sans-serif}
+button{font:inherit;border:0;background:none;cursor:pointer;color:inherit}
+a{color:var(--violet)}
+.wrap{max-width:720px;margin:0 auto;padding:18px 16px 60px}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.top .back{width:42px;height:42px;border-radius:50%;background:#fff;display:grid;place-items:center;text-decoration:none;font-size:20px;box-shadow:0 2px 8px rgba(60,40,140,.08)}
+.top h1{font-size:20px;margin:0;font-weight:600}
+.tag{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--lav);color:var(--violet-dark)}
+.tag.test{background:#FFF1D6;color:#8A5A00}.tag.ok{background:#DDF5E8;color:var(--green)}
+.card{background:#fff;border-radius:var(--r);padding:16px;box-shadow:0 2px 14px rgba(60,40,140,.07)}
+.btn{height:50px;padding:0 20px;border-radius:14px;background:var(--violet);color:#fff;font-weight:600;font-size:16px}
+.btn.ghost{background:#fff;color:var(--violet-dark);border:1.5px solid var(--lav)}
+.btn.green{background:var(--green)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.muted{color:var(--gray);font-size:14px}
+select{font:inherit;padding:10px 12px;border-radius:12px;border:1.5px solid var(--lav);background:#fff;max-width:100%;min-width:0}
+#theme{flex:1 1 100%}
+.ic{--s:56px;width:var(--s);height:var(--s);border-radius:12px;background-size:var(--s) auto;background-repeat:no-repeat;background-position:0 calc(var(--i,0) * -1 * var(--s));flex:none}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1C1F2B;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;transition:.3s;pointer-events:none}
+.toast.on{opacity:1}

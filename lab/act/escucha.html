@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<title>Escucha y elige · Laboratorio Evoala</title>
+<link rel="stylesheet" href="../lab.css">
+<style>
+  .prog{height:8px;border-radius:99px;background:var(--lav);overflow:hidden;margin:14px 0}
+  .prog i{display:block;height:100%;background:var(--violet);width:0;transition:width .3s}
+  .q{text-align:center;padding:26px 16px}
+  .play{width:96px;height:96px;border-radius:50%;background:var(--violet);color:#fff;font-size:38px;box-shadow:0 5px 0 var(--violet-dark);margin:6px auto 12px;display:grid;place-items:center}
+  .play:active{transform:translateY(3px);box-shadow:0 2px 0 var(--violet-dark)}
+  .opts{display:grid;gap:10px;margin-top:14px}
+  .opt{background:#fff;border:2px solid var(--lav);border-radius:16px;padding:14px;font-size:16px;text-align:left;box-shadow:0 3px 0 var(--lav)}
+  .opt.ok{border-color:#3DBE7E;background:#E6F6EE;box-shadow:0 3px 0 #BDE8D0}
+  .opt.no{border-color:var(--red);background:#FDECEF;box-shadow:0 3px 0 #F6C7D1}
+  .reveal{margin-top:12px;min-height:26px;font-weight:600;color:var(--violet-dark)}
+  .end{text-align:center;padding:30px 10px}.end img{width:90px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../">‹</a><h1>Escucha y elige</h1><span class="tag">Prototipo</span></div>
+  <div class="card row"><select id="theme"></select><button class="btn" id="go">Empezar</button></div>
+  <div class="prog"><i id="bar"></i></div>
+  <div id="zone"></div>
+</div>
+<script src="../lab.js"></script>
+<script>
+// Escucha y elige : 8 questions. On entend la phrase (sans la voir), on choisit sa traduction parmi 4.
+// La phrase en français s'affiche après la réponse.
+const N = 8; let theme = "", list = [], k = 0, score = 0, pool = [];
+const $ = id => document.getElementById(id);
+function start(){
+  pool = Lab.phrases(theme).filter(p => p.es && p.audio);
+  if(pool.length < 4) pool = Lab.phrases("").filter(p => p.es && p.audio);
+  list = pool.slice(0, N); k = 0; score = 0; ask();
+}
+function ask(){
+  $("bar").style.width = (k / list.length * 100) + "%";
+  if(k >= list.length){ $("zone").innerHTML = `<div class="card end"><img src="/img/ui/evo.png" alt=""><h2>${score} / ${list.length}</h2><p class="muted">${score === list.length ? "¡Perfecto!" : "¡Sigue practicando!"}</p><button class="btn" onclick="start()">Otra vez</button></div>`; return; }
+  const p = list[k], others = Lab.shuffle(pool.filter(x => x.es !== p.es)).slice(0, 3);
+  const opts = Lab.shuffle([p, ...others]);
+  $("zone").innerHTML = `<div class="card q"><div class="muted">Pregunta ${k + 1} de ${list.length}</div><button class="play" id="pl" aria-label="Escuchar">🔊</button>
+    <div class="muted">¿Qué significa?</div><div class="opts">${opts.map((o, i) => `<button class="opt" data-i="${i}">${o.es}</button>`).join("")}</div><div class="reveal" id="rv"></div></div>`;
+  $("pl").onclick = () => Lab.play(p);
+  Lab.play(p);
+  $("zone").querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    if($("zone").dataset.done === "1") return; $("zone").dataset.done = "1";
+    const good = opts[b.dataset.i] === p; if(good) score++;
+    b.classList.add(good ? "ok" : "no");
+    if(!good) $("zone").querySelectorAll(".opt")[opts.indexOf(p)].classList.add("ok");
+    $("rv").textContent = "« " + p.fr + " »";
+    setTimeout(() => { $("zone").dataset.done = ""; k++; ask(); }, good ? 1300 : 2200);
+  });
+}
+$("go").onclick = start;
+Lab.load().then(() => { Lab.themeSelect($("theme"), v => { theme = v; start(); }); start(); });
+</script>
+</body>
+</html>
