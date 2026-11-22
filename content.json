@@ -11502,12 +11502,8 @@
   {
    "cat": "Sagrados",
    "name": "Basilique du Sacré-Coeur",
-   "station": "Anvers",
+   "station": "Abbesses",
    "lines": [
-    {
-     "n": "2",
-     "c": "#006cb6"
-    },
     {
      "n": "12",
      "c": "#008d58"
