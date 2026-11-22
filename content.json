@@ -373,6 +373,19 @@
          ]
         },
         {
+         "fr": "Comment allez-vous ?",
+         "es": "¿Cómo está?",
+         "pr": "komán talé VÚ",
+         "icon": [
+          "img/icons/p3.webp",
+          1
+         ],
+         "audio": [
+          "snd/p3.json",
+          "f63146f993"
+         ]
+        },
+        {
          "fr": "À plus",
          "es": "Nos vemos",
          "pr": "a PLÚS",

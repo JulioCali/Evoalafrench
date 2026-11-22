@@ -575,17 +575,34 @@ function paris(ci, page=0){
 }
 
 /* ---------- Recherche ---------- */
-const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+// texte « nu » pour la recherche : sans accents, sans ponctuation (¿ ¡ ? ! …), œ → oe, apostrophes unifiées
+const norm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+  .replace(/œ/g, "oe").replace(/æ/g, "ae").replace(/[’ʼ`´]/g, "'").replace(/[¿¡?!.,;:…«»"()\/\-–—]/g, " ").replace(/\s+/g, " ").trim();
 function search(q){
   q = norm(q.trim());
   const res = document.getElementById("results"), menu = document.getElementById("menu");
   if(!q){ res.innerHTML = ""; menu.style.display = ""; return; }
   menu.style.display = "none";
-  const hits = [...index().values()].filter(x => norm(x.p.fr).includes(q) || norm(x.p.es).includes(q));
+  // on cherche dans toutes les phrases, même quand le même français a deux traductions (Salut = Hola / Chao)
+  // tolérant aussi aux espaces et apostrophes oubliés : "sil vous plait" trouve "s'il vous plaît"
+  const q2 = q.replace(/[ ']/g, "");
+  const hits = searchList().filter(x => x.n.includes(q) || x.n2.includes(q2));
   res.innerHTML = hits.length ? `<p class="intro">${hits.length} ${t("found")}</p><div class="card">${hits.slice(0,60).map(x => rowHTML(x.p, x.crumb)).join("")}</div>` : `<div class="empty">${t("none")}</div>`;
 }
 // toutes les phrases du guide : clé (texte français) -> phrase + d'où elle vient
-let IDX = null, IDXC = null;
+let IDX = null, IDXC = null, SL = null, SLC = null;
+function searchList(){
+  if(SLC === C) return SL;
+  SL = []; SLC = C; const seen = new Set();
+  [...GRID, "Bonus"].forEach((name, si) => { const s = sec(name); if(!s) return;
+    const cat = si === 8 ? t("nBonus") : tileLabel(name);
+    s.tabs.forEach((tb, ti) => (tb.subs || [tb]).forEach((v, u) => v.groups.forEach(g => g.phrases.forEach(p => {
+      const k = p.fr + "|" + p.es; if(!p.fr || seen.has(k)) return; seen.add(k);
+      SL.push({ p, si, n: norm(p.fr) + " | " + norm(p.es), n2: (norm(p.fr) + "|" + norm(p.es)).replace(/[ ']/g, ""), crumb: [`${cat} › ${tb.label || tb.name}`, pageHash(si, ti, tb.subs ? u : 0)] });
+    }))));
+  });
+  return SL;
+}
 function index(){
   if(IDXC === C) return IDX;
   IDX = new Map(); IDXC = C;
