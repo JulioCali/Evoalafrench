@@ -22,18 +22,17 @@
   <div class="hero"><img src="/img/ui/evo.png" alt=""><div><h1>Laboratorio</h1><div class="muted">Prototipos de actividades antes de pasarlas a la app. Privado: solo para ti.</div></div></div>
   <div class="grid" id="grid"></div>
 </div>
+<script src="acts.js"></script>
 <script>
-// Liste des activités du laboratoire. Pour en ajouter une : un fichier dans act/ et une ligne ici.
-// statut : "proto" (prototype), "test" (en test), "ok" (prête pour l'appli)
-const ACTS = [
-  { href: "act/memory.html", em: "🃏", title: "Memory", desc: "Encuentra las parejas francés / español, con audio al voltear.", status: "proto" },
-  { href: "act/escucha.html", em: "🎧", title: "Escucha y elige", desc: "Oyes la frase en francés y eliges la traducción correcta.", status: "proto" },
-  { href: "act/asocia.html", em: "🔗", title: "Asocia las palabras", desc: "Une cada palabra en francés con su traducción: cada pareja toma un color.", status: "proto" },
-  { href: "act/audios.html", em: "🔉", title: "¿Cuál es el audio?", desc: "Una frase en español y 3 audios en francés: elige el que corresponde.", status: "proto" }
-];
+// Note de la grille UX (enregistrée sur cet appareil par grille.html)
+let UX = {}; try { UX = (JSON.parse(localStorage.getItem("evolab-grille-ux")) || {}).evals || {}; } catch (e) {}
+function uxTag(t){ const ev = UX[t]; if(!ev) return ""; const v = Object.values(ev.notes || {}); if(!v.length) return "";
+  const p = Math.round(v.reduce((a,b)=>a+b,0) / (v.length*3) * 100), c = v.length < 18 ? "" : p >= 80 ? "ok" : "test";
+  return ` <span class="tag ${c}">UX ${p} %${v.length < 18 ? " · en cours" : ""}</span>`; }
 const ST = { proto: ["Prototipo", ""], test: ["En prueba", "test"], ok: ["Lista para la app", "ok"] };
 document.getElementById("grid").innerHTML = ACTS.map(a => `<a class="card act" href="${a.href}"><span class="em">${a.em}</span><b>${a.title}</b>
-  <span class="muted">${a.desc}</span><span><span class="tag ${ST[a.status][1]}">${ST[a.status][0]}</span></span></a>`).join("")
+  <span class="muted">${a.desc}</span><span><span class="tag ${ST[a.status][1]}">${ST[a.status][0]}</span>${uxTag(a.title)}</span></a>`).join("")
+  + `<a class="card act" href="grille.html"><span class="em">📋</span><b>Grille UX</b><span class="muted">Évalue chaque activité : efficace (Masson), agréable (Norman), sans friction (Krug).</span></a>`
   + `<div class="card act new"><span class="em">＋</span><span>Próxima actividad:<br>dime tu idea</span></div>`;
 </script>
 </body>

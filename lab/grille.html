@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Lab Evoala"><meta name="theme-color" content="#6C4FE0">
+<title>Grille UX · Lab Evoala</title>
+<link rel="stylesheet" href="lab.css">
+<style>
+  :root{
+    --violet-clair:var(--lav); --lavande:var(--lav2); --teal:var(--green); --teal-clair:#DDF5E8;
+    --orange:#E8892B; --rouge:var(--red); --texte:var(--ink); --bord:#E4DEFA; --blanc:#fff;
+  }
+  *{box-sizing:border-box}
+  body{-webkit-tap-highlight-color:transparent}
+  header{position:sticky;top:0;z-index:5;background:var(--blanc);box-shadow:0 2px 14px rgba(60,40,140,.08);padding:12px 16px 10px;padding-top:max(12px,env(safe-area-inset-top))}
+  header .in{max-width:720px;margin:0 auto}
+  header .top{margin-bottom:0}
+  select,input[type=text]{font:inherit;font-size:16px;border:1.5px solid var(--bord);border-radius:12px;padding:9px 12px;background:var(--blanc);color:var(--texte);width:100%}
+  .choix{display:flex;gap:8px;margin-top:10px}
+  .choix select{flex:1}
+  .btn-ico{border:none;background:var(--violet-clair);color:var(--violet);border-radius:12px;width:44px;font-size:20px;cursor:pointer}
+  .score{display:flex;align-items:center;gap:12px;margin-top:10px}
+  .anneau{--p:0;width:58px;height:58px;border-radius:50%;flex:none;display:grid;place-items:center;
+    background:conic-gradient(var(--c,var(--violet)) calc(var(--p)*1%),var(--violet-clair) 0)}
+  .anneau span{width:46px;height:46px;border-radius:50%;background:var(--blanc);display:grid;place-items:center;font-weight:700;font-size:14px}
+  .details{flex:1;font-size:13px;color:var(--gris);line-height:1.5}
+  .verdict{font-weight:700;font-size:15px;color:var(--texte)}
+  .piliers{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+  .pill{background:var(--lavande);border-radius:99px;padding:2px 8px;font-size:12px;color:var(--texte)}
+  main{padding:12px 16px 60px;max-width:720px;margin:0 auto}
+  .bareme{font-size:13px;color:var(--gris);margin:4px 2px 12px}
+  .alerte{background:#FFF1E6;border:1px solid #F5C9A0;color:#8A4A10;border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:12px;display:none}
+  h2{font-size:15px;margin:22px 2px 8px;display:flex;justify-content:space-between;align-items:baseline}
+  h2 small{font-weight:600;color:var(--gris);font-size:13px}
+  .carte{background:var(--blanc);border:1px solid var(--bord);border-radius:16px;padding:12px 14px;margin-bottom:10px}
+  .carte.zero{border-color:#F5C9A0;background:#FFFBF7}
+  .crit{font-weight:650;font-size:15px}
+  .num{color:var(--gris);font-weight:600;margin-right:4px}
+  .q{font-size:13.5px;color:var(--gris);margin:4px 0 10px;line-height:1.4}
+  .notes4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .notes4 button{font:inherit;font-size:15px;font-weight:650;border:1.5px solid var(--bord);background:var(--blanc);color:var(--texte);border-radius:10px;padding:9px 0;cursor:pointer}
+  .notes4 button small{display:block;font-size:10.5px;font-weight:500;color:var(--gris)}
+  .notes4 button.on[data-v="0"]{background:#FDE7E1;border-color:var(--rouge);color:var(--rouge)}
+  .notes4 button.on[data-v="1"]{background:#FFF0DF;border-color:var(--orange);color:#9A5310}
+  .notes4 button.on[data-v="2"]{background:var(--violet-clair);border-color:var(--violet);color:var(--violet)}
+  .notes4 button.on[data-v="3"]{background:var(--teal-clair);border-color:var(--teal);color:var(--teal)}
+  .notes4 button.on small{color:inherit}
+  textarea{font:inherit;font-size:15px;width:100%;min-height:90px;border:1.5px solid var(--bord);border-radius:12px;padding:10px 12px;resize:vertical}
+  .actions{display:flex;gap:8px;margin-top:16px}
+  .actions button{flex:1;font:inherit;font-size:14px;border-radius:12px;padding:11px;cursor:pointer;border:1.5px solid var(--bord);background:var(--blanc);color:var(--texte)}
+  .actions .danger{color:var(--rouge)}
+  .vide{text-align:center;color:var(--gris);padding:40px 10px}
+  table{width:100%;border-collapse:collapse;font-size:14px;background:var(--blanc);border-radius:12px;overflow:hidden}
+  td,th{padding:8px 10px;border-bottom:1px solid var(--bord);text-align:left}
+  th{font-size:12px;color:var(--gris);font-weight:600}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <div class="top"><a class="back" href="./" aria-label="Retour au labo">‹</a><h1>Grille UX</h1></div>
+  <div class="choix">
+    <select id="act" aria-label="Activité évaluée"></select>
+    <button class="btn-ico" id="ajout" aria-label="Ajouter une activité">＋</button>
+  </div>
+  <div class="score" id="score" hidden>
+    <div class="anneau" id="anneau"><span id="pct">–</span></div>
+    <div class="details">
+      <div class="verdict" id="verdict">Commence à noter</div>
+      <div id="total">0 / 54 · 0 / 18 critères notés</div>
+      <div class="piliers" id="piliers"></div>
+    </div>
+  </div>
+</div></header>
+
+<main id="main"></main>
+
+<script src="acts.js"></script>
+<script>
+const PILIERS = [
+  { id:"masson", nom:"Efficace", source:"Masson", crit:[
+    ["Attention ciblée","Un seul objectif clair ? Rien dans le décor ne détourne l'attention du français ?"],
+    ["Rappel avant la réponse","L'apprenant doit-il produire ou retrouver la phrase avant de la voir ou de l'entendre ?"],
+    ["Répétition","Chaque phrase est-elle mobilisée plusieurs fois pendant l'activité ?"],
+    ["Espacement","Les phrases reviennent-elles dans les jours suivants (révision) ?"],
+    ["Élaboration","La phrase est-elle reliée à une situation réelle ou à ce que l'apprenant sait déjà ?"],
+    ["Rétroaction immédiate","L'apprenant sait-il tout de suite si c'est juste, avec la bonne réponse ?"],
+    ["L'erreur, une étape normale","L'erreur est-elle dédramatisée, avec la possibilité de réessayer sans pénalité ?"]]},
+  { id:"norman", nom:"Agréable", source:"Norman", crit:[
+    ["Signifiants clairs","Voit-on immédiatement ce qui se touche, s'écoute ou se glisse ?"],
+    ["Feedback à chaque geste","Chaque action produit-elle un retour visible ou sonore ?"],
+    ["Contraintes et tolérance","Impossible de faire une fausse manœuvre ? Peut-on annuler ou réessayer ?"],
+    ["Modèle mental simple","La règle du jeu se comprend-elle en 3 secondes, sans tutoriel ?"],
+    ["Design émotionnel","Beau au premier regard, fluide à l'usage, sentiment de réussite à la fin ?"]]},
+  { id:"krug", nom:"Sans friction", source:"Krug", crit:[
+    ["Évidence","Une consigne courte et un seul bouton principal ?"],
+    ["Conventions","Mêmes gestes, couleurs et boutons que les autres activités Evoala ?"],
+    ["Peu de texte","Peut-on encore couper des mots sans perdre le sens ?"],
+    ["Repérage","Progression visible (ex. 3/10) et sortie évidente ?"],
+    ["Courte et sans accroc","2 à 5 minutes, sans bug ni chargement qui agace ?"],
+    ["Testée","Testée par au moins 3 personnes, remarques intégrées ?"]]}
+];
+const LIBELLES = ["absent","faible","correct","excellent"];
+const MAX = 54, CLE = "evolab-grille-ux";
+const ACTIVITES_DE_BASE = ACTS.map(a => a.title); // activités du labo (acts.js)
+
+// --- stockage (privé à ce navigateur) ---
+function charger(){ try{ return JSON.parse(localStorage.getItem(CLE)) || {}; }catch(e){ return {}; } }
+function sauver(){ try{ localStorage.setItem(CLE, JSON.stringify(etat)); }catch(e){} }
+let etat = charger();
+etat.evals = etat.evals || {};
+ACTIVITES_DE_BASE.forEach(a => { if(!etat.evals[a]) etat.evals[a] = { notes:{}, remarques:"" }; });
+
+const $ = id => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+let courante = params.get("act") || etat.derniere || "";
+if(courante && !etat.evals[courante]) etat.evals[courante] = { notes:{}, remarques:"" };
+
+function calcul(ev){
+  let total = 0, notes = 0, zeros = [], parPilier = {};
+  let n = 0;
+  PILIERS.forEach(p => {
+    parPilier[p.id] = 0;
+    p.crit.forEach(c => {
+      n++;
+      const v = ev.notes[n];
+      if(v !== undefined){ total += v; notes++; parPilier[p.id] += v; if(v === 0) zeros.push(c[0]); }
+    });
+  });
+  // Pourcentage calculé sur les critères déjà notés, pour ne pas pénaliser une grille en cours
+  const pct = notes ? Math.round(total / (notes * 3) * 100) : null;
+  return { total, notes, zeros, parPilier, pct };
+}
+function verdictDe(pct, notes){
+  if(pct === null) return ["Commence à noter","var(--violet)"];
+  if(notes < 18){
+    const c = pct >= 80 ? "var(--teal)" : pct >= 60 ? "var(--orange)" : "var(--rouge)";
+    return [`En cours · ${18 - notes} critère${18-notes>1?"s":""} à noter`, c];
+  }
+  if(pct >= 80) return ["✅ Prête pour l'appli","var(--teal)"];
+  if(pct >= 60) return ["🔧 À retravailler","var(--orange)"];
+  return ["❌ À repenser","var(--rouge)"];
+}
+
+function remplirSelect(){
+  const s = $("act");
+  s.innerHTML = '<option value="">— Choisis une activité —</option><option value="__resume">📊 Comparer les activités</option>';
+  Object.keys(etat.evals).forEach(a => {
+    const r = calcul(etat.evals[a]);
+    const o = document.createElement("option");
+    o.value = a; o.textContent = a + (r.pct !== null ? `  ·  ${r.pct} %` : "");
+    s.appendChild(o);
+  });
+  s.value = courante;
+}
+
+function majScore(){
+  const zone = $("score");
+  if(!courante || courante === "__resume"){ zone.hidden = true; return; }
+  zone.hidden = false;
+  const r = calcul(etat.evals[courante]);
+  const [v, c] = verdictDe(r.pct, r.notes);
+  $("anneau").style.setProperty("--p", r.pct || 0);
+  $("anneau").style.setProperty("--c", c);
+  $("pct").textContent = r.pct === null ? "–" : r.pct + "%";
+  $("verdict").textContent = v;
+  $("total").textContent = `${r.total} / ${MAX} · ${r.notes} / 18 critères notés`;
+  $("piliers").innerHTML = PILIERS.map(p => `<span class="pill">${p.nom} ${r.parPilier[p.id]}/${p.crit.length*3}</span>`).join("");
+  const al = $("alerte");
+  if(al){
+    al.style.display = r.zeros.length ? "block" : "none";
+    al.innerHTML = `⚠️ <b>Point${r.zeros.length>1?"s":""} bloquant${r.zeros.length>1?"s":""} :</b> ${r.zeros.join(", ")}. Un 0 compte plus que le total.`;
+  }
+  PILIERS.forEach(p => { const h = $("st-"+p.id); if(h) h.textContent = `${r.parPilier[p.id]} / ${p.crit.length*3}`; });
+  remplirSelect();
+}
+
+function afficher(){
+  const m = $("main");
+  if(courante === "__resume"){ return afficherResume(); }
+  if(!courante){
+    m.innerHTML = `<div class="vide">Choisis une activité du labo en haut,<br>ou ajoute-en une avec ＋.</div>`;
+    majScore(); return;
+  }
+  const ev = etat.evals[courante];
+  let html = `<p class="bareme">Note chaque critère : 0 absent · 1 faible · 2 correct · 3 excellent</p><div class="alerte" id="alerte"></div>`;
+  let n = 0;
+  PILIERS.forEach(p => {
+    html += `<h2>${p.nom} <small>(${p.source}) · <span id="st-${p.id}"></span></small></h2>`;
+    p.crit.forEach(c => {
+      n++;
+      const v = ev.notes[n];
+      html += `<div class="carte${v===0?" zero":""}" data-n="${n}">
+        <div class="crit"><span class="num">${n}.</span>${c[0]}</div>
+        <div class="q">${c[1]}</div>
+        <div class="notes4">${[0,1,2,3].map(k=>`<button data-v="${k}" class="${v===k?"on":""}">${k}<small>${LIBELLES[k]}</small></button>`).join("")}</div>
+      </div>`;
+    });
+  });
+  html += `<h2>Remarques</h2><textarea id="remarques" placeholder="Ce que les testeurs ont dit, idées d'amélioration…"></textarea>
+    <div class="actions"><button id="raz">Remettre à zéro</button><button class="danger" id="suppr">Supprimer l'activité</button></div>`;
+  m.innerHTML = html;
+  $("remarques").value = ev.remarques || "";
+  $("remarques").addEventListener("input", e => { ev.remarques = e.target.value; sauver(); });
+  m.querySelectorAll(".carte").forEach(carte => {
+    carte.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+      const num = +carte.dataset.n, val = +b.dataset.v;
+      if(ev.notes[num] === val) delete ev.notes[num]; else ev.notes[num] = val;
+      carte.querySelectorAll("button").forEach(x => x.classList.toggle("on", +x.dataset.v === ev.notes[num]));
+      carte.classList.toggle("zero", ev.notes[num] === 0);
+      sauver(); majScore();
+    }));
+  });
+  $("raz").onclick = () => { if(confirmer("Effacer toutes les notes de « "+courante+" » ?")){ ev.notes = {}; ev.remarques=""; sauver(); afficher(); } };
+  $("suppr").onclick = () => { if(confirmer("Supprimer « "+courante+" » de la grille ?")){ delete etat.evals[courante]; courante=""; etat.derniere=""; sauver(); remplirSelect(); afficher(); } };
+  majScore();
+}
+
+function afficherResume(){
+  const lignes = Object.keys(etat.evals).map(a => ({ a, r: calcul(etat.evals[a]) }))
+    .sort((x,y) => (y.r.pct??-1) - (x.r.pct??-1));
+  $("main").innerHTML = `<h2>Comparer les activités</h2>
+    <table><tr><th>Activité</th><th>Score</th><th>Effic.</th><th>Agréa.</th><th>Fric.</th><th>0</th></tr>
+    ${lignes.map(({a,r}) => `<tr><td><a href="?act=${encodeURIComponent(a)}" style="color:var(--violet)">${a}</a></td>
+      <td><b>${r.pct===null?"–":r.pct+" %"}</b></td><td>${r.parPilier.masson}/21</td><td>${r.parPilier.norman}/15</td><td>${r.parPilier.krug}/18</td>
+      <td style="color:${r.zeros.length?"var(--rouge)":"inherit"}">${r.zeros.length||"–"}</td></tr>`).join("")}
+    </table><p class="bareme" style="margin-top:10px">Colonne « 0 » : nombre de points bloquants.</p>`;
+  majScore();
+}
+
+// Petite confirmation sans boîte de dialogue du navigateur (double appui)
+let enAttente = null;
+function confirmer(msg){
+  if(enAttente === msg){ enAttente = null; return true; }
+  enAttente = msg; toast(msg + " Appuie encore pour confirmer.");
+  setTimeout(() => { if(enAttente === msg) enAttente = null; }, 4000);
+  return false;
+}
+function toast(t){
+  let d = document.getElementById("toast");
+  if(!d){ d = document.createElement("div"); d.id="toast";
+    d.style.cssText="position:fixed;left:16px;right:16px;bottom:max(16px,env(safe-area-inset-bottom));background:#221B3A;color:#fff;padding:12px 14px;border-radius:12px;font-size:14px;z-index:9;text-align:center";
+    document.body.appendChild(d); }
+  d.textContent = t; d.style.display="block"; clearTimeout(d._t); d._t = setTimeout(()=>d.style.display="none",4000);
+}
+
+$("act").addEventListener("change", e => {
+  courante = e.target.value; etat.derniere = courante === "__resume" ? etat.derniere : courante; sauver();
+  history.replaceState(null, "", courante ? "?act="+encodeURIComponent(courante) : location.pathname);
+  afficher(); window.scrollTo(0,0);
+});
+$("ajout").addEventListener("click", () => {
+  const zone = $("main");
+  zone.innerHTML = `<h2>Nouvelle activité</h2><input type="text" id="nom" placeholder="Nom de l'activité (ex. Le saut d'Evo)">
+    <div class="actions"><button id="ok" style="background:var(--violet);color:#fff;border-color:var(--violet)">Ajouter</button><button id="annul">Annuler</button></div>`;
+  $("nom").focus();
+  const valider = () => { const nom = $("nom").value.trim(); if(!nom) return;
+    if(!etat.evals[nom]) etat.evals[nom] = { notes:{}, remarques:"" };
+    courante = nom; etat.derniere = nom; sauver(); remplirSelect(); afficher(); };
+  $("ok").onclick = valider; $("nom").onkeydown = e => { if(e.key==="Enter") valider(); };
+  $("annul").onclick = afficher;
+});
+
+sauver(); remplirSelect(); afficher();
+</script>
+</body>
+</html>
