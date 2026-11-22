@@ -45,7 +45,7 @@ function next(){
   set = Lab.phrases(theme).filter(p => p.es && p.es.trim().toLowerCase() !== p.fr.trim().toLowerCase()).slice(0, PAIRS);
   const right = Lab.shuffle(set.map((p, i) => i));
   pairs = {}; sel = null; checked = false; $("fb").textContent = ""; $("fb").className = "fb";
-  $("L").innerHTML = set.map((p, i) => `<button class="w" data-side="L" data-i="${i}">${p.audio ? '<span class="spkb">🔊</span>' : ""}${Lab.icon(p, 52)}<span>${p.fr}</span><span class="mark"></span></button>`).join("");
+  $("L").innerHTML = set.map((p, i) => `<button class="w" data-side="L" data-i="${i}">${p.audio ? '<span class="spkb">' + Lab.SPK + '</span>' : ""}${Lab.icon(p, 52)}<span>${p.fr}</span><span class="mark"></span></button>`).join("");
   $("R").innerHTML = right.map(i => `<button class="w" data-side="R" data-i="${i}"><span>${set[i].es}</span><span class="mark"></span></button>`).join("");
   $("ok").textContent = "Confirmar"; $("ok").classList.remove("next"); paint();
 }

@@ -43,5 +43,7 @@ const Lab = (() => {
     el.innerHTML = `<option value="">Todo el guía</option>` + themes().map(t => `<option value="${t.key}">${t.label} (${t.n})</option>`).join("");
     el.onchange = () => onChange(el.value);
   }
-  return { load, themes, phrases, play, icon, shuffle, toast, themeSelect };
+  // icône haut-parleur, la même que dans le guide
+  const SPK = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+  return { load, themes, phrases, play, icon, shuffle, toast, themeSelect, SPK };
 })();

@@ -12,9 +12,9 @@
   .q .fr{min-height:28px;margin-top:6px;font-size:18px;color:var(--violet-dark);font-weight:600}
   .aud{display:flex;justify-content:center;gap:26px;margin-top:26px}
   .a{display:flex;flex-direction:column;align-items:center;gap:14px}
-  .a .pl{width:74px;height:74px;border-radius:50%;background:#A99BE4;color:#fff;font-size:30px;display:grid;place-items:center;box-shadow:0 4px 0 #8775D6;transition:transform .1s}
-  .a .pl:active{transform:translateY(3px);box-shadow:0 1px 0 #8775D6}
-  .a .pl.on{background:var(--violet);box-shadow:0 4px 0 var(--violet-dark)}
+  .a .pl{width:74px;height:74px;border-radius:50%;background:#C4BAF4;display:grid;place-items:center;box-shadow:0 4px 0 #A99BE4;transition:transform .1s}
+  .a .pl:active{transform:translateY(3px);box-shadow:0 1px 0 #A99BE4}
+  .a .pl.on{background:#A99BE4;box-shadow:0 4px 0 #8775D6}
   .a .ck{width:38px;height:38px;border-radius:50%;border:2px solid #CFCBDC;background:#fff;display:grid;place-items:center;font-weight:700;color:#fff}
   .a .ck.sel{border-color:var(--violet);background:var(--violet)}
   .a .ck.sel::after{content:"";width:12px;height:12px;border-radius:50%;background:#fff}
@@ -49,7 +49,7 @@ function ask(){
   $("ok").style.display = ""; $("ok").textContent = "Confirmar"; $("ok").classList.remove("next"); $("ok").disabled = true;
   const p = list[k]; opts = Lab.shuffle([p, ...Lab.shuffle(pool.filter(x => x.fr !== p.fr && x.es !== p.es)).slice(0, 2)]);
   $("zone").innerHTML = `<div class="q">${Lab.icon(p, 110)}<h2>${p.es}</h2><div class="fr" id="fr"></div>
-    <div class="aud">${opts.map((o, i) => `<div class="a"><button class="pl" data-i="${i}" aria-label="Audio ${i + 1}">🔊</button><button class="ck" data-i="${i}" aria-label="Elegir audio ${i + 1}"></button></div>`).join("")}</div></div>`;
+    <div class="aud">${opts.map((o, i) => `<div class="a"><button class="pl" data-i="${i}" aria-label="Audio ${i + 1}">${Lab.SPK}</button><button class="ck" data-i="${i}" aria-label="Elegir audio ${i + 1}"></button></div>`).join("")}</div></div>`;
 }
 $("zone").onclick = e => {
   const pl = e.target.closest(".pl"), ck = e.target.closest(".ck");
