@@ -132,6 +132,7 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 /* ---------- Guía de Paris ---------- */
 .legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;margin:10px 12px 12px;align-items:center}
 .legend span{display:flex;align-items:center;gap:4px}
+.legend .line{display:inline-grid;width:18px;height:18px;font-size:10px}
 .place{border:1.5px solid var(--card-border);border-radius:var(--radius);margin:0 8px 12px;padding:10px}
 .ptop{display:flex;gap:12px}
 .photo{flex:none;width:34%;aspect-ratio:1/1;border-radius:6px;object-fit:cover;background:var(--list-bg)}
@@ -139,7 +140,8 @@ button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:poin
 .pname{font-size:16px;font-weight:500;line-height:1.2}
 .metro{display:flex;align-items:center;gap:4px;font-size:13px;flex-wrap:wrap}
 .mlogo{width:20px;height:20px;border-radius:50%;border:1.5px solid #3D3B8F;color:#3D3B8F;display:inline-grid;place-items:center;font-size:12px}
-.line{width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;font-size:10px;font-weight:600;color:#fff}
+.line{width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;font-size:10px;font-weight:600;color:#fff;flex:none}
+.line.rer{border-radius:5px;font-size:11px}
 .pact{display:flex;align-items:center;gap:8px}
 .go{flex:1;display:flex;align-items:center;gap:6px;background:#FFF5E6;border-radius:10px;padding:6px 10px;color:var(--ink);text-decoration:none;font-size:14px}
 .fee{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700}

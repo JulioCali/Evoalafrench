@@ -47,7 +47,7 @@ const TXT = {
       nGuide:"Guía",nBonus:"Bonus",nParis:"Paris",soon:"Esta parte llegará en la próxima versión.",up:"Volver arriba ↑",
       pHead:"¿Qué ver en Paris ?",pSub:"Descubre aquí tus próximas visitas en Paris",city:"Entender la ciudad",mapT:"Mapa de los distritos",mapAlt:"Mapa de los distritos de París",
       move:"Moverse",safety:"Seguridad",hours:"Horarios y cierres",credits:"Créditos de las fotos",src:"Fuente",lic:"Licencia",
-      paid:"De pago",free:"Gratis",metro:"Metro cercano",go:"Cómo llegar",crnote:"Toca una foto para ver su autor y su licencia",
+      paid:"De pago",free:"Gratis",metro:"Metro cercano",mline:"Línea de metro",rline:"Línea de RER (tren)",go:"Cómo llegar",crnote:"Toca una foto para ver su autor y su licencia",
       none:"Ninguna frase encontrada.",audioSoon:"🎧 Audio disponible pronto",noPlay:"No se pudo reproducir",noLoad:"No se pudo cargar el contenido.",home:"Inicio",lang:"Idioma",allGuides:"Todas las guías",next:"Página siguiente",pick:"Elige la categoría que quieres estudiar",tuto:"Ver el tutorial",gTitle:"Francés para viajar",gKicker:"Guía de supervivencia",prog:"Tu progreso",pSeen:"Páginas visitadas",pHeard:"Frases escuchadas",pPract:"Frases practicadas",starsL:"estrellas",progHow:"mitad escucha, mitad práctica",cont:"Continúa donde lo dejaste",startAt:"Empieza por aquí",choose:"Elige una categoría",nPh:"frases",swipe:"Desliza",practice:"Practicar",again:"Repetir",lvl:"Nivel",allDone:"¡Completado!",pageWon:"Página completada",pageAgain:"Toca para practicar otra vez",pageNext:"Sigue con el nivel",practicePage:"Practicar esta página",practiceSub:"¡Escuchaste todo! Ayuda a Evo a saltar los muros",more:"Más categorías",found:"frases encontradas",hintB:"Toca la imagen",hint:" para ver cómo se pronuncia la frase.",ok:"Entendido",seePr:"Ver la pronunciación"},
   en:{guide:"FRENCH",guide2:"Survival guide",from:"EN",start:"Start",dep:"DEPARTURE",now:"Now",dest:"DESTINATION",me:"The French me",first:"FIRST CLASS",
       search:"Search a phrase in English or French",searchL:"Search a phrase",resume:"Pick up where you left off",toc:"Table of contents",tap:"Tap a topic",
@@ -55,7 +55,7 @@ const TXT = {
       nGuide:"Guide",nBonus:"Bonus",nParis:"Paris",soon:"This part is coming in the next version.",up:"Back to top ↑",
       pHead:"What to see in Paris?",pSub:"Discover your next visits in Paris",city:"Understanding the city",mapT:"Map of the districts",mapAlt:"Map of the Paris districts",
       move:"Getting around",safety:"Safety",hours:"Opening hours",credits:"Photo credits",src:"Source",lic:"License",
-      paid:"Paid",free:"Free",metro:"Nearest metro",go:"Directions",crnote:"Tap a photo to see its author and license",
+      paid:"Paid",free:"Free",metro:"Nearest metro",mline:"Metro line",rline:"RER line (train)",go:"Directions",crnote:"Tap a photo to see its author and license",
       none:"No phrase found.",audioSoon:"🎧 Audio coming soon",noPlay:"Couldn't play the audio",noLoad:"Couldn't load the content.",home:"Home",lang:"Language",allGuides:"All guides",next:"Next page",pick:"Choose the category you want to study",tuto:"See the tutorial",gTitle:"French for travelers",gKicker:"Survival guide",prog:"Your progress",pSeen:"Pages visited",pHeard:"Phrases listened to",pPract:"Phrases practiced",starsL:"stars",progHow:"half listening, half practice",cont:"Pick up where you left off",startAt:"Start here",choose:"Choose a category",nPh:"phrases",swipe:"Swipe",practice:"Practice",again:"Play again",lvl:"Level",allDone:"Completed!",pageWon:"Page completed",pageAgain:"Tap to practice again",pageNext:"Continue with level",practicePage:"Practice this page",practiceSub:"You listened to everything! Help Evo jump the walls",more:"More categories",found:"phrases found",hintB:"Tap the picture",hint:" to see how the phrase is pronounced.",ok:"Got it",seePr:"See the pronunciation"}
 };
 const t = k => TXT[LANG][k];
@@ -559,11 +559,13 @@ function paris(ci, page=0){
     ${pages>1?`<div class="pager">${Array.from({length:pages},(_,i)=>`<button class="${i===page?'on':''}" data-pp="${i}">${i+1}</button>`).join("")}</div>`:""}
     <div class="legend"><span><i class="fee paid" style="width:18px;height:18px;font-size:10px">€</i>${t("paid")}</span>
       <span><i class="fee free" style="width:18px;height:18px;font-size:10px">✓</i>${t("free")}</span>
-      <span><i class="mlogo">M</i>${t("metro")}</span></div>
+      <span><i class="mlogo">M</i>${t("metro")}</span>
+      <span>${lineBadge({n:"4",c:"#bd479a"})}${t("mline")}</span>
+      ${list.some(p=>p.lines?.some(l=>l.rer))?`<span>${lineBadge({n:"A",c:"#E3051C",rer:true})}${t("rline")}</span>`:""}</div>
     ${list.length ? list.map(p=>`<div class="place">
       <div class="ptop">${p.photo?(p.credit?.src?`<a class="phwrap" href="${esc(p.credit.src)}" target="_blank" rel="noopener">`:`<span class="phwrap">`)+`<img class="photo" loading="lazy" src="${p.photo}" alt="${esc(p.name)}">${p.credit?`<i class="cr">©</i>`:""}`+(p.credit?.src?`</a>`:`</span>`):`<div class="photo"></div>`}
         <div class="pinfo"><div class="pname">${esc(p.name)}</div>
-          ${p.station?`<div class="metro"><i class="mlogo">M</i>${esc(p.station)} ${p.lines.map(l=>`<span class="line" style="background:${l.c}">${esc(l.n)}</span>`).join("")}</div>`:""}
+          ${p.station?`<div class="metro"><i class="mlogo">M</i>${esc(p.station)} ${p.lines.map(lineBadge).join("")}</div>`:""}
           <div class="pdesc">${esc(p.desc)}</div>
           <div class="pact">${p.maps?`<a class="go" href="${esc(p.maps)}" target="_blank" rel="noopener">📍 ${t("go")}</a>`:""}
             <span class="fee ${p.paid?'paid':'free'}">${p.paid?'€':'✓'}</span></div></div></div>
@@ -576,6 +578,10 @@ function paris(ci, page=0){
 
 /* ---------- Recherche ---------- */
 // texte « nu » pour la recherche : sans accents, sans ponctuation (¿ ¡ ? ! …), œ → oe, apostrophes unifiées
+// pastille de ligne : rond pour le métro, carré arrondi pour le RER ; texte foncé sur les couleurs claires (ligne 1, RER C…)
+function lineBadge(l){ const h = (l.c || "#888").replace("#", ""), v = parseInt(h.length === 3 ? h.replace(/./g, "$&$&") : h, 16);
+  const light = ((v >> 16 & 255) * 299 + (v >> 8 & 255) * 587 + (v & 255) * 114) / 1000 > 175;
+  return `<span class="line${l.rer ? " rer" : ""}" style="background:${l.c};color:${light ? "#2E2550" : "#fff"}">${esc(l.n)}</span>`; }
 const norm = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
   .replace(/œ/g, "oe").replace(/æ/g, "ae").replace(/[’ʼ`´]/g, "'").replace(/[¿¡?!.,;:…«»"()\/\-–—]/g, " ").replace(/\s+/g, " ").trim();
 function search(q){

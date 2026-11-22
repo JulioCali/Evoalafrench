@@ -11142,7 +11142,7 @@
      "c": "#75c595"
     },
     {
-     "n": "121",
+     "n": "12",
      "c": "#038d56"
     },
     {
@@ -11253,7 +11253,7 @@
      "c": "#c59fcc"
     },
     {
-     "n": "121",
+     "n": "12",
      "c": "#008b56"
     }
    ],
@@ -11509,7 +11509,7 @@
      "c": "#006cb6"
     },
     {
-     "n": "121",
+     "n": "12",
      "c": "#008d58"
     }
    ],
@@ -11612,7 +11612,7 @@
    "station": "Notre-Dame-de-Lorette",
    "lines": [
     {
-     "n": "121",
+     "n": "12",
      "c": "#008d56"
     }
    ],
@@ -12196,7 +12196,7 @@
      "c": "#9d973b"
     },
     {
-     "n": "113",
+     "n": "11",
      "c": "#8f6339"
     }
    ],
@@ -12299,12 +12299,9 @@
    "station": "Versailles Château-Rive G.",
    "lines": [
     {
-     "n": "",
-     "c": "#ffffff"
-    },
-    {
-     "n": "",
-     "c": "#ffffff"
+     "n": "C",
+     "c": "#FFCE00",
+     "rer": true
     }
    ],
    "desc": "Descubre la residencia de los reyes de Francia, con sus salones suntuosos, la Galería de los Espejos y sus jardines.",
@@ -12364,8 +12361,9 @@
    "station": "Chantilly-Gouvieux",
    "lines": [
     {
-     "n": "",
-     "c": "#ffffff"
+     "n": "D",
+     "c": "#00814F",
+     "rer": true
     }
    ],
    "desc": "Explora un castillo que alberga una importante colección de pinturas antiguas y magníficos jardines.",
@@ -12397,12 +12395,9 @@
    "station": "Parc de Sceaux",
    "lines": [
     {
-     "n": "",
-     "c": "#ffffff"
-    },
-    {
-     "n": "",
-     "c": "#ffffff"
+     "n": "B",
+     "c": "#5291CE",
+     "rer": true
     }
    ],
    "desc": "Pasea por un inmenso parque francés con canales, fuentes y jardines diseñados por Le Nôtre.",
@@ -12439,12 +12434,9 @@
    "station": "Maisons-Laffitte",
    "lines": [
     {
-     "n": "",
-     "c": "#ffffff"
-    },
-    {
-     "n": "",
-     "c": "#ffffff"
+     "n": "A",
+     "c": "#E3051C",
+     "rer": true
     }
    ],
    "desc": "Descubre una joya de la arquitectura clásica francesa del siglo XVII, con una gran escalera, salones elegantes.",
@@ -12462,12 +12454,9 @@
    "station": "Saint-Germain-en-Laye",
    "lines": [
     {
-     "n": "",
-     "c": "#ffffff"
-    },
-    {
-     "n": "",
-     "c": "#ffffff"
+     "n": "A",
+     "c": "#E3051C",
+     "rer": true
     }
    ],
    "desc": "Cómo llegar Antigua residencia de los reyes de Francia, este castillo alberga hoy el Museo de Arqueología Nacional. Volver arriba Volver arriba",
@@ -12531,11 +12520,7 @@
    "station": "Botzaris/Buttes-Chaumont",
    "lines": [
     {
-     "n": "7",
-     "c": "#77c596"
-    },
-    {
-     "n": "",
+     "n": "7b",
      "c": "#77c596"
     }
    ],
@@ -12676,12 +12661,9 @@
    "station": "Cité Universitaire",
    "lines": [
     {
-     "n": "",
-     "c": "#ffffff"
-    },
-    {
-     "n": "",
-     "c": "#ffffff"
+     "n": "B",
+     "c": "#5291CE",
+     "rer": true
     }
    ],
    "desc": "Un tranquilo parque paisajístico con lago, césped, árboles centenarios y numerosas esculturas. Volver arriba Volver arriba",
@@ -13361,12 +13343,9 @@
    "station": "Marne-la-Vallée-Chessy",
    "lines": [
     {
-     "n": "",
-     "c": "#ffffff"
-    },
-    {
-     "n": "",
-     "c": "#ffffff"
+     "n": "A",
+     "c": "#E3051C",
+     "rer": true
     }
    ],
    "desc": "Dos parques temáticos con atracciones, desfiles, espectáculos y encuentros con personajes de Disney.",
