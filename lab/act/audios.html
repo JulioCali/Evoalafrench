@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png"><link rel="icon" href="../icon-192.png"><link rel="manifest" href="../manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Lab Evoala"><meta name="theme-color" content="#6C4FE0">
+<title>¿Cuál es el audio? · Laboratorio Evoala</title>
+<link rel="stylesheet" href="../lab.css">
+<style>
+  .q{text-align:center;padding:10px 0}
+  .q .ic{margin:0 auto 10px}
+  .q h2{margin:0;font-size:26px}
+  .q .fr{min-height:28px;margin-top:6px;font-size:18px;color:var(--violet-dark);font-weight:600}
+  .aud{display:flex;justify-content:center;gap:26px;margin-top:26px}
+  .a{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .a .pl{width:74px;height:74px;border-radius:50%;background:#A99BE4;color:#fff;font-size:30px;display:grid;place-items:center;box-shadow:0 4px 0 #8775D6;transition:transform .1s}
+  .a .pl:active{transform:translateY(3px);box-shadow:0 1px 0 #8775D6}
+  .a .pl.on{background:var(--violet);box-shadow:0 4px 0 var(--violet-dark)}
+  .a .ck{width:38px;height:38px;border-radius:50%;border:2px solid #CFCBDC;background:#fff;display:grid;place-items:center;font-weight:700;color:#fff}
+  .a .ck.sel{border-color:var(--violet);background:var(--violet)}
+  .a .ck.sel::after{content:"";width:12px;height:12px;border-radius:50%;background:#fff}
+  .a .ck.good{border-color:#1F8A70;background:#1F8A70}.a .ck.good::after{content:"✓";width:auto;height:auto;background:none}
+  .a .ck.bad{border-color:var(--red);background:var(--red)}.a .ck.bad::after{content:"✕";width:auto;height:auto;background:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../">‹</a><div class="prog" style="flex:1;margin:0"><i id="bar"></i></div></div>
+  <div class="card row" style="margin-bottom:10px"><select id="theme"></select></div>
+  <div class="ttl">¿Cuál es el audio correcto?</div>
+  <div id="zone"></div>
+  <div class="fb" id="fb"></div>
+  <button class="okb" id="ok" disabled>Confirmar</button>
+</div>
+<script src="../lab.js"></script>
+<script>
+// ¿Cuál es el audio? : une phrase en espagnol (avec son illustration), 3 audios en français dont un seul est la bonne traduction.
+// On écoute, on coche le cercle sous l'audio choisi, puis « Confirmar ». Le français s'affiche après la réponse.
+const N = 8; let theme = "", list = [], pool = [], k = 0, score = 0, opts = [], choice = null, checked = false;
+const $ = id => document.getElementById(id);
+function start(){
+  pool = Lab.phrases(theme).filter(p => p.es && p.audio);
+  if(pool.length < 3) pool = Lab.phrases("").filter(p => p.es && p.audio);
+  list = pool.slice(0, N); k = 0; score = 0; ask();
+}
+function ask(){
+  $("bar").style.width = (k / list.length * 100) + "%";
+  $("fb").textContent = ""; $("fb").className = "fb"; checked = false; choice = null;
+  if(k >= list.length){ $("zone").innerHTML = `<div class="card end"><img src="/img/ui/evo.png" alt=""><h2>${score} / ${list.length}</h2><p class="muted">${score === list.length ? "¡Perfecto!" : "¡Sigue practicando!"}</p><button class="btn" onclick="start()">Otra vez</button></div>`; $("ok").style.display = "none"; return; }
+  $("ok").style.display = ""; $("ok").textContent = "Confirmar"; $("ok").classList.remove("next"); $("ok").disabled = true;
+  const p = list[k]; opts = Lab.shuffle([p, ...Lab.shuffle(pool.filter(x => x.fr !== p.fr && x.es !== p.es)).slice(0, 2)]);
+  $("zone").innerHTML = `<div class="q">${Lab.icon(p, 110)}<h2>${p.es}</h2><div class="fr" id="fr"></div>
+    <div class="aud">${opts.map((o, i) => `<div class="a"><button class="pl" data-i="${i}" aria-label="Audio ${i + 1}">🔊</button><button class="ck" data-i="${i}" aria-label="Elegir audio ${i + 1}"></button></div>`).join("")}</div></div>`;
+}
+$("zone").onclick = e => {
+  const pl = e.target.closest(".pl"), ck = e.target.closest(".ck");
+  if(pl){ document.querySelectorAll(".pl").forEach(b => b.classList.toggle("on", b === pl)); Lab.play(opts[pl.dataset.i]); return; }
+  if(ck && !checked){ choice = +ck.dataset.i; document.querySelectorAll(".ck").forEach(b => b.classList.toggle("sel", b === ck)); $("ok").disabled = false; }
+};
+$("ok").onclick = () => {
+  if(checked){ k++; return ask(); }
+  checked = true; const p = list[k], good = opts[choice] === p; if(good) score++;
+  const cks = document.querySelectorAll(".ck");
+  cks[choice].classList.remove("sel"); cks[choice].classList.add(good ? "good" : "bad");
+  if(!good) cks[opts.indexOf(p)].classList.add("good");
+  $("fr").textContent = "« " + p.fr + " »"; Lab.play(p);
+  $("fb").className = "fb " + (good ? "good" : "bad"); $("fb").textContent = good ? "¡Correcto!" : "Era el audio " + (opts.indexOf(p) + 1);
+  $("ok").textContent = "Continuar"; $("ok").classList.add("next");
+};
+Lab.load().then(() => { Lab.themeSelect($("theme"), v => { theme = v; start(); }); start(); });
+</script>
+</body>
+</html>

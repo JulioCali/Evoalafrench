@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png"><link rel="icon" href="../icon-192.png"><link rel="manifest" href="../manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Lab Evoala"><meta name="theme-color" content="#6C4FE0">
+<title>Asocia las palabras · Laboratorio Evoala</title>
+<link rel="stylesheet" href="../lab.css">
+<style>
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px 22px}
+  .col{display:grid;gap:12px}
+  .w{position:relative;min-height:112px;border-radius:18px;background:#fff;border:2px solid #E4E1EE;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px 8px;font-size:16px;text-align:center;transition:border-color .15s,background .15s,transform .1s}
+  .w:active{transform:scale(.97)}
+  .w .spkb{position:absolute;top:8px;right:8px}
+  .w.c0{border-color:#6C4FE0;background:#F1EDFF}.w.c1{border-color:#F5A623;background:#FFF5E3}
+  .w.c2{border-color:#2F7AD9;background:#EAF2FD}.w.c3{border-color:#D96ECC;background:#FCEFFA}
+  .w.sel{box-shadow:0 0 0 4px rgba(108,79,224,.18)}
+  .w.good{border-color:#3DBE7E!important;background:#E6F6EE!important}
+  .w.bad{border-color:var(--red)!important;background:#FDECEF!important;animation:sh .35s}
+  .w .mark{position:absolute;top:-9px;left:-9px;width:24px;height:24px;border-radius:50%;color:#fff;font-size:14px;font-weight:700;display:grid;place-items:center}
+  .w.good .mark{background:#1F8A70}.w.bad .mark{background:var(--red)}
+  @keyframes sh{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../">‹</a><div class="prog" style="flex:1;margin:0"><i id="bar"></i></div></div>
+  <div class="card row" style="margin-bottom:10px"><select id="theme"></select></div>
+  <div class="ttl">Asocia las palabras</div>
+  <div class="cols"><div class="col" id="L"></div><div class="col" id="R"></div></div>
+  <div class="fb" id="fb"></div>
+  <button class="okb" id="ok" disabled>Confirmar</button>
+</div>
+<script src="../lab.js"></script>
+<script>
+// Asocia las palabras : 4 mots en français à gauche, 4 traductions à droite.
+// Un clic à gauche puis un clic à droite (ou l'inverse) : la paire prend une couleur (4 couleurs).
+// Toucher une carte déjà colorée défait sa paire. « Confirmar » s'allume quand les 4 paires sont faites.
+const ROUNDS = 5, PAIRS = 4;
+let theme = "", round = 0, score = 0, set = [], pairs = {}, sel = null, checked = false;   // pairs : index gauche -> { r, c }
+const $ = id => document.getElementById(id);
+function start(){ round = 0; score = 0; next(); }
+function next(){
+  $("bar").style.width = (round / ROUNDS * 100) + "%";
+  if(round >= ROUNDS){ $("L").parentElement.outerHTML; document.querySelector(".cols").innerHTML = `<div class="card end" style="grid-column:1/-1"><img src="/img/ui/evo.png" alt=""><h2>${score} / ${ROUNDS * PAIRS}</h2><p class="muted">parejas correctas</p><button class="btn" onclick="location.reload()">Otra vez</button></div>`; $("ok").style.display = "none"; $("fb").textContent = ""; return; }
+  set = Lab.phrases(theme).filter(p => p.es && p.es.trim().toLowerCase() !== p.fr.trim().toLowerCase()).slice(0, PAIRS);
+  const right = Lab.shuffle(set.map((p, i) => i));
+  pairs = {}; sel = null; checked = false; $("fb").textContent = ""; $("fb").className = "fb";
+  $("L").innerHTML = set.map((p, i) => `<button class="w" data-side="L" data-i="${i}">${p.audio ? '<span class="spkb">🔊</span>' : ""}${Lab.icon(p, 52)}<span>${p.fr}</span><span class="mark"></span></button>`).join("");
+  $("R").innerHTML = right.map(i => `<button class="w" data-side="R" data-i="${i}"><span>${set[i].es}</span><span class="mark"></span></button>`).join("");
+  $("ok").textContent = "Confirmar"; $("ok").classList.remove("next"); paint();
+}
+const usedColors = () => Object.values(pairs).map(x => x.c);
+function paint(){
+  document.querySelectorAll(".w").forEach(w => { w.className = "w"; });
+  Object.entries(pairs).forEach(([l, { r, c }]) => { q("L", l).classList.add("c" + c); q("R", r).classList.add("c" + c); });
+  if(sel){ const c = [0, 1, 2, 3].find(x => !usedColors().includes(x)); q(sel.side, sel.i).classList.add("c" + c, "sel"); }
+  $("ok").disabled = Object.keys(pairs).length !== PAIRS;
+}
+const q = (side, i) => document.querySelector(`.w[data-side="${side}"][data-i="${i}"]`);
+document.querySelector(".cols").onclick = e => {
+  const w = e.target.closest(".w"); if(!w || checked) return;
+  const side = w.dataset.side, i = w.dataset.i;
+  if(side === "L" && set[i]) Lab.play(set[i]);
+  // carte déjà associée : on défait sa paire
+  const owner = side === "L" ? (pairs[i] ? i : null) : Object.keys(pairs).find(l => pairs[l].r === i);
+  if(owner != null){ delete pairs[owner]; sel = { side, i }; return paint(); }
+  if(!sel || sel.side === side){ sel = (sel && sel.side === side && sel.i === i) ? null : { side, i }; return paint(); }
+  const c = [0, 1, 2, 3].find(x => !usedColors().includes(x));
+  const l = side === "L" ? i : sel.i, r = side === "R" ? i : sel.i;
+  pairs[l] = { r, c }; sel = null; paint();
+};
+$("ok").onclick = () => {
+  if(checked){ round++; return next(); }
+  checked = true; let good = 0;
+  Object.entries(pairs).forEach(([l, { r }]) => {
+    const ok = l === r; if(ok) good++;
+    [q("L", l), q("R", r)].forEach(w => { w.classList.add(ok ? "good" : "bad"); w.querySelector(".mark").textContent = ok ? "✓" : "✕"; });
+  });
+  score += good;
+  $("fb").className = "fb " + (good === PAIRS ? "good" : "bad");
+  $("fb").textContent = good === PAIRS ? "¡Perfecto! 🎉" : `${good} / ${PAIRS} correctas · ` + set.map(p => `${p.fr} = ${p.es}`).filter((x, i) => pairs[i] && pairs[i].r !== String(i)).join(" · ");
+  $("ok").textContent = "Continuar"; $("ok").classList.add("next");
+};
+Lab.load().then(() => { Lab.themeSelect($("theme"), v => { theme = v; start(); }); start(); });
+</script>
+</body>
+</html>
