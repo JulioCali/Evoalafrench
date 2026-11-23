@@ -938,12 +938,15 @@ app.addEventListener("click", e => {
 
 /* Audio : un fichier par page du PDF (snd/pNN.json), chargé au premier clic puis gardé en mémoire */
 const bundles = {}, urls = {};
-function bundle(file){
-  return bundles[file] ??= fetch(file).then(r => r.json());
+function bundle(file, fresh){
+  if(fresh) delete bundles[file];
+  return bundles[file] ??= fetch(file, fresh ? { cache: "reload" } : {}).then(r => r.json());
 }
 async function audioUrl(file, id){
   if(!urls[id]){
-    const b = await bundle(file);
+    let b = await bundle(file);
+    if(!b[id]) b = await bundle(file, true);   // fichier gardé en cache par le téléphone, d'avant l'ajout de cet audio : on le recharge
+    if(!b[id]) throw new Error("audio absent");
     const bin = Uint8Array.from(atob(b[id]), c => c.charCodeAt(0));
     urls[id] = URL.createObjectURL(new Blob([bin], {type:"audio/mpeg"}));
   }

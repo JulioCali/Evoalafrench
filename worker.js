@@ -184,7 +184,7 @@ export default {
     if((m = path.match(/^\/snd\/(p\d+)\.json$/))){
       if(!FREE_SND.has(m[1]) && !(await access(req)).pro) return json({ error: "locked" }, 403);
       const r = await asset(req, env, path);
-      const h = new Headers(r.headers); h.set("cache-control", "private, max-age=86400");
+      const h = new Headers(r.headers); h.set("cache-control", "private, no-cache");   // le téléphone revalide : un audio ajouté arrive tout de suite
       return new Response(r.body, { status: r.status, headers: h });
     }
     // tout autre fichier JSON du contenu (copie, ancien nom…) : jamais servi tel quel
