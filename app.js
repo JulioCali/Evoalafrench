@@ -132,8 +132,10 @@ function lockPanel(intro, labels){
 // le serveur renvoie le contenu complet ou gratuit selon le compte : on le recharge quand le compte change
 let lastAcc = "";
 function reloadContent(force){
-  delete contents[LANG];
-  return loadContent(LANG).then(c => {
+  const lg = LANG;
+  delete contents[lg];
+  return loadContent(lg).then(c => {
+    if(lg !== LANG) return c;   // la langue a changé entre-temps (ex. : langue du compte) : on ne remet pas l'ancienne
     const key = JSON.stringify(c._acc || {}), changed = key !== lastAcc;
     lastAcc = key;
     if(!changed && !force) return c;
@@ -493,7 +495,7 @@ function phrases(si, ti, sub=0){
   const view = tab.subs ? tab.subs[sub] : tab;
   const nx = nextPage(si, ti, sub);
   if(hasPh(view) && !view.locked) seen.add("evoala-seen", pageHash(si, ti, tab.subs ? sub : 0));
-  PVIEW = { view, title: view.name || tab.label || tab.name, back: pageHash(si, ti, tab.subs ? sub : 0) };
+  PVIEW = { view, title: tab.subs ? (view.label || view.name) : (tab.label || tab.name), back: pageHash(si, ti, tab.subs ? sub : 0) };
   app.innerHTML = `${topbar("guide").replace('class="top"','class="top flow"')}
     <label class="search psearch"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="q" placeholder="${t("search")}" autocomplete="off" aria-label="${t("searchL")}"></label>
     ${`${catPicked() ? "" : `<p class="cathint"><span>${t("pick")}</span></p>`}
@@ -1001,15 +1003,17 @@ function tour(name, force){
   const key = "evoala-tour-" + name;
   if(tourOn) return;
   if(!force){ try{ if(localStorage.getItem(key)) return; }catch(e){ return; } }
-  const steps = (TOURS[name][LANG] || TOURS[name].es).filter(st => !st.sel || document.querySelector(st.sel));
-  if(!steps.length) return;
+  const keep = TOURS[name].es.map((st, j) => j).filter(j => !TOURS[name].es[j].sel || document.querySelector(TOURS[name].es[j].sel));
+  if(!keep.length) return;
   tourOn = true;
-  const U = TOUR_UI[LANG] || TOUR_UI.es;
+  // textes relus à chaque étape : si la langue change pendant la visite, la bulle suit
+  const steps = new Proxy([], { get: (o, p) => p === "length" ? keep.length : /^\d+$/.test(p) ? (TOURS[name][LANG] || TOURS[name].es)[keep[+p]] : o[p] });
+  const UI_ = () => TOUR_UI[LANG] || TOUR_UI.es;
   const blk = document.createElement("div"), spot = document.createElement("div"), bub = document.createElement("div");
   blk.className = "tr-blk"; spot.className = "tr-spot none"; bub.className = "tr-bub";
   document.body.append(blk, spot, bub);
   let i = 0;
-  const end = () => { try{ localStorage.setItem(key, "1"); }catch(e){} [blk, spot, bub].forEach(el => el.remove()); tourOn = false; removeEventListener("resize", place); TOUR_AFTER[name]?.(); };
+  const end = () => { try{ localStorage.setItem(key, "1"); }catch(e){} [blk, spot, bub].forEach(el => el.remove()); tourOn = false; LANG_HOOKS.delete(show); removeEventListener("resize", place); TOUR_AFTER[name]?.(); };
   function place(){
     const st = steps[i], el = st.sel && document.querySelector(st.sel);
     if(!el){ spot.className = "tr-spot none"; bub.style.top = ""; bub.classList.add("mid"); return; }
@@ -1021,7 +1025,7 @@ function tour(name, force){
     bub.style.top = (below + bh < innerHeight - 10 ? below : Math.max(10, r.top - pad - 14 - bh)) + "px";
   }
   function show(){
-    const st = steps[i], el = st.sel && document.querySelector(st.sel), last = i === steps.length - 1;
+    const st = steps[i], el = st.sel && document.querySelector(st.sel), last = i === steps.length - 1, U = UI_();
     bub.innerHTML = `<img src="img/ui/evo.png" alt=""><div class="bt"><b>${st.t}</b><p>${st.p}</p>
       <div class="bf"><span class="cnt">${i + 1} / ${steps.length}</span>${last ? "" : `<button class="sk" data-trskip>${U.skip}</button>`}<button class="nx" data-trnext>${last ? U.done : U.next}</button></div></div>`;
     let moved = false;
@@ -1038,6 +1042,7 @@ function tour(name, force){
     if(e.target.closest("[data-trnext]")){ if(i === steps.length - 1) return end(); i++; show(); }
   });
   addEventListener("resize", place); addEventListener("load", place, { once: true });
+  LANG_HOOKS.add(show);
   show(); setTimeout(place, 400);
 }
 
@@ -1090,10 +1095,11 @@ function openTuto(){
 function pageTuto(){
   if(ptOn || !ptRow(2)) return;
   ptOn = true;
-  const T = PT_TXT[LANG] || PT_TXT.es, guest = !(window.EvoAuth && window.EvoAuth.user);
+  let T, S;
+  const guest = !(window.EvoAuth && window.EvoAuth.user);
   let again = false; try{ const n = +(localStorage.getItem("evoala-tuto-count") || 0) + 1; localStorage.setItem("evoala-tuto-count", String(n)); again = guest && n >= 2; }catch(e){}
   const f = (i, q) => () => ptRow(i)?.querySelector(q);
-  const S = [
+  const build = () => { T = PT_TXT[LANG] || PT_TXT.es; S = [
     { title: T.introT, text: again ? T.again : T.intro, next: T.start, skip: true, account: again },
     { el: () => document.querySelector(".catwrap"), title: T.catsT, text: T.cats },
     { el: () => document.querySelector(".ptabs"), title: T.tabsT, text: T.tabs },
@@ -1110,7 +1116,8 @@ function pageTuto(){
     { el: () => document.querySelector(".nav"), title: T.navT, text: T.nav },
     { el: () => document.querySelector('.nav [data-go="p1"]'), round: true, title: T.parisT, text: T.paris },
     { title: T.endT, text: T.end, next: T.go, end: true }
-  ];
+  ]; };
+  build();
   const blk = document.createElement("div"), spot = document.createElement("div"), bub = document.createElement("div"), hand = document.createElement("div"), lab = document.createElement("div");
   blk.className = "tr-blk"; spot.className = "tr-spot none"; bub.className = "tr-bub"; hand.id = "tr-hand"; lab.id = "tr-lab";
   hand.innerHTML = `<svg viewBox="-4 -8 52 66"><g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path class="ray" d="M18 -6V-1M8.5 -2l3 3.5M27.5 -2l-3 3.5M3 8h5M28 8h5"/></g><path d="M14 31V10a4 4 0 0 1 8 0v15v-1.5a4 4 0 0 1 8 0V27v-1a4 4 0 0 1 8 0v3.5a3.5 3.5 0 0 1 7 0V42c0 8-6 14-14 14h-6c-5 0-8-2.5-11-6.5L5.2 40.6a3.6 3.6 0 0 1 5.4-4.8L14 39.5Z" fill="#fff" stroke="#2E2550" stroke-width="2.6" stroke-linejoin="round"/><path d="M22 25v5M30 26.5v4M38 28.5v3.5" stroke="#2E2550" stroke-width="2.2" stroke-linecap="round"/></svg>`;
@@ -1119,7 +1126,7 @@ function pageTuto(){
   const count = () => k >= 1 && k < S.length - 1 ? `${k} / ${S.length - 2}` : "";
   function finish(goBack){
     try{ localStorage.setItem("evoala-tuto", "1"); }catch(e){}
-    [blk, spot, bub, hand, lab].forEach(el => el.remove()); document.body.classList.remove("pt-tap"); ptOn = false; clearInterval(handT);
+    [blk, spot, bub, hand, lab].forEach(el => el.remove()); document.body.classList.remove("pt-tap"); ptOn = false; clearInterval(handT); LANG_HOOKS.delete(relang);
     removeEventListener("resize", place); removeEventListener("scroll", place);
     // on reste sur la page : le bouton « Practicar » débloqué y est visible
   }
@@ -1170,6 +1177,8 @@ function pageTuto(){
     if(done !== false){ k++; show(); }
   });
   addEventListener("resize", place); addEventListener("scroll", place, { passive: true });
+  const relang = () => { build(); show(); };   // la langue change pendant le tutoriel : on le réaffiche dans la nouvelle langue
+  LANG_HOOKS.add(relang);
   show();
 }
 function maybeTuto(h, tries = 0){
@@ -1212,13 +1221,14 @@ function route(){
 }
 addEventListener("hashchange", route);
 const contents = {};
+const LANG_HOOKS = new Set();   // visites guidées / tutoriel ouverts : ils se réaffichent dans la nouvelle langue
 const loadContent = l => contents[l] ??= fetch(l === "en" ? "content-en.json" : "content.json").then(r => r.json());
 function setLang(l, fromAccount){
   if(l === LANG) return;
   LANG = l; try{ localStorage.setItem("evoala-lang", l); }catch(e){}
   if(!fromAccount) window.EvoAuth?.save({ lang: l });
   document.documentElement.lang = l;
-  loadContent(l).then(c => { C = c; const y = scrollY; route(); scrollTo(0, y); })
+  loadContent(l).then(c => { if(l !== LANG) return; C = c; const y = scrollY; route(); scrollTo(0, y); LANG_HOOKS.forEach(f => f()); })
     .catch(() => toast(t("noLoad")));
 }
 document.documentElement.lang = LANG;

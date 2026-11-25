@@ -177,6 +177,8 @@ const PH = [
 // phrases envoyées par l'appli (bouton « Practicar »), sinon le parcours de démonstration
 let SET = null; try{ SET = JSON.parse(sessionStorage.getItem("evoala-game")); }catch(e){}
 if(SET && Array.isArray(SET.items) && SET.items.length) PH.splice(0, PH.length, ...SET.items);
+else if((SET && SET.lang || (()=>{ try{ return localStorage.getItem("evoala-lang"); }catch(e){ return ""; } })()) === "en")   // parcours de démonstration en anglais
+  ["Thank you", "Hello", "Goodbye", "Please", "I don't understand"].forEach((v, i) => PH[i].es = v);
 const EN = (SET && SET.lang || (()=>{ try{ return localStorage.getItem("evoala-lang"); }catch(e){ return ""; } })()) === "en";
 const T = EN ? { help:"Say it in French so Evo jumps the wall", mic:"Tap to say it in French", rec:"Listening… (tap to finish)", wait:"Checking…", wall:"Wall", of:"of",
     ok:"Great job!", almost:"Almost!", almostS:"Listen and try again.", no:"Evo couldn't jump.", noS:"Try again.", heard:"We heard", silent:"We couldn't hear you.", silentS:"Speak a little louder, close to the phone.",
@@ -189,6 +191,9 @@ const T = EN ? { help:"Say it in French so Evo jumps the wall", mic:"Tap to say 
     perfect:"¡Perfecto!",great:"¡Excelente!", l1:"Escucha y repite", l1s:"Lees la frase y la repites después del audio", l2:"Ordena la frase", l2s:"Toca las palabras en el orden correcto", l3:"Tradúcela tú", l3s:"Dices la frase en francés sin verla",
     play:"Jugar", done:"Hecho", again:"Volver a jugar", nlv:"Nivel", lvdone:"completado!", nextL:"Nivel", order:"Forma la frase en francés:", orderS:"Ordena las sílabas:", wrong:"Casi.", wrongS:"Escucha y vuelve a intentarlo.", rep:"Escucha y repite en francés", startL:"3 niveles", e1:"¡Muy bien! Ahora ordena las frases.", e2:"Ya sabes formarlas. ¿Te atreves a decirlas sin verlas?", e3:"Dominas estas frases. ¡Bravo!", tutoBack:"Continuar", lvl3:"Nivel 3",  bravo:"¡Bravo!", made:"¡Llegaste!", again:"Jugar otra vez", back:"Volver a la guía", start:"Ayuda a Evo a cruzar París", startP:"Evo corre por los techos de París. Delante de cada muro, <b>di la frase en francés</b> y Evo saltará.", go:"¡Vamos!", phr:"frases" };
 const $ = id => document.getElementById(id);
+document.documentElement.lang = EN ? "en" : "es";
+if(EN){ $("help").textContent = T.help; document.title = "Evo crosses Paris · Evoala";
+  [[".hud .back", "Back to the app"], ["#mic", "Record"], ["#hintb", "Hint"], ["#lis", "Listen"]].forEach(([q, v]) => document.querySelector(q)?.setAttribute("aria-label", v)); }
 // niveaux faits pour cette carte / page (0 à 3), gardés pour l'appli
 const LKEY = SET && SET.key ? SET.key : "demo";
 const lvDone = () => { try{ return (JSON.parse(localStorage.getItem("evoala-levels") || "{}") || {})[LKEY] || 0; }catch(e){ return 0; } };
@@ -894,7 +899,7 @@ const COACH_LV = EN ? [["#lvls", "3 levels", "Listen and repeat, put the phrase 
   : [["#lvls", "3 niveles", "Escucha y repite, ordena la frase y, al final, dila tú solo. Cada nivel se abre al terminar el anterior."]];
 const COACH_2 = EN ? [["#pool", "Put it in order", "Tap the words in the right order, then tap “Confirm”. Tap a word again to send it back."]]
   : [["#pool", "Ordena la frase", "Toca las palabras en el orden correcto y luego «Confirmar». Si te equivocas, toca una palabra para devolverla."]];
-const COACH_3 = EN ? [["#es", "Now without seeing it", "You only see the phrase in Spanish: say it in French."], ["#hintb", "Stuck?", "The light bulb shows you the French phrase."]]
+const COACH_3 = EN ? [["#es", "Now without seeing it", "You only see the phrase in English: say it in French."], ["#hintb", "Stuck?", "The light bulb shows you the French phrase."]]
   : [["#es", "Ahora sin verla", "Solo ves la frase en español: dila en francés."], ["#hintb", "¿Te bloqueas?", "La bombilla te muestra la frase en francés."]];
 function coachDue(id){
   if(!SET || !(SET.coach || SET.tuto)) return false;
@@ -1063,7 +1068,7 @@ $("mic").onclick = async () => {
   if(G.state !== "wall" && G.state !== "fail") return;
   if(mrec && mrec.state === "recording"){ mrec.stop(); return; }
   if(playing) try{ playing.pause(); }catch(e){}
-  let st; try{ st = await getStream(); }catch(e){ const fb = $("fb"); fb.className = "fb ko"; fb.innerHTML = "<b>Micrófono bloqueado</b> Permite el acceso al micrófono en los ajustes del navegador."; return; }
+  let st; try{ st = await getStream(); }catch(e){ const fb = $("fb"); fb.className = "fb ko"; fb.innerHTML = EN ? "<b>Microphone blocked</b> Allow microphone access in your browser settings." : "<b>Micrófono bloqueado</b> Permite el acceso al micrófono en los ajustes del navegador."; return; }
   chunks = []; const opt = { audioBitsPerSecond: 32000 }; if(MIME) opt.mimeType = MIME;   // son léger (voix) = envoi plus rapide
   try{ mrec = new MediaRecorder(st, opt); }catch(e){ mrec = MIME ? new MediaRecorder(st, { mimeType: MIME }) : new MediaRecorder(st); }
   mrec.ondataavailable = e => { if(e.data && e.data.size) chunks.push(e.data); };
@@ -1083,7 +1088,7 @@ async function check(){
   const blob = new Blob(chunks, { type: (mrec && mrec.mimeType) || MIME || "audio/mp4" });
   let said = "";
   try{ const r = await fetch("/api/stt", { method: "POST", headers: { "content-type": blob.type }, body: blob }); const d = await r.json(); if(!r.ok) throw new Error(d.error || r.status); said = d.text || ""; }
-  catch(e){ setMic("idle"); const fb = $("fb"); fb.className = "fb ko"; fb.innerHTML = `<b>Sin conexión</b> Revisa internet y vuelve a intentarlo.<small>(${e.message})</small>`; return; }
+  catch(e){ setMic("idle"); const fb = $("fb"); fb.className = "fb ko"; fb.innerHTML = (EN ? "<b>No connection</b> Check your internet and try again." : "<b>Sin conexión</b> Revisa internet y vuelve a intentarlo.") + `<small>(${e.message})</small>`; return; }
   setMic("idle"); G.tries++;
   if(junk(said, PH[G.i].fr)) return fail("", 0, heardVoice ? "unclear" : "silent");
   const s = score(said, PH[G.i].fr);
