@@ -51,7 +51,7 @@
 <script>
 // Escucha y repite (étape Découverte) : un mot ou une phrase, avec son illustration et sa traduction.
 // 1. On écoute (« Escucha »)  2. le bouton « Repite » apparaît, on répète au micro  3. « ¡Excelente! » et on continue.
-// La reconnaissance vocale (fr-FR) est indulgente : c'est une découverte, pas un examen. Après 2 essais, on passe quand même.
+// Validation mot par mot : tous les mots doivent être dits (les mots longs peuvent être approximatifs). Après 2 essais, on passe quand même.
 const N = 8; let theme = "", list = [], k = 0, essais = 0, rec = null;
 const $ = id => document.getElementById(id);
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -115,8 +115,8 @@ function repeter(){
     const der = e.results[e.results.length - 1], debut = [...e.results].slice(0, -1).map(r => r[0].transcript).join(" ");
     alts = [...der].map(x => (debut + " " + x.transcript).trim());
     $("oui").textContent = "« " + entendu + " »";
-    if(meilleur().score >= 0.6) return terminer();          // reconnu : on n'attend pas
-    clearTimeout(tSilence); tSilence = setTimeout(terminer, 1500);
+    if(meilleur().ok) return terminer();                    // phrase complète : on n'attend pas
+    clearTimeout(tSilence); tSilence = setTimeout(terminer, 1300);   // incomplète : on attend la fin
   };
   rec.onerror = e => {
     if(e.error === "no-speech" || e.error === "aborted") return;
@@ -128,22 +128,44 @@ function repeter(){
   tMax = setTimeout(terminer, 7000);
   try{ rec.start(); }catch(e){ fini = true; arreter(); Lab.toast("El micrófono no respondió, inténtalo otra vez"); }
 }
+// Évaluation mot par mot : chaque mot de la phrase doit avoir été dit, dans l'ordre.
+// Un mot long peut être approximatif (prononciation), un mot court doit être exact (« pas », « ne », « le »… changent le sens).
+const HOMO = [["et","est","ai","es","e"],["a","as","ah"],["ou"],["la","las"],["son","sont"],["on","ont"],["mes","mais","mai","met","mets"],["ce","se"],["cest","ces","ses","sest","sait","sais"],["vert","verre","vers","ver"],["un","hein"]];
+function memeMot(cible, dit){
+  if(cible === dit) return true;
+  if(HOMO.some(g => g.includes(cible) && g.includes(dit))) return true;
+  return cible.length >= 4 && ressemblance(cible, dit) >= 0.75;   // « bonjour » ≠ « bonsoir »
+}
+function evaluer(texte){
+  const cible = norm(list[k].fr).split(" ").filter(Boolean), dit = norm(texte).split(" ").filter(Boolean);
+  let j = 0; const manque = [];
+  // un mot élidé (« dorange » pour « d'orange ») peut avoir été entendu en deux morceaux (« d orange »)
+  cible.forEach(m => {
+    let t = dit.findIndex((d, i) => i >= j && memeMot(m, d)), pas = 1;
+    if(t < 0){ t = dit.findIndex((d, i) => i >= j && i + 1 < dit.length && memeMot(m, d + dit[i + 1])); pas = 2; }
+    if(t < 0) manque.push(m); else j = t + pas;
+  });
+  return { manque, ok: !manque.length && dit.length > 0 };
+}
 function meilleur(){
   const cands = [entendu, ...alts].filter(Boolean);
-  if(!cands.length) return { score: 0, dit: "" };
-  const sc = cands.map(t => ressemblance(t, list[k].fr)), m = Math.max(...sc);
-  return { score: m, dit: cands[sc.indexOf(m)] };
+  if(!cands.length) return { ok: false, dit: "", manque: [] };
+  const ev = cands.map(t => ({ dit: t, ...evaluer(t) }));
+  return ev.sort((x, y) => x.manque.length - y.manque.length)[0];
 }
 function terminer(){
   if(fini) return; fini = true;
-  const p = list[k], { score, dit } = meilleur();
+  const p = list[k], { ok, dit, manque } = meilleur();
   arreter();
   if(!dit){ $("oui").textContent = "No te oí. Toca « Repite » y habla."; return; }
   $("oui").textContent = "";
-  if(score >= 0.6) return ouvrir("bien", "¡Excelente!", "Dijiste: « " + dit + " »");
+  if(ok) return ouvrir("bien", "¡Excelente!", "Dijiste: « " + dit + " »");
+  // mots manquants affichés comme dans la phrase (« pas », « c'est »…)
+  const motsFr = list[k].fr.replace(/[?!.,¿¡…]/g, "").split(/[\s-]+/).filter(Boolean);
+  const falta = "Te faltó: « " + manque.map(m => motsFr.find(w => norm(w) === m) || m).join(" ") + " »";
   essais++;
   if(essais >= 2) return ouvrir("bien", "¡Bien intentado!", "Dijiste: « " + dit + " »\nSe dice: « " + p.fr + " »", true);
-  ouvrir("presque", "¡Casi!", "Dijiste: « " + dit + " »\nEscucha y repite otra vez.", false, true);
+  ouvrir("presque", "¡Casi!", "Dijiste: « " + dit + " »\n" + falta, false, true);
 }
 function arreter(){
   clearTimeout(tSilence); clearTimeout(tMax);
@@ -152,7 +174,7 @@ function arreter(){
 }
 
 // Ressemblance entre ce qui a été entendu et la phrase (0 à 1), sans accents ni ponctuation
-const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/['’]/g, "").replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
 function ressemblance(a, b){
   a = norm(a); b = norm(b); if(!a || !b) return 0; if(a === b) return 1;
   const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
