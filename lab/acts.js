@@ -25,5 +25,6 @@ const ACTS = [
   { href: "act/repite.html", etape: "decouverte", em: "🎙️", title: "Escucha y repite", desc: "Una palabra con su imagen y su traducción: la escuchas y la repites en voz alta.", status: "proto" },
   { href: "act/escribe.html", etape: "pratique", em: "✍️", title: "Memoriza y escribe", desc: "Mira la palabra unos segundos, desaparece y la escribes con letras (o la frase con palabras).", status: "proto" },
   { href: "act/imagen.html", etape: "comprehension", em: "🖼️", title: "Elige la buena imagen", desc: "Escuchas una frase en francés y eliges, entre 4 imágenes, la que corresponde.", status: "proto" },
-  { href: "act/oyes.html", etape: "comprehension", em: "👂", title: "¿Qué oyes?", desc: "Escuchas una frase sin verla y eliges, entre 2 frases escritas, la que oíste.", status: "proto" }
+  { href: "act/oyes.html", etape: "comprehension", em: "👂", title: "¿Qué oyes?", desc: "Escuchas una frase sin verla y eliges, entre 2 frases escritas, la que oíste.", status: "proto" },
+  { href: "act/oyes.html?trad=1", etape: "decouverte", em: "👂", title: "¿Qué oyes? (con traducción)", desc: "Escuchas una frase, ves su traducción y eliges, entre 2 frases escritas, la que oíste.", status: "proto" }
 ];
