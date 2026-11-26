@@ -2,6 +2,7 @@
    - Lab.load()          : charge le contenu du guide (mêmes phrases et audios que l'appli)
    - Lab.themes()        : liste des thèmes (section › onglet › sous-page) pour choisir les phrases
    - Lab.phrases(key, n) : phrases d'un thème (ou de tout le guide), mélangées
+   - Lab.voisins(p, n)   : n autres phrases du même thème que p (pour des choix proches, pas devinables)
    - Lab.play(p)         : joue l'audio d'une phrase
    - Lab.unlocked()      : true une fois l'audio débloqué par un premier toucher (iPhone)
    - Lab.webAudio()      : joue les audios avec Web Audio au lieu du lecteur <audio> (activités avec micro, voir plus bas)
@@ -26,6 +27,14 @@ const Lab = (() => {
     const all = key ? (views().find(v => v.key === key)?.ph || []) : views().flatMap(v => v.ph);
     const uniq = [...new Map(all.map(p => [p.fr, p])).values()];
     return shuffle(uniq).slice(0, n || uniq.length);
+  }
+  function voisins(p, n, filtre = () => true){
+    const v = views().find(v => v.ph.some(x => x.fr === p.fr));
+    const pris = new Set([p.fr]), out = [];
+    const ajoute = arr => shuffle(arr).forEach(x => { if(out.length < n && !pris.has(x.fr) && filtre(x)){ pris.add(x.fr); out.push(x); } });
+    if(v) ajoute(v.ph);
+    if(out.length < n) ajoute(views().flatMap(v => v.ph));    // thème trop petit : on complète avec le reste du guide
+    return out;
   }
   async function audioUrl(p){
     if(!p.audio) return null;
@@ -100,5 +109,5 @@ const Lab = (() => {
   }
   // icône haut-parleur, la même que dans le guide
   const SPK = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
-  return { load, themes, phrases, play, stop, webAudio, unlocked: isUnlocked, playToEnd, icon, shuffle, toast, themeSelect, SPK };
+  return { load, themes, phrases, voisins, play, stop, webAudio, unlocked: isUnlocked, playToEnd, icon, shuffle, toast, themeSelect, SPK };
 })();
