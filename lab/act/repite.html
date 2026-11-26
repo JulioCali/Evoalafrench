@@ -95,38 +95,59 @@ function montrerMic(){
 }
 
 // 2. Répéter au micro
+// Écoute en continu avec résultats intermédiaires (plus fiable sur iPhone) : on s'arrête dès que la phrase est reconnue,
+// après 1,5 s de silence, après 7 s au maximum, ou quand l'apprenant touche de nouveau le bouton.
+let entendu = "", alts = [], fini = false, tSilence = null, tMax = null;
 function repeter(){
   const p = list[k], mic = $("mic");
-  if(rec){ arreter(); return; }
+  if(rec){ terminer(); return; }                 // 2e appui : on arrête et on évalue ce qui a été dit
   if(!SR){ // navigateur sans reconnaissance vocale : pas de correction possible
     Lab.toast("Sin reconocimiento de voz en este navegador");
     return ouvrir("bien", "¡Excelente!", "« " + p.fr + " »");
   }
-  rec = new SR(); rec.lang = "fr-FR"; rec.interimResults = false; rec.maxAlternatives = 5;
-  mic.classList.add("on"); mic.lastChild.textContent = "Te escucho…"; $("oui").textContent = "";
-  let entendu = false;
+  Lab.stop();                                     // l'audio du guide ne doit pas se mélanger au micro
+  entendu = ""; alts = []; fini = false;
+  rec = new SR(); rec.lang = "fr-FR"; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 3;
+  mic.classList.add("on"); mic.lastChild.textContent = "Te escucho…"; $("oui").textContent = "Habla ahora…";
   rec.onresult = e => {
-    entendu = true;
-    const alts = [...e.results[0]].map(r => r.transcript);
-    const scores = alts.map(t => ressemblance(t, p.fr)), score = Math.max(...scores);
-    const dit = alts[scores.indexOf(score)];   // ce que l'apprenant a dit (la meilleure version entendue)
-    arreter();
-    if(score >= 0.6) return ouvrir("bien", "¡Excelente!", "Dijiste: « " + dit + " »");
-    essais++;
-    if(essais >= 2) return ouvrir("bien", "¡Bien intentado!", "Dijiste: « " + dit + " »\nSe dice: « " + p.fr + " »", true);
-    ouvrir("presque", "¡Casi!", "Dijiste: « " + dit + " »\nEscucha y repite otra vez.", false, true);
+    // texte entendu jusqu'ici (meilleure version de chaque morceau) + variantes du dernier morceau
+    entendu = [...e.results].map(r => r[0].transcript).join(" ").replace(/\s+/g, " ").trim();
+    const der = e.results[e.results.length - 1], debut = [...e.results].slice(0, -1).map(r => r[0].transcript).join(" ");
+    alts = [...der].map(x => (debut + " " + x.transcript).trim());
+    $("oui").textContent = "« " + entendu + " »";
+    if(meilleur().score >= 0.6) return terminer();          // reconnu : on n'attend pas
+    clearTimeout(tSilence); tSilence = setTimeout(terminer, 1500);
   };
   rec.onerror = e => {
-    arreter();
-    if(e.error === "not-allowed" || e.error === "service-not-allowed") Lab.toast("Permite el micrófono para repetir");
-    else if(e.error === "no-speech") $("oui").textContent = "No te oí. Toca « Repite » y habla.";
+    if(e.error === "no-speech" || e.error === "aborted") return;
+    fini = true; arreter();
+    if(e.error === "not-allowed" || e.error === "service-not-allowed") Lab.toast("Permite el micrófono (y el dictado) para repetir");
     else Lab.toast("El micrófono no respondió, inténtalo otra vez");
   };
-  rec.onend = () => { if(!entendu) arreter(); };
-  try{ rec.start(); }catch(e){ arreter(); }
+  rec.onend = () => { if(!fini) terminer(); };
+  tMax = setTimeout(terminer, 7000);
+  try{ rec.start(); }catch(e){ fini = true; arreter(); Lab.toast("El micrófono no respondió, inténtalo otra vez"); }
+}
+function meilleur(){
+  const cands = [entendu, ...alts].filter(Boolean);
+  if(!cands.length) return { score: 0, dit: "" };
+  const sc = cands.map(t => ressemblance(t, list[k].fr)), m = Math.max(...sc);
+  return { score: m, dit: cands[sc.indexOf(m)] };
+}
+function terminer(){
+  if(fini) return; fini = true;
+  const p = list[k], { score, dit } = meilleur();
+  arreter();
+  if(!dit){ $("oui").textContent = "No te oí. Toca « Repite » y habla."; return; }
+  $("oui").textContent = "";
+  if(score >= 0.6) return ouvrir("bien", "¡Excelente!", "Dijiste: « " + dit + " »");
+  essais++;
+  if(essais >= 2) return ouvrir("bien", "¡Bien intentado!", "Dijiste: « " + dit + " »\nSe dice: « " + p.fr + " »", true);
+  ouvrir("presque", "¡Casi!", "Dijiste: « " + dit + " »\nEscucha y repite otra vez.", false, true);
 }
 function arreter(){
-  if(rec){ try{ rec.abort(); }catch(e){} rec = null; }
+  clearTimeout(tSilence); clearTimeout(tMax);
+  if(rec){ const r = rec; rec = null; try{ r.onend = null; r.abort(); }catch(e){} }
   const mic = $("mic"); if(mic){ mic.classList.remove("on"); mic.lastChild.textContent = "Repite"; }
 }
 
