@@ -22,5 +22,6 @@ const ACTS = [
   { href: "act/escucha.html", etape: "memorisation", em: "🎧", title: "Escucha y elige", desc: "Oyes la frase en francés y eliges la traducción correcta.", status: "proto" },
   { href: "act/asocia.html", etape: "memorisation", em: "🔗", title: "Asocia las palabras", desc: "Une cada palabra en francés con su traducción: cada pareja toma un color.", status: "proto" },
   { href: "act/audios.html", etape: "memorisation", em: "🔉", title: "¿Cuál es el audio?", desc: "Una frase en español y 3 audios en francés: elige el que corresponde.", status: "proto" },
-  { href: "act/repite.html", etape: "decouverte", em: "🎙️", title: "Escucha y repite", desc: "Una palabra con su imagen y su traducción: la escuchas y la repites en voz alta.", status: "proto" }
+  { href: "act/repite.html", etape: "decouverte", em: "🎙️", title: "Escucha y repite", desc: "Una palabra con su imagen y su traducción: la escuchas y la repites en voz alta.", status: "proto" },
+  { href: "act/escribe.html", etape: "pratique", em: "✍️", title: "Memoriza y escribe", desc: "Mira la palabra unos segundos, desaparece y la escribes con letras (o la frase con palabras).", status: "proto" }
 ];

@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><link rel="apple-touch-icon" href="../apple-touch-icon.png"><link rel="icon" href="../icon-192.png"><link rel="manifest" href="../manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Lab Evoala"><meta name="theme-color" content="#6C4FE0">
+<title>Memoriza y escribe · Laboratorio Evoala</title>
+<link rel="stylesheet" href="../lab.css">
+<style>
+  .wrap{padding-bottom:200px}
+  .modes{display:flex;gap:8px;margin-top:10px}
+  .modes button{flex:1;height:38px;border-radius:12px;background:#fff;border:1.5px solid var(--lav);font-size:14px;font-weight:600;color:var(--gray)}
+  .modes button.on{background:var(--lav);border-color:var(--violet);color:var(--violet-dark)}
+  .q{text-align:center}
+  .titre{display:inline-block;padding:10px 22px;border-radius:14px;background:var(--lav);color:var(--violet-dark);font-weight:600;font-size:18px;margin:4px auto 14px}
+  .scene{position:relative;display:flex;justify-content:center;align-items:center}
+  .scene .spk{position:absolute;right:6%;width:46px;height:46px;border-radius:50%;background:#C4BAF4;display:grid;place-items:center}
+  .scene .spk svg{width:22px;height:22px;fill:#4A33B0}
+  .fr{font-size:28px;font-weight:700;margin:12px 0 4px;min-height:40px}
+  .es{font-size:16px;color:var(--gray);min-height:22px}
+  .chrono{height:6px;border-radius:99px;background:var(--lav);overflow:hidden;width:60%;margin:14px auto 0}
+  .chrono i{display:block;height:100%;width:100%;background:var(--violet);transform-origin:left}
+  .pret{margin-top:16px}
+  /* zone de réponse */
+  .rep{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-height:58px;margin:18px 0 6px;padding:8px 10px;border-radius:14px;background:#EFEDF5;text-align:left}
+  .rep .fixe{padding:8px 12px;border-radius:10px;background:#fff;font-weight:600;font-size:18px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .rep .lettres{display:flex;flex-wrap:wrap;gap:2px;font-size:24px;font-weight:600;letter-spacing:.02em}
+  .rep .lettres button{min-width:18px;padding:2px 1px;font-size:24px;font-weight:600;color:var(--ink)}
+  .rep .curseur{width:2px;height:28px;background:var(--violet);animation:clign 1s steps(1) infinite;margin-left:2px}
+  .rep .mot{padding:8px 12px;border-radius:10px;background:#fff;font-size:17px;font-weight:600;box-shadow:0 2px 0 #DDD8EC}
+  .rep .vide{color:#A9A4BC;font-size:14px;padding-left:4px}
+  .tuiles{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px}
+  .tuile{min-width:46px;height:50px;padding:0 12px;border-radius:12px;background:#fff;border:1.5px solid #E3E0EC;box-shadow:0 3px 0 #E3E0EC;font-size:20px;font-weight:600;transition:transform .08s}
+  .tuile.mot{font-size:17px}
+  .tuile:active{transform:translateY(2px);box-shadow:0 1px 0 #E3E0EC}
+  .tuile.prise{background:#EFEDF5;border-color:transparent;box-shadow:none;color:transparent;pointer-events:none}   /* place gardée : les tuiles ne bougent pas */
+  .revoir{margin-top:16px;font-size:14px;font-weight:600;color:#A9A4BC}
+  /* panneau de résultat (comme Escucha y repite) */
+  .sheet{position:fixed;left:0;right:0;bottom:0;padding:22px 20px max(22px,env(safe-area-inset-bottom));border-radius:22px 22px 0 0;text-align:center;transform:translateY(110%);transition:transform .3s ease-out;z-index:5}
+  .sheet.on{transform:none}
+  .sheet .in{max-width:720px;margin:0 auto}
+  .sheet .tt{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}
+  .sheet .tt img{width:52px;margin-top:-34px}
+  .sheet h3{margin:0;font-size:24px;font-weight:700}
+  .sheet p{margin:0 0 14px;font-size:16px;line-height:1.6}
+  .sheet p b.err{color:var(--red);text-decoration:underline}
+  .sheet .okb{margin-top:6px}
+  .sheet.bien{background:#D3EFB8}.sheet.bien h3{color:#3E8E1F}.sheet.bien .okb{background:#7BC94A;box-shadow:0 4px 0 #5DA532}
+  .sheet.presque{background:#FFE7C2}.sheet.presque h3{color:#A8620A}.sheet.presque .okb{background:#E8962E;box-shadow:0 4px 0 #C27716}
+  @keyframes clign{50%{opacity:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../">‹</a><div class="prog" style="flex:1;margin:0"><i id="bar"></i></div><a class="tag" href="../grille.html?act=Memoriza%20y%20escribe" style="text-decoration:none">📋</a></div>
+  <div class="card" style="margin-bottom:10px"><select id="theme" style="width:100%"></select>
+    <div class="modes" id="modes"><button data-m="tout" class="on">Todo</button><button data-m="mot">Palabras</button><button data-m="phrase">Frases</button></div></div>
+  <div id="zone"></div>
+</div>
+<div class="sheet" id="sheet"><div class="in"><div class="tt"><img id="sh-evo" src="/img/ui/evo-happy.png" alt=""><h3 id="sh-t"></h3></div><p id="sh-p"></p><button class="okb" id="sh-ok">Continuar</button></div></div>
+<script src="../lab.js"></script>
+<script>
+// Memoriza y escribe (étape Pratique) : on regarde le mot (ou la phrase) quelques secondes, il disparaît, on le réécrit.
+// - un mot   → tuiles de lettres (orthographe), l'article (Un, Une, Le, L'…) est déjà placé
+// - une phrase → tuiles de mots (ordre des mots)
+// Des tuiles pièges ciblent les erreurs typiques d'un hispanophone (j pour g, é pour e, le / la, « no »…).
+const N = 8; let demarre = false, theme = "", mode = "tout", list = [], k = 0, score = 0, q = null, fini = false, tChrono = null;
+const $ = id => document.getElementById(id);
+const ARTICLES = ["un", "une", "le", "la", "les", "l'", "des", "du"];
+
+// Découpe une entrée du guide : article + mot (mode mot) ou liste de mots (mode phrase)
+function decouper(p){
+  const fin = (p.fr.match(/\s*[?!.]+$/) || [""])[0];               // ponctuation finale, affichée telle quelle
+  const corps = p.fr.slice(0, p.fr.length - fin.length).trim();
+  let art = "", reste = corps;
+  const m = corps.match(/^(un|une|le|la|les|des|du)\s+(.+)$/i) || corps.match(/^(l')(.+)$/i);
+  if(m){ art = m[1]; reste = m[2]; }
+  if(!/\s/.test(reste)) return { type: "mot", art, mot: reste, fin, p };
+  // la majuscule du 1er mot trahirait sa place : les tuiles sont en minuscules
+  const mots = corps.split(/\s+/); mots[0] = mots[0][0].toLowerCase() + mots[0].slice(1);
+  return { type: "phrase", mots, fin, p };
+}
+function utilisable(p){
+  if(!p.fr || !p.es || !p.icon || /…|\.\.\.|\d/.test(p.fr)) return false;
+  const d = decouper(p);
+  return d.type === "mot" ? d.mot.length >= 2 && d.mot.length <= 12 : d.mots.length <= 8;
+}
+
+// Lettres pièges pour un mot (erreurs fréquentes d'un hispanophone)
+function piegesLettres(mot){
+  const m = mot.toLowerCase(), c = [];
+  if(/g[eiy]/.test(m)) c.push("j");
+  if(/[cç]/.test(m)) c.push(m.includes("ç") ? "c" : "s");
+  if(/v/.test(m)) c.push("b"); else if(/b/.test(m)) c.push("v");
+  if(/é|è|ê/.test(m)) c.push("e"); else if(/e/.test(m)) c.push("é");
+  if(/ou/.test(m)) c.push("u");
+  if(/qu/.test(m)) c.push("k");
+  if(/(eau|au)/.test(m)) c.push("o");
+  const simple = [...m].find((x, i) => "flstnmpr".includes(x) && m[i+1] !== x && m[i-1] !== x);
+  if(simple) c.push(simple);                                          // une consonne doublée par erreur (girafe → giraffe)
+  const uniq = [...new Set(c)];
+  while(uniq.length < 2){ const r = "aeiourstln"[Math.floor(Math.random() * 10)]; if(!uniq.includes(r)) uniq.push(r); }
+  return Lab.shuffle(uniq).slice(0, 3);
+}
+// Mots pièges pour une phrase
+function piegesMots(mots){
+  const bas = mots.map(w => w.toLowerCase()), c = [];
+  const paires = { le: "la", la: "le", un: "une", une: "un", les: "des", est: "et", et: "est", à: "a", a: "à", sont: "son", mon: "ma", ma: "mon" };
+  bas.forEach(w => { if(paires[w]) c.push(paires[w]); });
+  if(bas.includes("pas") || bas.includes("ne")) c.push("no");                   // l'espagnol n'a que « no »
+  if(bas.some(w => w === "j'ai")) c.push("suis");                               // calque de « tengo / estoy »
+  const uniq = [...new Set(c)].filter(w => !bas.includes(w));
+  return Lab.shuffle(uniq).slice(0, mots.length > 3 ? 2 : 1);
+}
+
+function start(){
+  demarre = true;
+  let pool = Lab.phrases(theme).filter(utilisable);
+  if(pool.length < 3) pool = Lab.phrases("").filter(utilisable);
+  if(mode !== "tout"){ const f = pool.filter(p => decouper(p).type === mode); if(f.length >= 3) pool = f; }
+  list = pool.slice(0, N); k = 0; score = 0; ask();
+}
+
+// 1. Mémoriser : le mot est visible quelques secondes (selon sa longueur), ou jusqu'à « Ya lo tengo »
+function ask(){
+  fermer(); clearTimeout(tChrono); fini = false;
+  $("bar").style.width = (k / list.length * 100) + "%";
+  if(k >= list.length){
+    $("zone").innerHTML = `<div class="card end"><img src="/img/ui/evo.png" alt=""><h2>${score} / ${list.length}</h2><p class="muted">${score === list.length ? "¡Perfecto!" : "¡Sigue practicando!"}</p><button class="btn" onclick="start()">Otra vez</button></div>`;
+    return;
+  }
+  const p = list[k]; q = decouper(p);
+  const duree = q.type === "mot" ? 3000 : Math.min(3000 + q.mots.length * 500, 6500);
+  $("zone").innerHTML = `<div class="q"><div class="titre">Memoriza</div>
+      <div class="scene">${Lab.icon(p, 140)}<button class="spk" id="spk" aria-label="Escuchar">${Lab.SPK}</button></div>
+      <div class="fr" id="fr">${p.fr}</div><div class="es">${p.es}</div>
+      <div class="chrono"><i id="chrono"></i></div>
+      <button class="btn ghost pret" id="pret">Ya lo tengo</button></div>`;
+  $("spk").onclick = () => Lab.play(p);
+  $("pret").onclick = ecrire;
+  Lab.play(p);
+  const c = $("chrono"); c.style.transition = `transform ${duree}ms linear`;
+  requestAnimationFrame(() => requestAnimationFrame(() => c.style.transform = "scaleX(0)"));
+  tChrono = setTimeout(ecrire, duree);
+}
+
+// 2. Écrire : le mot a disparu, on le reconstruit avec les tuiles
+let pris = [];   // indices des tuiles placées, dans l'ordre
+let tuiles = [];
+function ecrire(){
+  clearTimeout(tChrono);
+  const p = list[k];
+  if(q.type === "mot"){
+    const lettres = [...q.mot.toLowerCase()];
+    tuiles = Lab.shuffle([...lettres, ...piegesLettres(q.mot)]);
+  } else tuiles = Lab.shuffle([...q.mots, ...piegesMots(q.mots)]);
+  pris = [];
+  $("zone").innerHTML = `<div class="q"><div class="titre">${q.type === "mot" ? "Escribe la palabra" : "Escribe la frase"}</div>
+      <div class="scene">${Lab.icon(p, 110)}<button class="spk" id="spk" aria-label="Escuchar">${Lab.SPK}</button></div>
+      <div class="es" style="margin-top:8px">${p.es}</div>
+      <div class="rep" id="rep"></div>
+      <div class="tuiles" id="tuiles">${tuiles.map((t, i) => `<button class="tuile ${q.type === "phrase" ? "mot" : ""}" data-i="${i}">${t}</button>`).join("")}</div>
+      <button class="okb" id="ok" disabled>Comprobar</button>
+      <button class="revoir" id="revoir">Ver otra vez</button></div>`;
+  $("spk").onclick = () => Lab.play(p);
+  $("tuiles").onclick = e => { const b = e.target.closest(".tuile"); if(!b || fini || b.classList.contains("prise")) return; pris.push(+b.dataset.i); majRep(); };
+  $("rep").onclick = e => { const b = e.target.closest("[data-j]"); if(!b || fini) return; pris.splice(+b.dataset.j, 1); majRep(); };
+  $("ok").onclick = verifier;
+  $("revoir").onclick = revoir;
+  majRep();
+}
+function majRep(){
+  const html = pris.map((i, j) => q.type === "mot" ? `<button data-j="${j}">${tuiles[i]}</button>` : `<button class="mot" data-j="${j}">${tuiles[i]}</button>`).join("");
+  if(q.type === "mot") $("rep").innerHTML = (q.art ? `<span class="fixe">${q.art}</span>` : "") + `<span class="lettres">${html}</span><span class="curseur"></span>`;
+  else $("rep").innerHTML = html || `<span class="vide">Toca las palabras en orden</span>`;
+  document.querySelectorAll(".tuile").forEach(b => b.classList.toggle("prise", pris.includes(+b.dataset.i)));
+  $("ok").disabled = !pris.length;
+}
+// « Ver otra vez » : le mot réapparaît 1,5 s, sans pénalité
+function revoir(){
+  const r = $("rep"), garde = r.innerHTML;
+  r.innerHTML = `<span style="font-size:22px;font-weight:700;margin:auto">${list[k].fr}</span>`; Lab.play(list[k]);
+  setTimeout(() => { if($("rep") === r) majRep(); }, 1500);
+}
+
+// 3. Vérifier : on montre ce qui a été écrit, avec les erreurs en rouge
+function verifier(){
+  fini = true;
+  const p = list[k];
+  let ecrit, attendu, html;
+  if(q.type === "mot"){
+    ecrit = pris.map(i => tuiles[i]).join(""); attendu = q.mot.toLowerCase();
+    html = diff([...ecrit], [...attendu]).join("");
+    ecrit = (q.art ? q.art + (q.art.endsWith("'") ? "" : " ") : "") + ecrit;
+  } else {
+    const e = pris.map(i => tuiles[i]), a = q.mots;
+    html = diff(e, a, true).join(" "); attendu = a.join(" "); ecrit = e.join(" ");
+    ecrit = ecrit;
+  }
+  const ok = q.type === "mot" ? pris.map(i => tuiles[i]).join("") === q.mot.toLowerCase() : pris.map(i => tuiles[i]).join(" ") === q.mots.join(" ");
+  if(ok){ score++; ouvrir("bien", "¡Excelente!", "« " + p.fr + " »"); }
+  else{
+    const avant = q.type === "mot" && q.art ? q.art + (q.art.endsWith("'") ? "" : " ") : "";
+    ouvrir("presque", "¡Casi!", `Escribiste: « ${avant}${html} »<br>Se escribe: « ${p.fr} »`);
+  }
+  Lab.play(p);
+}
+// Différence élément par élément (plus longue sous-suite commune) : ce qui n'est pas à sa place est en rouge
+function diff(e, a, mots){
+  const n = e.length, m = a.length, L = Array.from({ length: n + 1 }, () => Array(m + 1).fill(0));
+  const eg = (x, y) => mots ? x.toLowerCase() === y.toLowerCase() : x === y;
+  for(let i = n - 1; i >= 0; i--) for(let j = m - 1; j >= 0; j--) L[i][j] = eg(e[i], a[j]) ? L[i+1][j+1] + 1 : Math.max(L[i+1][j], L[i][j+1]);
+  const out = []; let i = 0, j = 0;
+  while(i < n){
+    if(j < m && eg(e[i], a[j])){ out.push(esc(e[i])); i++; j++; }
+    else if(j < m && L[i+1][j] < L[i][j+1]) j++;
+    else { out.push(`<b class="err">${esc(e[i])}</b>`); i++; }
+  }
+  return out.length ? out : ["…"];
+}
+const esc = s => s.replace(/[<>&]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]));
+
+function ouvrir(type, titre, html){
+  $("sh-evo").src = type === "bien" ? "/img/ui/evo-happy.png" : "/img/ui/evo.png";
+  $("sheet").className = "sheet " + type + " on";
+  $("sh-t").textContent = titre; $("sh-p").innerHTML = html;
+  $("sh-ok").onclick = () => { k++; ask(); };
+}
+function fermer(){ $("sheet").className = "sheet"; }
+
+$("modes").onclick = e => { const b = e.target.closest("button"); if(!b) return; mode = b.dataset.m;
+  document.querySelectorAll("#modes button").forEach(x => x.classList.toggle("on", x === b)); (demarre || Lab.unlocked()) ? start() : accueil(); };
+// Premier écran : un toucher pour commencer (débloque l'audio sur iPhone)
+function accueil(){
+  $("zone").innerHTML = `<div class="card end"><img src="/img/ui/evo.png" alt=""><h2>Memoriza y escribe</h2>
+    <p class="muted">Mira la palabra unos segundos. Luego desaparece: ¡escríbela!</p><button class="btn" id="go">Empezar</button></div>`;
+  $("go").onclick = start;
+}
+Lab.load().then(() => { Lab.themeSelect($("theme"), v => { theme = v; (demarre || Lab.unlocked()) ? start() : accueil(); }); accueil(); });
+</script>
+</body>
+</html>
