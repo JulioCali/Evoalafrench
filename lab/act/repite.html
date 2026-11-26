@@ -71,7 +71,7 @@
 // Escucha y repite (étape Découverte) : un mot ou une phrase, avec son illustration et sa traduction.
 // 1. On écoute (« Escucha »)  2. le bouton « Repite » apparaît, on répète au micro  3. « ¡Excelente! » et on continue.
 // Validation mot par mot : tous les mots doivent être dits (les mots longs peuvent être approximatifs). Après 2 essais, on passe quand même.
-const N = 8; let theme = "", list = [], k = 0, essais = 0, rec = null;
+const N = 8; let theme = "", list = [], k = 0, essais = 0;
 const $ = id => document.getElementById(id);
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const MIC = '<svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11z"/></svg>';
@@ -138,27 +138,18 @@ function diag(m){ journal.push(m); const d = $("diag"); if(d) d.textContent = "�
 // Le micro de l'iPhone met près d'une seconde à s'ouvrir : on affiche « Un momento… », puis « ¡Habla ahora! » en rouge
 // quand il écoute vraiment. On s'arrête dès que toute la phrase est reconnue, après 1,3 s de silence, après 8 s,
 // ou quand l'apprenant touche de nouveau le bouton.
-let entendu = "", alts = [], fini = false, tSilence = null, tMax = null, tPrep = null, debut = 0, voix = false, relance = 0;
-function repeter(){
-  const p = list[k];
-  if(rec){ diag("stop"); terminer(); return; }     // 2e appui : on arrête et on évalue ce qui a été dit
-  if(!SR){ // navigateur sans reconnaissance vocale : pas de correction possible
-    Lab.toast("Sin reconocimiento de voz en este navegador");
-    return ouvrir("bien", "¡Excelente!", "« " + p.fr + " »");
-  }
-  Lab.stop();                                       // l'audio du guide ne doit pas se mélanger au micro
-  entendu = ""; alts = []; fini = false; voix = false; relance = 0; journal = []; $("bulle").textContent = "";
-  lancer();
-}
-function lancer(){
-  rec = new SR(); rec.lang = "fr-FR"; rec.continuous = false; rec.interimResults = true; rec.maxAlternatives = 3;
-  debut = Date.now(); etat("prep"); diag(relance ? "relance" : "start");
-  const ecoute = () => { clearTimeout(tPrep); if(!fini && !voix) etat("ecoute"); };
-  rec.onstart = () => diag("ok");
-  rec.onaudiostart = () => { diag("audio"); ecoute(); };
-  tPrep = setTimeout(ecoute, 1200);                 // certains navigateurs ne signalent pas l'ouverture du micro
-  rec.onspeechstart = () => { diag("voz"); voix = true; etat("voix"); };
-  rec.onresult = e => {
+// Un seul objet de reconnaissance pour toute l'activité, réutilisé à chaque mot et refermé proprement (stop, pas abort) :
+// sur iPhone, en créer un nouveau ou couper le précédent brutalement empêchait le micro de marcher après le 1er mot.
+let R = null, actif = false, enCours = false;
+let entendu = "", alts = [], fini = true, tSilence = null, tMax = null, tPrep = null, debut = 0, voix = false, relance = 0;
+function reco(){
+  if(R) return R;
+  R = new SR(); R.lang = "fr-FR"; R.continuous = false; R.interimResults = true; R.maxAlternatives = 3;  // continuous=true ne marche pas sur iPhone
+  R.onstart = () => { actif = true; if(enCours) diag("ok"); };
+  R.onaudiostart = () => { if(!enCours) return; diag("audio"); ecoute(); };
+  R.onspeechstart = () => { if(!enCours) return; diag("voz"); voix = true; etat("voix"); };
+  R.onresult = e => {
+    if(!enCours) return;
     if(!voix){ voix = true; etat("voix"); }
     // texte entendu jusqu'ici (meilleure version de chaque morceau) + variantes du dernier morceau
     entendu = [...e.results].map(r => r[0].transcript).join(" ").replace(/\s+/g, " ").trim();
@@ -168,22 +159,50 @@ function lancer(){
     if(meilleur().ok){ diag("frase completa"); return terminer(); }   // phrase complète : on n'attend pas
     clearTimeout(tSilence); tSilence = setTimeout(() => { diag("silencio"); terminer(); }, 1300);
   };
-  rec.onerror = e => {
+  R.onerror = e => {
+    if(!enCours) return;
     diag("error: " + e.error);
     if(e.error === "no-speech" || e.error === "aborted") return;
     fini = true; arreter();
     if(e.error === "not-allowed" || e.error === "service-not-allowed") etat("pret", "Permite el micrófono y el dictado<small>Ajustes › General › Teclado › Dictado</small>");
     else etat("pret", "El micrófono no respondió<small>Toca para intentar otra vez</small>");
   };
-  rec.onend = () => {
+  R.onend = () => {
+    actif = false;
+    if(!enCours) return;
     diag("fin");
     if(fini) return;
     // l'iPhone ferme parfois le micro aussitôt ouvert, sans rien entendre : on le relance une fois
-    if(!entendu && !voix && Date.now() - debut < 1500 && relance < 1){ relance++; rec = null; try{ return lancer(); }catch(e){} }
+    if(!entendu && !voix && Date.now() - debut < 1500 && relance < 1){ relance++; return lancer(); }
     terminer();
   };
+  return R;
+}
+const ecoute = () => { clearTimeout(tPrep); if(!fini && !voix) etat("ecoute"); };
+
+function repeter(){
+  const p = list[k];
+  if(enCours && !fini){ diag("stop"); terminer(); return; }   // 2e appui : on arrête et on évalue ce qui a été dit
+  if(!SR){ // navigateur sans reconnaissance vocale : pas de correction possible
+    Lab.toast("Sin reconocimiento de voz en este navegador");
+    return ouvrir("bien", "¡Excelente!", "« " + p.fr + " »");
+  }
+  Lab.stop();                                       // l'audio du guide ne doit pas se mélanger au micro
+  entendu = ""; alts = []; voix = false; relance = 0; journal = []; $("bulle").textContent = "";
+  lancer();
+}
+function lancer(){
+  const r = reco();
+  fini = false; enCours = true; debut = Date.now(); etat("prep"); diag(relance ? "relance" : "start");
+  clearTimeout(tPrep); tPrep = setTimeout(ecoute, 1200);        // certains navigateurs ne signalent pas l'ouverture du micro
   clearTimeout(tMax); tMax = setTimeout(() => { diag("8 s"); terminer(); }, 8000);
-  try{ rec.start(); }catch(e){ diag("start falló"); fini = true; arreter(); etat("pret", "El micrófono no respondió<small>Toca para intentar otra vez</small>"); }
+  try{ r.start(); }
+  catch(e){
+    // encore ouvert (session précédente pas tout à fait finie) : on le ferme et on réessaie une fois
+    diag("ocupado");
+    try{ r.abort(); }catch(_){}
+    setTimeout(() => { try{ r.start(); }catch(_){ diag("start falló"); fini = true; arreter(); etat("pret", "El micrófono no respondió<small>Toca para intentar otra vez</small>"); } }, 400);
+  }
 }
 // Évaluation mot par mot : chaque mot de la phrase doit avoir été dit, dans l'ordre.
 // Un mot long peut être approximatif (prononciation), un mot court doit être exact (« pas », « ne », « le »… changent le sens).
@@ -225,7 +244,8 @@ function terminer(){
 }
 function arreter(){
   clearTimeout(tSilence); clearTimeout(tMax); clearTimeout(tPrep);
-  if(rec){ const r = rec; rec = null; try{ r.onend = null; r.onresult = null; r.abort(); }catch(e){} }
+  enCours = false;
+  if(R && actif){ try{ R.stop(); }catch(e){} }      // fermeture propre : l'iPhone pourra rouvrir le micro au mot suivant
   etat("pret");
 }
 
