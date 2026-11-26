@@ -16,13 +16,32 @@
   .q h2{margin:0;font-size:30px;font-weight:700}
   .q .es{margin-top:4px;font-size:18px;color:var(--gray)}
   .bas{margin-top:34px;display:flex;flex-direction:column;align-items:center;gap:22px;min-height:120px}
-  .mic{display:inline-flex;align-items:center;gap:14px;height:62px;padding:0 30px 0 22px;border-radius:16px;background:#9C93E8;color:#fff;font-weight:600;font-size:20px;box-shadow:0 4px 0 #7E74D6;transition:transform .1s}
-  .mic:active{transform:translateY(3px);box-shadow:0 1px 0 #7E74D6}
-  .mic svg{width:26px;height:26px;fill:#fff}
-  .mic.on{background:var(--violet);box-shadow:0 4px 0 var(--violet-dark);animation:pulse 1s infinite}
-  .mic.apparait{animation:monte .35s ease-out}
+  /* Micro : un gros bouton rond qui change d'état (prêt → un moment → parle → je t'écoute) */
+  .micbox{width:100%;display:flex;flex-direction:column;align-items:center;gap:12px;animation:monte .35s ease-out}
+  .rond{position:relative;isolation:isolate;width:88px;height:88px;border-radius:50%;background:var(--violet);display:grid;place-items:center;box-shadow:0 5px 0 var(--violet-dark);transition:background .2s,transform .1s}
+  .rond:active{transform:translateY(3px);box-shadow:0 2px 0 var(--violet-dark)}
+  .rond svg{width:38px;height:38px;fill:#fff}
+  .rond .barres{display:none;gap:5px;align-items:center;height:38px}
+  .rond .barres i{display:block;width:6px;height:10px;border-radius:3px;background:#fff}
+  .etat{font-size:17px;font-weight:600;color:var(--violet-dark);min-height:24px;text-align:center}
+  .etat small{display:block;font-size:13px;font-weight:500;color:var(--gray)}
+  .bulle{max-width:92%;min-height:44px;font-size:16px;color:var(--ink);border-radius:14px;padding:10px 14px;line-height:1.5}   /* place réservée : rien ne bouge quand le texte arrive */
+  .bulle:not(:empty){background:#fff;box-shadow:0 2px 10px rgba(60,40,140,.08)}
+  .micbox[data-etat="prep"] .rond{background:#B8AEF0;box-shadow:0 5px 0 #9C90E3}
+  .micbox[data-etat="prep"] .rond::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:3px solid transparent;border-top-color:var(--violet);animation:tourne .8s linear infinite}
+  .micbox[data-etat="ecoute"] .rond,.micbox[data-etat="voix"] .rond{background:#E5484D;box-shadow:0 5px 0 #B8323A}
+  .micbox[data-etat="ecoute"] .rond::before,.micbox[data-etat="voix"] .rond::before{content:"";position:absolute;inset:0;border-radius:50%;background:#E5484D;animation:onde 1.4s ease-out infinite;z-index:-1}
+  .micbox[data-etat="ecoute"] .rond svg,.micbox[data-etat="voix"] .rond svg{display:none}
+  .micbox[data-etat="ecoute"] .rond .barres,.micbox[data-etat="voix"] .rond .barres{display:flex}
+  .micbox[data-etat="ecoute"] .barres i{animation:barre 1.2s ease-in-out infinite}
+  .micbox[data-etat="voix"] .barres i{animation:barre .45s ease-in-out infinite}
+  .barres i:nth-child(2){animation-delay:.15s!important}.barres i:nth-child(3){animation-delay:.3s!important}.barres i:nth-child(4){animation-delay:.45s!important}
+  .micbox[data-etat="ecoute"] .etat,.micbox[data-etat="voix"] .etat{color:#C4313A}
+  .diag{font:11px/1.4 ui-monospace,Menlo,monospace;color:#B3AEC4;text-align:center;min-height:15px}
+  @keyframes onde{from{transform:scale(1);opacity:.45}to{transform:scale(1.7);opacity:0}}
+  @keyframes barre{0%,100%{height:8px}50%{height:34px}}
+  @keyframes tourne{to{transform:rotate(360deg)}}
   .lien{font-size:14px;font-weight:600;color:#B3AEC4}
-  .oui{font-size:13px;color:var(--gray);min-height:18px}
   /* panneau de résultat, en bas comme dans l'appli */
   .sheet{position:fixed;left:0;right:0;bottom:0;padding:22px 20px max(22px,env(safe-area-inset-bottom));border-radius:22px 22px 0 0;text-align:center;transform:translateY(110%);transition:transform .3s ease-out;z-index:5}
   .sheet.on{transform:none}
@@ -75,7 +94,7 @@ function ask(){
   $("zone").innerHTML = `<div class="q">
       <button class="esc" id="esc"><span class="c">${Lab.SPK}</span>Escucha</button>
       ${Lab.icon(p, 150)}<h2>${p.fr}</h2><div class="es">${p.es}</div>
-      <div class="bas" id="bas"><span class="oui" id="oui"></span><button class="lien" id="noesc">No puedo escuchar</button></div></div>`;
+      <div class="bas" id="bas"><button class="lien" id="noesc">No puedo escuchar</button></div></div>`;
   $("esc").onclick = () => ecouter(p);
   $("noesc").onclick = montrerMic;
   ecouter(p);
@@ -90,44 +109,81 @@ async function ecouter(p){
 
 function montrerMic(){
   if($("mic")) return;
-  $("bas").innerHTML = `<span class="oui" id="oui"></span><button class="mic apparait" id="mic">${MIC}Repite</button><button class="lien" id="noparle">No puedo hablar</button>`;
+  $("bas").innerHTML = `<div class="micbox" id="micbox" data-etat="pret"><div class="bulle" id="bulle"></div>
+      <button class="rond" id="mic" aria-label="Hablar">${MIC}<span class="barres"><i></i><i></i><i></i><i></i></span></button>
+      <div class="etat" id="etat"></div></div>
+    <button class="lien" id="noparle">No puedo hablar</button><div class="diag" id="diag"></div>`;
+  etat("pret");
   $("mic").onclick = repeter;
   $("noparle").onclick = () => { arreter(); ouvrir("bien", "¡Sigamos!", "Puedes repetir en voz baja, también cuenta."); };
 }
 
+// États visibles du micro
+const ETATS = {
+  pret:   "Toca y repite",
+  prep:   "Un momento…",
+  ecoute: "¡Habla ahora!<small>Toca para terminar</small>",
+  voix:   "Te escucho…<small>Toca para terminar</small>",
+  fin:    "Un momento…"
+};
+function etat(e, msg){
+  const box = $("micbox"); if(!box) return;
+  box.dataset.etat = e; $("etat").innerHTML = msg || ETATS[e];
+}
+// Journal discret des événements du micro (labo uniquement), pour comprendre un blocage sur un téléphone
+let journal = [];
+function diag(m){ journal.push(m); const d = $("diag"); if(d) d.textContent = "🎤 " + journal.join(" · "); }
+
 // 2. Répéter au micro
-// Écoute d'une phrase (le téléphone s'arrête seul quand on se tait), avec résultats intermédiaires : on s'arrête dès que
-// toute la phrase est reconnue, après 1,3 s de silence, après 7 s au maximum, ou quand l'apprenant touche de nouveau le bouton.
-let entendu = "", alts = [], fini = false, tSilence = null, tMax = null;
+// Le micro de l'iPhone met près d'une seconde à s'ouvrir : on affiche « Un momento… », puis « ¡Habla ahora! » en rouge
+// quand il écoute vraiment. On s'arrête dès que toute la phrase est reconnue, après 1,3 s de silence, après 8 s,
+// ou quand l'apprenant touche de nouveau le bouton.
+let entendu = "", alts = [], fini = false, tSilence = null, tMax = null, tPrep = null, debut = 0, voix = false, relance = 0;
 function repeter(){
-  const p = list[k], mic = $("mic");
-  if(rec){ terminer(); return; }                 // 2e appui : on arrête et on évalue ce qui a été dit
+  const p = list[k];
+  if(rec){ diag("stop"); terminer(); return; }     // 2e appui : on arrête et on évalue ce qui a été dit
   if(!SR){ // navigateur sans reconnaissance vocale : pas de correction possible
     Lab.toast("Sin reconocimiento de voz en este navegador");
     return ouvrir("bien", "¡Excelente!", "« " + p.fr + " »");
   }
-  Lab.stop();                                     // l'audio du guide ne doit pas se mélanger au micro
-  entendu = ""; alts = []; fini = false;
-  rec = new SR(); rec.lang = "fr-FR"; rec.continuous = false; rec.interimResults = true; rec.maxAlternatives = 3;   // continuous=true ne marche pas sur iPhone
-  mic.classList.add("on"); mic.lastChild.textContent = "Te escucho…"; $("oui").textContent = "Habla ahora…";
+  Lab.stop();                                       // l'audio du guide ne doit pas se mélanger au micro
+  entendu = ""; alts = []; fini = false; voix = false; relance = 0; journal = []; $("bulle").textContent = "";
+  lancer();
+}
+function lancer(){
+  rec = new SR(); rec.lang = "fr-FR"; rec.continuous = false; rec.interimResults = true; rec.maxAlternatives = 3;
+  debut = Date.now(); etat("prep"); diag(relance ? "relance" : "start");
+  const ecoute = () => { clearTimeout(tPrep); if(!fini && !voix) etat("ecoute"); };
+  rec.onstart = () => diag("ok");
+  rec.onaudiostart = () => { diag("audio"); ecoute(); };
+  tPrep = setTimeout(ecoute, 1200);                 // certains navigateurs ne signalent pas l'ouverture du micro
+  rec.onspeechstart = () => { diag("voz"); voix = true; etat("voix"); };
   rec.onresult = e => {
+    if(!voix){ voix = true; etat("voix"); }
     // texte entendu jusqu'ici (meilleure version de chaque morceau) + variantes du dernier morceau
     entendu = [...e.results].map(r => r[0].transcript).join(" ").replace(/\s+/g, " ").trim();
-    const der = e.results[e.results.length - 1], debut = [...e.results].slice(0, -1).map(r => r[0].transcript).join(" ");
-    alts = [...der].map(x => (debut + " " + x.transcript).trim());
-    $("oui").textContent = "« " + entendu + " »";
-    if(meilleur().ok) return terminer();                    // phrase complète : on n'attend pas
-    clearTimeout(tSilence); tSilence = setTimeout(terminer, 1300);   // incomplète : on attend la fin
+    const der = e.results[e.results.length - 1], avant = [...e.results].slice(0, -1).map(r => r[0].transcript).join(" ");
+    alts = [...der].map(x => (avant + " " + x.transcript).trim());
+    $("bulle").textContent = entendu;
+    if(meilleur().ok){ diag("frase completa"); return terminer(); }   // phrase complète : on n'attend pas
+    clearTimeout(tSilence); tSilence = setTimeout(() => { diag("silencio"); terminer(); }, 1300);
   };
   rec.onerror = e => {
+    diag("error: " + e.error);
     if(e.error === "no-speech" || e.error === "aborted") return;
     fini = true; arreter();
-    if(e.error === "not-allowed" || e.error === "service-not-allowed") Lab.toast("Permite el micrófono (y el dictado) para repetir");
-    else Lab.toast("El micrófono no respondió, inténtalo otra vez");
+    if(e.error === "not-allowed" || e.error === "service-not-allowed") etat("pret", "Permite el micrófono y el dictado<small>Ajustes › General › Teclado › Dictado</small>");
+    else etat("pret", "El micrófono no respondió<small>Toca para intentar otra vez</small>");
   };
-  rec.onend = () => { if(!fini) terminer(); };
-  tMax = setTimeout(terminer, 7000);
-  try{ rec.start(); }catch(e){ fini = true; arreter(); Lab.toast("El micrófono no respondió, inténtalo otra vez"); }
+  rec.onend = () => {
+    diag("fin");
+    if(fini) return;
+    // l'iPhone ferme parfois le micro aussitôt ouvert, sans rien entendre : on le relance une fois
+    if(!entendu && !voix && Date.now() - debut < 1500 && relance < 1){ relance++; rec = null; try{ return lancer(); }catch(e){} }
+    terminer();
+  };
+  clearTimeout(tMax); tMax = setTimeout(() => { diag("8 s"); terminer(); }, 8000);
+  try{ rec.start(); }catch(e){ diag("start falló"); fini = true; arreter(); etat("pret", "El micrófono no respondió<small>Toca para intentar otra vez</small>"); }
 }
 // Évaluation mot par mot : chaque mot de la phrase doit avoir été dit, dans l'ordre.
 // Un mot long peut être approximatif (prononciation), un mot court doit être exact (« pas », « ne », « le »… changent le sens).
@@ -157,9 +213,8 @@ function meilleur(){
 function terminer(){
   if(fini) return; fini = true;
   const p = list[k], { ok, dit, manque } = meilleur();
-  arreter();
-  if(!dit){ $("oui").textContent = "No te oí. Toca « Repite » y habla."; return; }
-  $("oui").textContent = "";
+  arreter(); $("bulle") && ($("bulle").textContent = "");
+  if(!dit){ etat("pret", "No te oí<small>Toca, espera « ¡Habla ahora! » y repite</small>"); return; }
   if(ok) return ouvrir("bien", "¡Excelente!", "Dijiste: « " + dit + " »");
   // mots manquants affichés comme dans la phrase (« pas », « c'est »…)
   const motsFr = list[k].fr.replace(/[?!.,¿¡…]/g, "").split(/[\s-]+/).filter(Boolean);
@@ -169,9 +224,9 @@ function terminer(){
   ouvrir("presque", "¡Casi!", "Dijiste: « " + dit + " »\n" + falta, false, true);
 }
 function arreter(){
-  clearTimeout(tSilence); clearTimeout(tMax);
-  if(rec){ const r = rec; rec = null; try{ r.onend = null; r.abort(); }catch(e){} }
-  const mic = $("mic"); if(mic){ mic.classList.remove("on"); mic.lastChild.textContent = "Repite"; }
+  clearTimeout(tSilence); clearTimeout(tMax); clearTimeout(tPrep);
+  if(rec){ const r = rec; rec = null; try{ r.onend = null; r.onresult = null; r.abort(); }catch(e){} }
+  etat("pret");
 }
 
 // Ressemblance entre ce qui a été entendu et la phrase (0 à 1), sans accents ni ponctuation
