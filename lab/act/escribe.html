@@ -61,7 +61,7 @@
 // Memoriza y escribe (étape Pratique) : on regarde le mot (ou la phrase) quelques secondes, il disparaît, on le réécrit.
 // - un mot   → tuiles de lettres (orthographe), l'article (Un, Une, Le, L'…) est déjà placé
 // - une phrase → tuiles de mots (ordre des mots)
-// Des lettres pièges ciblent les erreurs typiques d'un hispanophone (j pour g, é pour e…). Pas de mots pièges pour le moment.
+// Pas de tuiles pièges pour le moment (piegesLettres / piegesMots restent disponibles pour les remettre).
 const N = 8; let demarre = false, theme = "", mode = "tout", list = [], k = 0, score = 0, q = null, fini = false, tChrono = null;
 const $ = id => document.getElementById(id);
 const ARTICLES = ["un", "une", "le", "la", "les", "l'", "des", "du"];
@@ -150,7 +150,7 @@ function ecrire(){
   const p = list[k];
   if(q.type === "mot"){
     const lettres = [...q.mot.toLowerCase()];
-    tuiles = Lab.shuffle([...lettres, ...piegesLettres(q.mot)]);
+    tuiles = Lab.shuffle([...lettres]);   // lettres pièges retirées pour le moment (piegesLettres reste disponible)
   } else tuiles = Lab.shuffle([...q.mots]);   // mots pièges retirés pour le moment (piegesMots reste disponible)
   pris = [];
   $("zone").innerHTML = `<div class="q"><div class="titre">${q.type === "mot" ? "Escribe la palabra" : "Escribe la frase"}</div>
