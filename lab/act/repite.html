@@ -175,7 +175,13 @@ function ouvrir(type, titre, texte, rejouer, reessayer){
 function fermer(){ $("sheet").className = "sheet"; }
 $("sh-alt").onclick = () => { k++; ask(); };
 
-Lab.load().then(() => { Lab.themeSelect($("theme"), v => { theme = v; start(); }); start(); });
+// Premier écran : un seul toucher pour commencer (il débloque l'audio sur iPhone), ensuite chaque mot se lance seul
+function accueil(){
+  $("zone").innerHTML = `<div class="card end"><img src="/img/ui/evo.png" alt=""><h2>Escucha y repite</h2>
+    <p class="muted">Escucha cada palabra y repítela en voz alta.</p><button class="btn" id="go">Empezar</button></div>`;
+  $("go").onclick = start;
+}
+Lab.load().then(() => { Lab.themeSelect($("theme"), v => { theme = v; Lab.unlocked() ? start() : accueil(); }); accueil(); });
 </script>
 </body>
 </html>
