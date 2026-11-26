@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><link rel="apple-touch-icon" href="../apple-touch-icon.png"><link rel="icon" href="../icon-192.png"><link rel="manifest" href="../manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Lab Evoala"><meta name="theme-color" content="#6C4FE0">
+<title>Escucha y repite · Laboratorio Evoala</title>
+<link rel="stylesheet" href="../lab.css">
+<style>
+  .wrap{padding-bottom:200px}
+  .q{text-align:center;padding:4px 0 0}
+  .esc{display:inline-flex;align-items:center;gap:12px;padding:10px 26px 10px 12px;border-radius:16px;background:var(--lav);color:var(--violet-dark);font-weight:600;font-size:18px;margin:6px auto 18px;transition:transform .1s}
+  .esc:active{transform:scale(.97)}
+  .esc .c{width:44px;height:44px;border-radius:50%;background:#C4BAF4;display:grid;place-items:center}
+  .esc .c svg{width:22px;height:22px;fill:#4A33B0}
+  .esc.on .c{animation:pulse 1s infinite}
+  .q .ic{margin:0 auto 14px}
+  .q h2{margin:0;font-size:30px;font-weight:700}
+  .q .es{margin-top:4px;font-size:18px;color:var(--gray)}
+  .bas{margin-top:34px;display:flex;flex-direction:column;align-items:center;gap:22px;min-height:120px}
+  .mic{display:inline-flex;align-items:center;gap:14px;height:62px;padding:0 30px 0 22px;border-radius:16px;background:#9C93E8;color:#fff;font-weight:600;font-size:20px;box-shadow:0 4px 0 #7E74D6;transition:transform .1s}
+  .mic:active{transform:translateY(3px);box-shadow:0 1px 0 #7E74D6}
+  .mic svg{width:26px;height:26px;fill:#fff}
+  .mic.on{background:var(--violet);box-shadow:0 4px 0 var(--violet-dark);animation:pulse 1s infinite}
+  .mic.apparait{animation:monte .35s ease-out}
+  .lien{font-size:14px;font-weight:600;color:#B3AEC4}
+  .oui{font-size:13px;color:var(--gray);min-height:18px}
+  /* panneau de résultat, en bas comme dans l'appli */
+  .sheet{position:fixed;left:0;right:0;bottom:0;padding:22px 20px max(22px,env(safe-area-inset-bottom));border-radius:22px 22px 0 0;text-align:center;transform:translateY(110%);transition:transform .3s ease-out;z-index:5}
+  .sheet.on{transform:none}
+  .sheet .in{max-width:720px;margin:0 auto}
+  .sheet h3{margin:0 0 6px;font-size:24px;font-weight:700}
+  .sheet p{margin:0 0 14px;font-size:15px;min-height:4px}
+  .sheet .okb{margin-top:6px}
+  .sheet.bien{background:#D3EFB8}.sheet.bien h3{color:#3E8E1F}.sheet.bien .okb{background:#7BC94A;box-shadow:0 4px 0 #5DA532}
+  .sheet.presque{background:#FFE7C2}.sheet.presque h3{color:#A8620A}.sheet.presque .okb{background:#E8962E;box-shadow:0 4px 0 #C27716}
+  .sheet .alt[hidden]{display:none}
+  .sheet .alt{display:block;width:100%;margin-top:12px;font-weight:600;color:#8A7F6A;font-size:14px}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(108,79,224,.35)}50%{box-shadow:0 0 0 12px rgba(108,79,224,0)}}
+  @keyframes monte{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../">‹</a><div class="prog" style="flex:1;margin:0"><i id="bar"></i></div><a class="tag" href="../grille.html?act=Escucha%20y%20repite" style="text-decoration:none">📋</a></div>
+  <div class="card row" style="margin-bottom:10px"><select id="theme"></select></div>
+  <div id="zone"></div>
+</div>
+<div class="sheet" id="sheet"><div class="in"><h3 id="sh-t"></h3><p id="sh-p"></p><button class="okb" id="sh-ok">Continuar</button><button class="alt" id="sh-alt" hidden>Continuar sin repetir</button></div></div>
+<script src="../lab.js"></script>
+<script>
+// Escucha y repite (étape Découverte) : un mot ou une phrase, avec son illustration et sa traduction.
+// 1. On écoute (« Escucha »)  2. le bouton « Repite » apparaît, on répète au micro  3. « ¡Excelente! » et on continue.
+// La reconnaissance vocale (fr-FR) est indulgente : c'est une découverte, pas un examen. Après 2 essais, on passe quand même.
+const N = 8; let theme = "", list = [], k = 0, essais = 0, rec = null;
+const $ = id => document.getElementById(id);
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const MIC = '<svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V21h2v-3.1A7 7 0 0 0 19 11z"/></svg>';
+
+function start(){
+  let pool = Lab.phrases(theme).filter(p => p.es && p.audio && p.icon);
+  if(pool.length < 3) pool = Lab.phrases("").filter(p => p.es && p.audio && p.icon);
+  list = pool.slice(0, N); k = 0; ask();
+}
+
+function ask(){
+  fermer(); arreter(); essais = 0;
+  $("bar").style.width = (k / list.length * 100) + "%";
+  if(k >= list.length){
+    $("zone").innerHTML = `<div class="card end"><img src="/img/ui/evo.png" alt=""><h2>¡Muy bien!</h2><p class="muted">Descubriste ${list.length} palabras y frases nuevas.</p><button class="btn" onclick="start()">Otra vez</button></div>`;
+    return;
+  }
+  const p = list[k];
+  $("zone").innerHTML = `<div class="q">
+      <button class="esc" id="esc"><span class="c">${Lab.SPK}</span>Escucha</button>
+      ${Lab.icon(p, 150)}<h2>${p.fr}</h2><div class="es">${p.es}</div>
+      <div class="bas" id="bas"><span class="oui" id="oui"></span><button class="lien" id="noesc">No puedo escuchar</button></div></div>`;
+  $("esc").onclick = () => ecouter(p);
+  $("noesc").onclick = montrerMic;
+  ecouter(p);
+}
+
+// 1. Écouter : le bouton « Repite » apparaît quand l'audio est fini (ou tout de suite s'il ne peut pas être joué)
+async function ecouter(p){
+  const b = $("esc"); b.classList.add("on");
+  await Lab.playToEnd(p);
+  if($("esc") === b){ b.classList.remove("on"); montrerMic(); }
+}
+
+function montrerMic(){
+  if($("mic")) return;
+  $("bas").innerHTML = `<span class="oui" id="oui"></span><button class="mic apparait" id="mic">${MIC}Repite</button><button class="lien" id="noparle">No puedo hablar</button>`;
+  $("mic").onclick = repeter;
+  $("noparle").onclick = () => { arreter(); ouvrir("bien", "¡Sigamos!", "Puedes repetir en voz baja, también cuenta."); };
+}
+
+// 2. Répéter au micro
+function repeter(){
+  const p = list[k], mic = $("mic");
+  if(rec){ arreter(); return; }
+  if(!SR){ // navigateur sans reconnaissance vocale : pas de correction possible
+    Lab.toast("Sin reconocimiento de voz en este navegador");
+    return ouvrir("bien", "¡Excelente!", "« " + p.fr + " »");
+  }
+  rec = new SR(); rec.lang = "fr-FR"; rec.interimResults = false; rec.maxAlternatives = 5;
+  mic.classList.add("on"); mic.lastChild.textContent = "Te escucho…"; $("oui").textContent = "";
+  let entendu = false;
+  rec.onresult = e => {
+    entendu = true;
+    const alts = [...e.results[0]].map(r => r.transcript);
+    const score = Math.max(...alts.map(t => ressemblance(t, p.fr)));
+    arreter();
+    if(score >= 0.6) return ouvrir("bien", "¡Excelente!", "« " + p.fr + " »");
+    essais++;
+    if(essais >= 2) return ouvrir("bien", "¡Bien intentado!", "Escucha otra vez: « " + p.fr + " »", true);
+    ouvrir("presque", "¡Casi!", "Entendí « " + alts[0] + " ». Escucha y repite otra vez.", false, true);
+  };
+  rec.onerror = e => {
+    arreter();
+    if(e.error === "not-allowed" || e.error === "service-not-allowed") Lab.toast("Permite el micrófono para repetir");
+    else if(e.error === "no-speech") $("oui").textContent = "No te oí. Toca « Repite » y habla.";
+    else Lab.toast("El micrófono no respondió, inténtalo otra vez");
+  };
+  rec.onend = () => { if(!entendu) arreter(); };
+  try{ rec.start(); }catch(e){ arreter(); }
+}
+function arreter(){
+  if(rec){ try{ rec.abort(); }catch(e){} rec = null; }
+  const mic = $("mic"); if(mic){ mic.classList.remove("on"); mic.lastChild.textContent = "Repite"; }
+}
+
+// Ressemblance entre ce qui a été entendu et la phrase (0 à 1), sans accents ni ponctuation
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
+function ressemblance(a, b){
+  a = norm(a); b = norm(b); if(!a || !b) return 0; if(a === b) return 1;
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for(let j = 1; j <= b.length; j++) d[0][j] = j;
+  for(let i = 1; i <= a.length; i++) for(let j = 1; j <= b.length; j++)
+    d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+  return 1 - d[a.length][b.length] / Math.max(a.length, b.length);
+}
+
+// 3. Panneau du bas
+function ouvrir(type, titre, texte, rejouer, reessayer){
+  $("sheet").className = "sheet " + type + " on";
+  $("sh-t").textContent = titre; $("sh-p").textContent = texte;
+  $("sh-alt").hidden = !reessayer;
+  $("sh-ok").textContent = reessayer ? "Intentar otra vez" : "Continuar";
+  $("sh-ok").onclick = reessayer ? () => { fermer(); ecouter(list[k]); } : () => { k++; ask(); };
+  if(rejouer) Lab.play(list[k]);
+}
+function fermer(){ $("sheet").className = "sheet"; }
+$("sh-alt").onclick = () => { k++; ask(); };
+
+Lab.load().then(() => { Lab.themeSelect($("theme"), v => { theme = v; start(); }); start(); });
+</script>
+</body>
+</html>

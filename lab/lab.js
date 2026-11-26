@@ -3,6 +3,7 @@
    - Lab.themes()        : liste des thèmes (section › onglet › sous-page) pour choisir les phrases
    - Lab.phrases(key, n) : phrases d'un thème (ou de tout le guide), mélangées
    - Lab.play(p)         : joue l'audio d'une phrase
+   - Lab.playToEnd(p)    : joue l'audio et attend qu'il soit fini (false s'il n'a pas pu être joué)
    - Lab.icon(p, size)   : HTML de l'illustration d'une phrase */
 const Lab = (() => {
   let C = null;
@@ -35,6 +36,12 @@ const Lab = (() => {
   }
   const player = new Audio();
   async function play(p){ const u = await audioUrl(p); if(!u) return false; player.src = u; try{ await player.play(); return true; }catch(e){ return false; } }
+  async function playToEnd(p){
+    if(!(await play(p))) return false;
+    await new Promise(r => { const fin = () => { player.removeEventListener("ended", fin); player.removeEventListener("pause", fin); r(); };
+      player.addEventListener("ended", fin); player.addEventListener("pause", fin); });
+    return true;
+  }
   const icon = (p, s = 56) => p.icon ? `<div class="ic" style="--s:${s}px;background-image:url('/${p.icon[0]}');--i:${p.icon[1]}"></div>` : "";
   function toast(m){ let t = document.querySelector(".toast"); if(!t){ t = document.createElement("div"); t.className = "toast"; document.body.append(t); }
     t.textContent = m; t.classList.add("on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), 1800); }
@@ -45,5 +52,5 @@ const Lab = (() => {
   }
   // icône haut-parleur, la même que dans le guide
   const SPK = '<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
-  return { load, themes, phrases, play, icon, shuffle, toast, themeSelect, SPK };
+  return { load, themes, phrases, play, playToEnd, icon, shuffle, toast, themeSelect, SPK };
 })();
