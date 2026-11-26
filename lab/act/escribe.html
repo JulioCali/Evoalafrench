@@ -27,6 +27,11 @@
   .rep .curseur{width:2px;height:28px;background:var(--violet);animation:clign 1s steps(1) infinite;margin-left:2px}
   .rep .mot{padding:8px 12px;border-radius:10px;background:#fff;font-size:17px;font-weight:600;box-shadow:0 2px 0 #DDD8EC}
   .rep .vide{color:#A9A4BC;font-size:14px;padding-left:4px}
+  .rep{position:relative;padding-right:58px}
+  .efface{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:46px;height:42px;border-radius:10px;background:#fff;display:grid;place-items:center;box-shadow:0 2px 0 #DDD8EC}
+  .efface svg{width:24px;height:24px;fill:none;stroke:var(--violet-dark);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+  .efface:active{transform:translateY(calc(-50% + 2px));box-shadow:none}
+  .efface:disabled{opacity:.35;box-shadow:none}
   .tuiles{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px}
   .tuile{min-width:46px;height:50px;padding:0 12px;border-radius:12px;background:#fff;border:1.5px solid #E3E0EC;box-shadow:0 3px 0 #E3E0EC;font-size:20px;font-weight:600;transition:transform .08s}
   .tuile.mot{font-size:17px}
@@ -169,8 +174,10 @@ function ecrire(){
 }
 function majRep(){
   const html = pris.map((i, j) => q.type === "mot" ? `<button data-j="${j}">${tuiles[i]}</button>` : `<button class="mot" data-j="${j}">${tuiles[i]}</button>`).join("");
-  if(q.type === "mot") $("rep").innerHTML = (q.art ? `<span class="fixe">${q.art}</span>` : "") + `<span class="lettres">${html}</span><span class="curseur"></span>`;
-  else $("rep").innerHTML = html || `<span class="vide">Toca las palabras en orden</span>`;
+  const efface = `<button class="efface" id="efface" aria-label="Borrar" ${pris.length ? "" : "disabled"}><svg viewBox="0 0 24 24"><path d="M9 5h11v14H9l-6-7z"/><path d="M12.5 9.5l5 5m0-5l-5 5"/></svg></button>`;
+  if(q.type === "mot") $("rep").innerHTML = (q.art ? `<span class="fixe">${q.art}</span>` : "") + `<span class="lettres">${html}</span><span class="curseur"></span>` + efface;
+  else $("rep").innerHTML = (html || `<span class="vide">Toca las palabras en orden</span>`) + efface;
+  $("efface").onclick = e => { e.stopPropagation(); if(fini || !pris.length) return; pris.pop(); majRep(); };   // efface la dernière lettre (ou le dernier mot)
   document.querySelectorAll(".tuile").forEach(b => b.classList.toggle("prise", pris.includes(+b.dataset.i)));
   $("ok").disabled = !pris.length;
 }
