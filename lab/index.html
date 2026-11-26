@@ -38,6 +38,16 @@
   .act{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;transition:transform .15s}
   .act:active{transform:scale(.98)}
   .act .em{font-size:30px}
+  /* aperçu : mini schéma de l'écran de l'activité */
+  .ap{display:block;border-radius:14px;background:var(--lav2);padding:8px;margin:-4px -4px 2px}
+  .ap svg{display:block;width:100%;height:auto;max-height:150px}
+  /* menu de toutes les activités : 2 colonnes compactes */
+  .menu{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .mini{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:inherit;padding:10px}
+  .mini b{font-size:14px;line-height:1.25}
+  .mini .ap{margin:0;padding:6px}
+  .mini .et{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--c)}
+  .mini .et i{width:18px;height:18px;border-radius:50%;background:var(--c);color:#fff;font-style:normal;font-size:11px;display:grid;place-items:center}
   .act b{font-size:17px}
   .act.new{border:2px dashed #CFC6F2;box-shadow:none;background:transparent;align-items:center;justify-content:center;text-align:center;color:var(--gray);min-height:150px}
 </style>
@@ -45,6 +55,7 @@
 <body>
 <div class="wrap" id="app"></div>
 <script src="acts.js"></script>
+<script src="apercus.js"></script>
 <script>
 // Accueil du labo : les 5 étapes de la méthode (acts.js), puis la page de chaque étape (#decouverte, #comprehension…)
 const ST = { proto: ["Prototype", ""], test: ["En test", "test"], ok: ["Prête pour l'appli", "ok"] };
@@ -60,7 +71,7 @@ const nbTxt = n => n ? `${n} activité${n > 1 ? "s" : ""}` : "À créer";
 const vars = e => `--c:${e.couleur};--f:${e.fond}`;
 
 function carteAct(a){
-  return `<a class="card act" href="${a.href}"><span class="em">${a.em}</span><b>${a.title}</b>
+  return `<a class="card act" href="${a.href}">${a.apercu ? `<span class="ap">${Apercu(a.apercu)}</span>` : `<span class="em">${a.em}</span>`}<b>${a.title}</b>
     <span class="muted">${a.desc}</span><span><span class="tag ${ST[a.status][1]}">${ST[a.status][0]}</span>${uxTag(a.title)}</span></a>`;
 }
 
@@ -74,6 +85,9 @@ function accueil(){
         <span class="txt"><b>${e.em} ${e.nom}</b><span class="muted">${e.desc}</span></span>
         <span class="nb ${n ? "" : "vide"}">${nbTxt(n)}</span></a>`; }).join("")}</div>
     ${sansEtape.length ? `<div class="sec">Sans étape</div><div class="grid">${sansEtape.map(carteAct).join("")}</div>` : ""}
+    <div class="sec">Toutes les activités</div>
+    <div class="menu">${ETAPES.flatMap(e => actsDe(e.id).map(a => `<a class="card mini" href="${a.href}" style="${vars(e)}">
+      <span class="ap">${Apercu(a.apercu)}</span><b>${a.title}</b><span class="et"><i>${e.lettre}</i>${e.nom}</span></a>`)).join("")}</div>
     <div class="sec">Outils</div>
     <div class="grid"><a class="card act" href="grille.html"><span class="em">📋</span><b>Grille UX</b>
       <span class="muted">Évalue chaque activité : efficace (Masson), agréable (Norman), sans friction (Krug).</span></a></div>`;
