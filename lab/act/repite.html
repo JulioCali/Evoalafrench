@@ -27,14 +27,18 @@
   .sheet{position:fixed;left:0;right:0;bottom:0;padding:22px 20px max(22px,env(safe-area-inset-bottom));border-radius:22px 22px 0 0;text-align:center;transform:translateY(110%);transition:transform .3s ease-out;z-index:5}
   .sheet.on{transform:none}
   .sheet .in{max-width:720px;margin:0 auto}
-  .sheet h3{margin:0 0 6px;font-size:24px;font-weight:700}
-  .sheet p{margin:0 0 14px;font-size:15px;min-height:4px}
+  .sheet .tt{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}
+  .sheet .tt img{width:52px;margin-top:-34px}
+  .sheet.on .tt img{animation:saute .5s ease-out}
+  .sheet h3{margin:0;font-size:24px;font-weight:700}
+  .sheet p{margin:0 0 14px;font-size:15px;min-height:4px;white-space:pre-line;line-height:1.5}
   .sheet .okb{margin-top:6px}
   .sheet.bien{background:#D3EFB8}.sheet.bien h3{color:#3E8E1F}.sheet.bien .okb{background:#7BC94A;box-shadow:0 4px 0 #5DA532}
   .sheet.presque{background:#FFE7C2}.sheet.presque h3{color:#A8620A}.sheet.presque .okb{background:#E8962E;box-shadow:0 4px 0 #C27716}
   .sheet .alt[hidden]{display:none}
   .sheet .alt{display:block;width:100%;margin-top:12px;font-weight:600;color:#8A7F6A;font-size:14px}
   @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(108,79,224,.35)}50%{box-shadow:0 0 0 12px rgba(108,79,224,0)}}
+  @keyframes saute{0%{transform:translateY(16px)}60%{transform:translateY(-6px)}100%{transform:none}}
   @keyframes monte{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 </style>
 </head>
@@ -44,7 +48,7 @@
   <div class="card row" style="margin-bottom:10px"><select id="theme"></select></div>
   <div id="zone"></div>
 </div>
-<div class="sheet" id="sheet"><div class="in"><h3 id="sh-t"></h3><p id="sh-p"></p><button class="okb" id="sh-ok">Continuar</button><button class="alt" id="sh-alt" hidden>Continuar sin repetir</button></div></div>
+<div class="sheet" id="sheet"><div class="in"><div class="tt"><img id="sh-evo" src="/img/ui/evo-happy.png" alt=""><h3 id="sh-t"></h3></div><p id="sh-p"></p><button class="okb" id="sh-ok">Continuar</button><button class="alt" id="sh-alt" hidden>Continuar sin repetir</button></div></div>
 <script src="../lab.js"></script>
 <script>
 // Escucha y repite (étape Découverte) : un mot ou une phrase, avec son illustration et sa traduction.
@@ -106,12 +110,13 @@ function repeter(){
   rec.onresult = e => {
     entendu = true;
     const alts = [...e.results[0]].map(r => r.transcript);
-    const score = Math.max(...alts.map(t => ressemblance(t, p.fr)));
+    const scores = alts.map(t => ressemblance(t, p.fr)), score = Math.max(...scores);
+    const dit = alts[scores.indexOf(score)];   // ce que l'apprenant a dit (la meilleure version entendue)
     arreter();
-    if(score >= 0.6) return ouvrir("bien", "¡Excelente!", "« " + p.fr + " »");
+    if(score >= 0.6) return ouvrir("bien", "¡Excelente!", "Dijiste: « " + dit + " »");
     essais++;
-    if(essais >= 2) return ouvrir("bien", "¡Bien intentado!", "Escucha otra vez: « " + p.fr + " »", true);
-    ouvrir("presque", "¡Casi!", "Entendí « " + alts[0] + " ». Escucha y repite otra vez.", false, true);
+    if(essais >= 2) return ouvrir("bien", "¡Bien intentado!", "Dijiste: « " + dit + " »\nSe dice: « " + p.fr + " »", true);
+    ouvrir("presque", "¡Casi!", "Dijiste: « " + dit + " »\nEscucha y repite otra vez.", false, true);
   };
   rec.onerror = e => {
     arreter();
@@ -140,6 +145,7 @@ function ressemblance(a, b){
 
 // 3. Panneau du bas
 function ouvrir(type, titre, texte, rejouer, reessayer){
+  $("sh-evo").src = type === "bien" ? "/img/ui/evo-happy.png" : "/img/ui/evo.png";
   $("sheet").className = "sheet " + type + " on";
   $("sh-t").textContent = titre; $("sh-p").textContent = texte;
   $("sh-alt").hidden = !reessayer;
