@@ -48,6 +48,8 @@
   .sheet p{margin:0 0 14px;font-size:16px;line-height:1.6}
   .sheet p b.err{color:var(--red);text-decoration:underline}
   .sheet .okb{margin-top:6px}
+  .sheet .alt[hidden]{display:none}
+  .sheet .alt{display:block;width:100%;margin-top:12px;font-weight:600;color:#8A7F6A;font-size:15px;padding:6px}
   .sheet.bien{background:#D3EFB8}.sheet.bien h3{color:#3E8E1F}.sheet.bien .okb{background:#7BC94A;box-shadow:0 4px 0 #5DA532}
   .sheet.presque{background:#FFE7C2}.sheet.presque h3{color:#A8620A}.sheet.presque .okb{background:#E8962E;box-shadow:0 4px 0 #C27716}
   @keyframes clign{50%{opacity:0}}
@@ -60,14 +62,14 @@
     <div class="modes" id="modes"><button data-m="tout" class="on">Todo</button><button data-m="mot">Palabras</button><button data-m="phrase">Frases</button></div></div>
   <div id="zone"></div>
 </div>
-<div class="sheet" id="sheet"><div class="in"><div class="tt"><img id="sh-evo" src="/img/ui/evo-happy.png" alt=""><h3 id="sh-t"></h3></div><p id="sh-p"></p><button class="okb" id="sh-ok">Continuar</button></div></div>
+<div class="sheet" id="sheet"><div class="in"><div class="tt"><img id="sh-evo" src="/img/ui/evo-happy.png" alt=""><h3 id="sh-t"></h3></div><p id="sh-p"></p><button class="okb" id="sh-ok">Continuar</button><button class="alt" id="sh-alt" hidden>Continuar</button></div></div>
 <script src="../lab.js"></script>
 <script>
 // Memoriza y escribe (étape Pratique) : on regarde le mot (ou la phrase) quelques secondes, il disparaît, on le réécrit.
 // - un mot   → tuiles de lettres (orthographe), l'article (Un, Une, Le, L'…) est déjà placé
 // - une phrase → tuiles de mots (ordre des mots)
 // Pas de tuiles pièges pour le moment (piegesLettres / piegesMots restent disponibles pour les remettre).
-const N = 8; let demarre = false, theme = "", mode = "tout", list = [], k = 0, score = 0, q = null, fini = false, tChrono = null;
+const N = 8; let essai = 0, demarre = false, theme = "", mode = "tout", list = [], k = 0, score = 0, q = null, fini = false, tChrono = null;
 const $ = id => document.getElementById(id);
 const ARTICLES = ["un", "une", "le", "la", "les", "l'", "des", "du"];
 
@@ -130,7 +132,7 @@ function start(){
   let pool = Lab.phrases(theme).filter(utilisable);
   if(pool.length < 3) pool = Lab.phrases("").filter(utilisable);
   if(mode !== "tout"){ const f = pool.filter(p => decouper(p).type === mode); if(f.length >= 3) pool = f; }
-  list = pool.slice(0, N); k = 0; score = 0; ask();
+  list = pool.slice(0, N); k = 0; score = 0; essai = 0; ask();
 }
 
 // 1. Mémoriser : le mot est visible quelques secondes (selon sa longueur), ou jusqu'à « Ya lo tengo »
@@ -212,10 +214,10 @@ function verifier(){
     ecrit = ecrit;
   }
   const ok = q.type === "mot" ? pris.map(i => tuiles[i]).join("") === q.mot.toLowerCase() : pris.map(i => tuiles[i]).join(" ") === q.mots.join(" ");
-  if(ok){ score++; ouvrir("bien", "¡Excelente!", "« " + p.fr + " »"); }
+  if(ok){ if(!essai) score++; ouvrir("bien", "¡Excelente!", "« " + p.fr + " »"); }
   else{
     const avant = q.type === "mot" && q.art ? q.art + (q.art.endsWith("'") ? "" : " ") : "";
-    ouvrir("presque", "¡Casi!", `Escribiste: « ${avant}${html} »<br>Se escribe: « ${p.fr} »`);
+    ouvrir("presque", "¡Casi!", `Escribiste: « ${avant}${html} »<br>Se escribe: « ${p.fr} »`, true);
   }
   Lab.play(p);
 }
@@ -234,12 +236,17 @@ function diff(e, a, mots){
 }
 const esc = s => s.replace(/[<>&]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]));
 
-function ouvrir(type, titre, html){
+// Après une erreur : « Intentar otra vez » (on réécrit le même mot) ou « Continuar ». Le score ne compte que le 1er essai.
+function ouvrir(type, titre, html, reessayer){
   $("sh-evo").src = type === "bien" ? "/img/ui/evo-happy.png" : "/img/ui/evo.png";
   $("sheet").className = "sheet " + type + " on";
   $("sh-t").textContent = titre; $("sh-p").innerHTML = html;
-  $("sh-ok").onclick = () => { k++; ask(); };
+  $("sh-alt").hidden = !reessayer;
+  $("sh-ok").textContent = reessayer ? "Intentar otra vez" : "Continuar";
+  $("sh-ok").onclick = reessayer ? () => { essai++; fermer(); fini = false; ecrire(); } : suivant;
+  $("sh-alt").onclick = suivant;
 }
+function suivant(){ k++; essai = 0; ask(); }
 function fermer(){ $("sheet").className = "sheet"; }
 
 $("modes").onclick = e => { const b = e.target.closest("button"); if(!b) return; mode = b.dataset.m;
