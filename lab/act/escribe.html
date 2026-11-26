@@ -80,9 +80,18 @@ function decouper(p){
   if(m){ art = m[1]; reste = m[2]; }
   if(!/\s/.test(reste)) return { type: "mot", art, mot: reste, fin, p };
   // la majuscule du 1er mot trahirait sa place : les tuiles sont en minuscules
-  const mots = corps.split(/\s+/); mots[0] = mots[0][0].toLowerCase() + mots[0].slice(1);
+  const mots = corps.split(/\s+/).flatMap(elision); mots[0] = mots[0][0].toLowerCase() + mots[0].slice(1);
   return { type: "phrase", mots, fin, p };
 }
+// Élision : « n'ai » → « n' » + « ai », « j'ai » → « j' » + « ai », « l'eau » → « l' » + « eau »
+// (sauf les mots qui s'écrivent toujours avec l'apostrophe : aujourd'hui, quelqu'un…)
+function elision(w){
+  if(/^(aujourd|quelqu|presqu|prud)['’]/i.test(w)) return [w];
+  const m = w.match(/^([a-zàâçéèêëîïôûù]{1,6}['’])(.+)$/i);
+  return m ? [m[1], ...elision(m[2])] : [w];
+}
+// Remet des mots bout à bout : pas d'espace après une apostrophe (« n' » + « ai » → « n'ai »)
+const colle = (items, mots) => items.map((h, i) => h + (/['’]$/.test(mots[i]) ? "" : " ")).join("").trim();
 function utilisable(p){
   if(!p.fr || !p.es || !p.icon || /…|\.\.\.|\d/.test(p.fr)) return false;
   const d = decouper(p);
