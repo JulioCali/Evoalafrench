@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="fr">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png"><link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Lab Evoala"><meta name="theme-color" content="#6C4FE0">
@@ -9,6 +9,31 @@
   .hero{display:flex;gap:14px;align-items:center;margin:6px 0 22px}
   .hero img{width:64px}
   .hero h1{margin:0;font-size:24px}
+  .sec{font-size:13px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin:26px 2px 10px}
+
+  /* Les 5 étapes : un parcours vertical relié par une ligne */
+  .etapes{position:relative;display:grid;gap:12px}
+  .etapes::before{content:"";position:absolute;left:37px;top:30px;bottom:30px;width:3px;border-radius:3px;
+    background:linear-gradient(#3E9BD6,#D9659B,#7B66D9,#E0962A,#4FA65A);opacity:.35}
+  .etape{position:relative;display:flex;align-items:center;gap:14px;text-decoration:none;color:inherit;transition:transform .15s}
+  .etape:active{transform:scale(.98)}
+  .lettre{width:44px;height:44px;flex:none;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:19px;color:#fff;
+    background:var(--c);box-shadow:0 0 0 5px #fff}
+  .etape .txt{flex:1;min-width:0}
+  .etape b{font-size:17px;display:block}
+  .etape .muted{font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .nb{flex:none;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--f);color:var(--c);white-space:nowrap}
+  .nb.vide{background:#F1EFF6;color:var(--gray)}
+  .fleche{color:#C9C2E3;font-size:22px;flex:none}
+
+  /* Page d'une étape */
+  .tete{border-radius:var(--r);padding:18px;background:var(--f);margin-bottom:18px}
+  .tete .row{gap:12px;flex-wrap:nowrap}
+  .tete h1{margin:0;font-size:22px;color:var(--c)}
+  .tete p{margin:10px 0 0;font-size:14px;line-height:1.5}
+  .nav{display:flex;justify-content:space-between;gap:10px;margin-top:22px}
+  .nav a{flex:1;text-decoration:none;font-size:14px;font-weight:600;padding:12px;border-radius:14px;background:#fff;color:var(--violet-dark);text-align:center;box-shadow:0 2px 10px rgba(60,40,140,.06)}
+
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
   .act{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;transition:transform .15s}
   .act:active{transform:scale(.98)}
@@ -18,22 +43,59 @@
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="hero"><img src="/img/ui/evo.png" alt=""><div><h1>Laboratorio</h1><div class="muted">Prototipos de actividades antes de pasarlas a la app. Privado: solo para ti.</div></div></div>
-  <div class="grid" id="grid"></div>
-</div>
+<div class="wrap" id="app"></div>
 <script src="acts.js"></script>
 <script>
+// Accueil du labo : les 5 étapes de la méthode (acts.js), puis la page de chaque étape (#decouverte, #comprehension…)
+const ST = { proto: ["Prototype", ""], test: ["En test", "test"], ok: ["Prête pour l'appli", "ok"] };
+
 // Note de la grille UX (enregistrée sur cet appareil par grille.html)
 let UX = {}; try { UX = (JSON.parse(localStorage.getItem("evolab-grille-ux")) || {}).evals || {}; } catch (e) {}
 function uxTag(t){ const ev = UX[t]; if(!ev) return ""; const v = Object.values(ev.notes || {}); if(!v.length) return "";
   const p = Math.round(v.reduce((a,b)=>a+b,0) / (v.length*3) * 100), c = v.length < 18 ? "" : p >= 80 ? "ok" : "test";
   return ` <span class="tag ${c}">UX ${p} %${v.length < 18 ? " · en cours" : ""}</span>`; }
-const ST = { proto: ["Prototipo", ""], test: ["En prueba", "test"], ok: ["Lista para la app", "ok"] };
-document.getElementById("grid").innerHTML = ACTS.map(a => `<a class="card act" href="${a.href}"><span class="em">${a.em}</span><b>${a.title}</b>
-  <span class="muted">${a.desc}</span><span><span class="tag ${ST[a.status][1]}">${ST[a.status][0]}</span>${uxTag(a.title)}</span></a>`).join("")
-  + `<a class="card act" href="grille.html"><span class="em">📋</span><b>Grille UX</b><span class="muted">Évalue chaque activité : efficace (Masson), agréable (Norman), sans friction (Krug).</span></a>`
-  + `<div class="card act new"><span class="em">＋</span><span>Próxima actividad:<br>dime tu idea</span></div>`;
+
+const actsDe = id => ACTS.filter(a => a.etape === id);
+const nbTxt = n => n ? `${n} activité${n > 1 ? "s" : ""}` : "À créer";
+const vars = e => `--c:${e.couleur};--f:${e.fond}`;
+
+function carteAct(a){
+  return `<a class="card act" href="${a.href}"><span class="em">${a.em}</span><b>${a.title}</b>
+    <span class="muted">${a.desc}</span><span><span class="tag ${ST[a.status][1]}">${ST[a.status][0]}</span>${uxTag(a.title)}</span></a>`;
+}
+
+function accueil(){
+  const sansEtape = ACTS.filter(a => !ETAPES.some(e => e.id === a.etape));
+  return `<div class="hero"><img src="/img/ui/evo.png" alt=""><div><h1>Laboratorio</h1>
+      <div class="muted">Prototypes d'activités avant de les passer dans l'appli. Privé : rien que pour toi.</div></div></div>
+    <div class="sec">Les 5 étapes</div>
+    <div class="etapes">${ETAPES.map(e => { const n = actsDe(e.id).length;
+      return `<a class="card etape" href="#${e.id}" style="${vars(e)}"><span class="lettre">${e.lettre}</span>
+        <span class="txt"><b>${e.em} ${e.nom}</b><span class="muted">${e.desc}</span></span>
+        <span class="nb ${n ? "" : "vide"}">${nbTxt(n)}</span></a>`; }).join("")}</div>
+    ${sansEtape.length ? `<div class="sec">Sans étape</div><div class="grid">${sansEtape.map(carteAct).join("")}</div>` : ""}
+    <div class="sec">Outils</div>
+    <div class="grid"><a class="card act" href="grille.html"><span class="em">📋</span><b>Grille UX</b>
+      <span class="muted">Évalue chaque activité : efficace (Masson), agréable (Norman), sans friction (Krug).</span></a></div>`;
+}
+
+function pageEtape(e){
+  const i = ETAPES.indexOf(e), prec = ETAPES[i-1], suiv = ETAPES[i+1], acts = actsDe(e.id);
+  return `<div class="top"><a class="back" href="#" aria-label="Retour aux étapes">‹</a><h1>Étape ${i+1} sur 5</h1></div>
+    <div class="tete" style="${vars(e)}"><div class="row"><span class="lettre">${e.lettre}</span><h1>${e.em} ${e.nom}</h1></div><p>${e.desc}</p></div>
+    <div class="grid">${acts.map(carteAct).join("")}
+      <div class="card act new"><span class="em">＋</span><span>${acts.length ? "Prochaine activité" : "Première activité"} :<br>dis-moi ton idée</span></div></div>
+    <div class="nav">${prec ? `<a href="#${prec.id}">‹ ${prec.nom}</a>` : `<span style="flex:1"></span>`}${suiv ? `<a href="#${suiv.id}">${suiv.nom} ›</a>` : `<span style="flex:1"></span>`}</div>`;
+}
+
+function afficher(){
+  const e = ETAPES.find(x => "#" + x.id === location.hash);
+  document.getElementById("app").innerHTML = e ? pageEtape(e) : accueil();
+  document.title = (e ? e.nom + " · " : "") + "Laboratorio · Evoala";
+  window.scrollTo(0, 0);
+}
+addEventListener("hashchange", afficher);
+afficher();
 </script>
 </body>
 </html>
