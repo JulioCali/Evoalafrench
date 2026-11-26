@@ -10,7 +10,8 @@
   .gros{display:block;width:124px;height:124px;margin:10px auto 34px;border-radius:50%;background:#C4BAF4;box-shadow:0 6px 0 #A99BE4;display:grid;place-items:center;transition:transform .1s}
   .gros:active{transform:translateY(4px);box-shadow:0 2px 0 #A99BE4}
   .gros svg{width:56px;height:56px;fill:#4A33B0}
-  .trad{margin:-18px 0 26px;text-align:center;font-size:18px;color:var(--gray)}
+  .opt{flex-direction:column;gap:4px}
+  .opt .trad{font-size:15px;font-weight:500;color:var(--gray)}
   .gros.on{animation:pulse 1s infinite}
   .choix{display:grid;gap:12px}
   .opt{display:flex;align-items:center;justify-content:center;min-height:64px;padding:14px 16px;font-size:19px !important;font-weight:600;border-radius:18px;background:#fff;border:2px solid #ECE9F4;box-shadow:0 3px 0 #ECE9F4;font-size:15px;line-height:1.3;text-align:center;transition:transform .08s}
@@ -44,7 +45,7 @@
 // ¿Qué oyes? (étape Compréhension) : on entend une phrase en français (sans la voir), on choisit
 // parmi 2 phrases écrites celle qu'on a entendue, puis « Comprobar ». Pas d'image : on relie le son à l'écrit.
 // L'autre phrase vient du même thème et lui ressemble (longueur, mots en commun), pour qu'il faille vraiment écouter.
-// Variante Découverte (?trad=1) : une ligne sous le haut-parleur montre la traduction de la phrase entendue
+// Variante Découverte (?trad=1) : chaque phrase proposée montre sa traduction en dessous
 const TRAD = new URLSearchParams(location.search).has("trad");
 const TITRE = TRAD ? "¿Qué oyes? (con traducción)" : "¿Qué oyes?";
 document.title = TITRE + " · Laboratorio Evoala";
@@ -81,8 +82,7 @@ function ask(){
   opts = Lab.shuffle([p, ...autre]);
   $("zone").innerHTML = `<div class="titre">¿Qué oyes?</div>
     <button class="gros" id="spk" aria-label="Escuchar otra vez">${Lab.SPK}</button>
-    ${TRAD ? `<div class="trad">${p.es}</div>` : ""}
-    <div class="choix">${opts.map((o, i) => `<button class="opt" data-i="${i}">${o.fr}</button>`).join("")}</div>
+    <div class="choix">${opts.map((o, i) => `<button class="opt" data-i="${i}">${o.fr}${TRAD ? `<small class="trad">${o.es}</small>` : ""}</button>`).join("")}</div>
     <button class="okb" id="ok" disabled>Comprobar</button>`;
   $("spk").onclick = ecouter;
   $("zone").querySelector(".choix").onclick = e => {
@@ -116,7 +116,7 @@ function fermer(){ $("sheet").className = "sheet"; }
 // Premier écran : un toucher pour commencer (débloque l'audio sur iPhone)
 function accueil(){
   $("zone").innerHTML = `<div class="card end"><img src="/img/ui/evo.png" alt=""><h2>${TITRE}</h2>
-    <p class="muted">Escucha la frase${TRAD ? ", mira lo que quiere decir" : ""} y elige la que oíste.</p><button class="btn" id="go">Empezar</button></div>`;
+    <p class="muted">Escucha la frase y elige la que oíste.</p><button class="btn" id="go">Empezar</button></div>`;
   $("go").onclick = start;
 }
 Lab.load().then(() => { Lab.themeSelect($("theme"), v => { theme = v; (demarre || Lab.unlocked()) ? start() : accueil(); }); accueil(); });
