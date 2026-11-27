@@ -7,6 +7,9 @@
 <style>
   body{overflow-x:hidden}
   .wrap{padding-bottom:40px}
+  .segs{flex:1;display:flex;gap:4px}
+  .segs i{flex:1;height:10px;border-radius:99px;background:#E4DEFA;transition:background .25s}
+  .segs i.ici{background:#C4BAF4}.segs i.bien{background:#3DBE7E}.segs i.mal{background:#E8962E}
   .cpt{font-size:14px;font-weight:600;color:var(--gray);white-space:nowrap}
   .question{margin:18px 0 14px;text-align:center;font-size:17px;font-weight:600;color:var(--violet-dark)}
   /* pile de cartes */
@@ -43,6 +46,10 @@
   .grand-hp svg{width:50px;height:50px}
   .grand-hp.on span{animation:pulse 1s infinite}
   .aide{margin:12px 0 0;font-size:13px;color:#8C86A3}
+  .bravo{position:absolute;left:50%;top:50%;width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;background:#2E9E66;display:grid;place-items:center;box-shadow:0 8px 24px rgba(46,160,103,.35);transform:scale(0);z-index:3;pointer-events:none}
+  .bravo svg{width:50px;height:50px;fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+  .carte.juste .bravo{animation:pop .45s cubic-bezier(.2,1.6,.4,1) forwards}
+  @keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
   .tampon{position:absolute;top:30px;padding:4px 16px;border:4px solid;border-radius:12px;font-size:34px;font-weight:700;letter-spacing:.06em;background:rgba(255,255,255,.85);opacity:0;z-index:2;pointer-events:none}
   .tampon.si{left:22px;transform:rotate(-14deg);color:#2E9E66;border-color:#2E9E66}
   .tampon.no{right:22px;transform:rotate(14deg);color:#E5484D;border-color:#E5484D}
@@ -75,7 +82,7 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="top"><a class="back" href="../" aria-label="Volver">‹</a><div class="prog" style="flex:1;margin:0"><i id="bar"></i></div><span class="cpt" id="cpt"></span><a class="tag" id="grille" href="../grille.html" style="text-decoration:none">📋</a></div>
+  <div class="top"><a class="back" href="../" aria-label="Volver">‹</a><div class="segs" id="segs"></div><span class="cpt" id="cpt"></span><a class="tag" id="grille" href="../grille.html" style="text-decoration:none">📋</a></div>
   <div id="zone"></div>
 </div>
 <div class="sheet" id="sheet"><div class="in"><div class="tt"><img src="/img/ui/evo.png" alt=""><h3>¡Casi!</h3></div><div id="sh-c"></div><button class="okb" id="sh-ok">Continuar</button></div></div>
@@ -87,7 +94,7 @@
 //   2 · Compréhension : image + mot + traduction, on juge l'AUDIO (qui se lance seul)
 //   3 · Mémorisation  : image + mot, on juge l'AUDIO
 //   4 · Mémorisation  : seulement l'audio, on juge la TRADUCTION
-// Bonne réponse : éclair vert et carte suivante, sans s'arrêter. Erreur : panneau avec la correction.
+// Bonne réponse : coche verte qui pop sur la carte, segment vert, puis carte suivante, sans s'arrêter. Erreur : panneau avec la correction.
 const NIV = Math.min(4, Math.max(1, +new URLSearchParams(location.search).get("nivel") || 1));
 const NOMS = { 1: "Traducción", 2: "Traducción y audio", 3: "Palabra, imagen y audio", 4: "Solo audio" };
 const QUESTIONS = { 1: "¿Es la traducción correcta?", 2: "¿El audio corresponde a la palabra?", 3: "¿El audio corresponde a la palabra?", 4: "¿Es la traducción de lo que oyes?" };
@@ -121,10 +128,14 @@ function start(){
   k = 0; score = 0; suivante();
 }
 
+// Barre de progression : un segment par carte, vert si juste, orange si faux
+function segments(){
+  $("segs").innerHTML = list.map((c, i) => `<i class="${c.res || (i === k ? "ici" : "")}"></i>`).join("");
+}
 // Une carte : ce qui est donné en haut, ce qu'on juge en bas (après la ligne pointillée)
 function suivante(){
   fermer(); occupe = false;
-  $("bar").style.width = (k / list.length * 100) + "%";
+  segments();
   $("cpt").textContent = k < list.length ? `${k + 1} / ${list.length}` : "";
   if(k >= list.length){
     $("zone").innerHTML = `<div class="card end"><img src="/img/ui/evo.png" alt=""><h2>${score} / ${list.length}</h2><p class="muted">${score === list.length ? "¡Perfecto!" : "¡Sigue practicando!"}</p><button class="btn" onclick="start()">Otra vez</button></div>`;
@@ -146,7 +157,7 @@ function suivante(){
       <p class="aide">Toca para escuchar otra vez</p>${sep("TRADUCCIÓN")}<p class="prop">${prop.es}</p>`;
   $("zone").innerHTML = `<p class="question">${QUESTIONS[NIV]}</p>
     <div class="pile"><div class="fond f2"></div><div class="fond f1"></div>
-      <div class="carte" id="carte"><div class="tampon si" id="t-si">SÍ</div><div class="tampon no" id="t-no">NO</div>${html}</div></div>
+      <div class="carte" id="carte"><div class="bravo" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><div class="tampon si" id="t-si">SÍ</div><div class="tampon no" id="t-no">NO</div>${html}</div></div>
     <div class="boutons">
       <div><button class="bt non" id="b-no" aria-label="No"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button><span style="color:#C4313A">No</span></div>
       <div><button class="bt oui" id="b-si" aria-label="Sí"><svg viewBox="0 0 24 24" style="width:34px;height:34px"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button><span style="color:#237A4F">Sí</span></div>
@@ -191,11 +202,13 @@ function repondre(oui){
   if(occupe) return; occupe = true;
   const { p, vrai, faux } = list[k], juste = oui === vrai;
   Lab.stop();
-  carte.classList.add("anime"); poser(oui ? 140 : -140);
+  carte.classList.add("anime"); poser((oui ? 1 : -1) * (juste ? 30 : 140));   // juste : la carte reste presque au centre pour qu'on voie la coche
+  $(oui ? "t-si" : "t-no").style.opacity = 1;                                    // le tampon du choix, bien net
+  list[k].res = juste ? "bien" : "mal"; segments();
   if(juste){
     score++; carte.classList.add("juste");
-    setTimeout(() => { carte.style.transform = `translateX(${oui ? 520 : -520}px) rotate(${oui ? 24 : -24}deg)`; carte.style.opacity = 0; }, 160);
-    setTimeout(() => { k++; suivante(); }, 520);
+    setTimeout(() => { carte.style.transform = `translateX(${oui ? 520 : -520}px) rotate(${oui ? 24 : -24}deg)`; carte.style.opacity = 0; }, 560);
+    setTimeout(() => { k++; suivante(); }, 900);
     return;
   }
   setTimeout(() => corriger(p, vrai, faux), 280);
