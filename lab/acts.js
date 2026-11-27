@@ -27,5 +27,9 @@ const ACTS = [
   { href: "act/escribe.html", etape: "pratique", em: "✍️", title: "Memoriza y escribe", desc: "Mira la palabra unos segundos, desaparece y la escribes con letras (o la frase con palabras).", apercu: "escribe", status: "proto" },
   { href: "act/imagen.html", etape: "comprehension", em: "🖼️", title: "Elige la buena imagen", desc: "Escuchas una frase en francés y eliges, entre 4 imágenes, la que corresponde.", apercu: "imagen", status: "proto" },
   { href: "act/oyes.html", etape: "comprehension", em: "👂", title: "¿Qué oyes?", desc: "Escuchas una frase sin verla y eliges, entre 2 frases escritas, la que oíste.", apercu: "oyes", status: "proto" },
-  { href: "act/oyes.html?trad=1", etape: "decouverte", em: "👂", title: "¿Qué oyes? (con traducción)", desc: "Escuchas una frase y eliges, entre 2 frases escritas con su traducción, la que oíste.", apercu: "oyesTrad", status: "proto" }
+  { href: "act/oyes.html?trad=1", etape: "decouverte", em: "👂", title: "¿Qué oyes? (con traducción)", desc: "Escuchas una frase y eliges, entre 2 frases escritas con su traducción, la que oíste.", apercu: "oyesTrad", status: "proto" },
+  { href: "act/desliza.html?nivel=1", etape: "comprehension", em: "👆", title: "Desliza · Traducción", desc: "Una palabra con su imagen y una traducción: desliza a la derecha si es correcta, a la izquierda si no.", apercu: "desliza1", status: "proto" },
+  { href: "act/desliza.html?nivel=2", etape: "comprehension", em: "👆", title: "Desliza · Traducción y audio", desc: "La palabra, su imagen y su traducción: ¿el audio corresponde? Desliza sí o no.", apercu: "desliza2", status: "proto" },
+  { href: "act/desliza.html?nivel=3", etape: "memorisation", em: "👆", title: "Desliza · Palabra, imagen y audio", desc: "La palabra y su imagen, sin traducción: ¿el audio corresponde? Desliza sí o no.", apercu: "desliza3", status: "proto" },
+  { href: "act/desliza.html?nivel=4", etape: "memorisation", em: "👆", title: "Desliza · Solo audio", desc: "Solo el audio y una traducción: ¿es lo que oyes? Desliza sí o no.", apercu: "desliza4", status: "proto" }
 ];

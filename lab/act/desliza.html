@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><link rel="apple-touch-icon" href="../apple-touch-icon.png"><link rel="icon" href="../icon-192.png"><link rel="manifest" href="../manifest.webmanifest"><meta name="apple-mobile-web-app-title" content="Lab Evoala"><meta name="theme-color" content="#6C4FE0">
+<title>Desliza · Laboratorio Evoala</title>
+<link rel="stylesheet" href="../lab.css">
+<style>
+  body{overflow-x:hidden}
+  .wrap{padding-bottom:40px}
+  .cpt{font-size:14px;font-weight:600;color:var(--gray);white-space:nowrap}
+  .question{margin:18px 0 14px;text-align:center;font-size:17px;font-weight:600;color:var(--violet-dark)}
+  /* pile de cartes */
+  .pile{position:relative;height:468px;max-width:420px;margin:0 auto}
+  .pile .fond{position:absolute;border-radius:28px}
+  .pile .f2{left:22px;right:22px;top:22px;bottom:-6px;background:#E9E4FB}
+  .pile .f1{left:11px;right:11px;top:11px;bottom:-3px;background:#F1EDFD}
+  .carte{position:absolute;inset:0;border-radius:28px;background:#fff;box-shadow:0 10px 30px rgba(60,40,140,.12);display:flex;flex-direction:column;align-items:center;padding:22px 22px 24px;box-sizing:border-box;touch-action:none;user-select:none;-webkit-user-select:none;will-change:transform;transform-origin:50% 100%}
+  .carte.anime{transition:transform .3s ease-out,opacity .3s}
+  .carte.juste{outline:3px solid #3DBE7E}
+  .carte .petit-hp{position:absolute;left:18px;top:18px;width:44px;height:44px;border-radius:50%;background:var(--lav);display:grid;place-items:center}
+  .carte .petit-hp svg,.lect .rond svg,.grand-hp svg{fill:#fff}
+  .carte .petit-hp svg{fill:#4A33B0;width:22px;height:22px}
+  .ill{border-radius:24px;background:#FFF6E8;display:grid;place-items:center}
+  .ill .ic{border-radius:0}
+  .mot{margin-top:16px;padding:10px 24px;border-radius:18px;text-align:center}
+  .mot.boite{background:var(--lav2)}
+  .mot h2{margin:0;font-size:34px;font-weight:700;letter-spacing:-.01em;line-height:1.15}
+  .mot p{margin:2px 0 0;font-size:18px;color:var(--gray)}
+  .sep{width:100%;display:flex;align-items:center;gap:10px;margin:22px 0 18px}
+  .sep i{flex:1;border-top:2px dashed #E1DCF0}
+  .sep span{font-size:11px;font-weight:600;letter-spacing:.12em;color:#8C86A3}
+  .prop{margin:0;font-size:26px;font-weight:600;color:var(--violet-dark);text-align:center;line-height:1.25}
+  .lect{display:flex;align-items:center;gap:14px;height:60px;padding:0 20px 0 10px;border-radius:30px;background:var(--lav)}
+  .lect .rond{width:42px;height:42px;border-radius:50%;background:var(--violet);display:grid;place-items:center}
+  .lect .rond svg{width:20px;height:20px}
+  .lect .onde{display:flex;align-items:center;gap:4px;height:30px}
+  .lect .onde i{display:block;width:4px;border-radius:2px;background:#B8AEF0}
+  .lect.on .onde i{background:var(--violet);animation:onde .8s ease-in-out infinite}
+  .lect .onde i:nth-child(2n){animation-delay:.2s!important}.lect .onde i:nth-child(3n){animation-delay:.4s!important}
+  .lect svg.rejouer{width:20px;height:20px;fill:none;stroke:#4A33B0;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .grand-hp{margin-top:14px;width:150px;height:150px;border-radius:50%;background:var(--lav);display:grid;place-items:center;box-shadow:0 0 0 14px var(--lav2)}
+  .grand-hp span{width:108px;height:108px;border-radius:50%;background:var(--violet);display:grid;place-items:center;box-shadow:0 6px 0 var(--violet-dark)}
+  .grand-hp svg{width:50px;height:50px}
+  .grand-hp.on span{animation:pulse 1s infinite}
+  .aide{margin:12px 0 0;font-size:13px;color:#8C86A3}
+  .tampon{position:absolute;top:30px;padding:4px 16px;border:4px solid;border-radius:12px;font-size:34px;font-weight:700;letter-spacing:.06em;background:rgba(255,255,255,.85);opacity:0;z-index:2;pointer-events:none}
+  .tampon.si{left:22px;transform:rotate(-14deg);color:#2E9E66;border-color:#2E9E66}
+  .tampon.no{right:22px;transform:rotate(14deg);color:#E5484D;border-color:#E5484D}
+  /* boutons No / Sí */
+  .boutons{display:flex;justify-content:center;gap:56px;margin-top:30px}
+  .boutons > div{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .bt{width:76px;height:76px;border-radius:50%;background:#fff;display:grid;place-items:center;transition:transform .12s,background .12s}
+  .bt:active{transform:scale(.92)}
+  .bt svg{width:32px;height:32px;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+  .bt.non{box-shadow:0 6px 18px rgba(229,72,77,.18)}.bt.non svg{stroke:#E5484D}
+  .bt.oui{box-shadow:0 6px 18px rgba(46,160,103,.2)}.bt.oui svg{stroke:#2E9E66}
+  .bt.non.on{background:#E5484D}.bt.non.on svg,.bt.oui.on svg{stroke:#fff}.bt.oui.on{background:#2E9E66}
+  .boutons span{font-size:14px;font-weight:600}
+  /* panneau de correction */
+  .sheet{position:fixed;left:0;right:0;bottom:0;padding:22px 20px max(26px,env(safe-area-inset-bottom));border-radius:22px 22px 0 0;text-align:center;transform:translateY(110%);transition:transform .3s ease-out;z-index:5;background:#FFE7C2;box-shadow:0 -8px 24px rgba(120,70,0,.12)}
+  .sheet.on{transform:none}
+  .sheet .in{max-width:720px;margin:0 auto}
+  .sheet .tt{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
+  .sheet .tt img{width:54px;margin-top:-40px}
+  .sheet h3{margin:0;font-size:25px;font-weight:700;color:#A8620A}
+  .sheet p{margin:0 0 12px;font-size:16px;line-height:1.5}
+  .sheet .ecoutes{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;text-align:left}
+  .sheet .ecoutes button{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.55);border-radius:14px;padding:8px 12px;font-size:15px;color:var(--ink)}
+  .sheet .ecoutes .r{width:40px;height:40px;border-radius:50%;background:#fff;display:grid;place-items:center;flex:none}
+  .sheet .ecoutes svg{width:18px;height:18px;fill:#C27716}
+  .sheet .okb{background:#E8962E;box-shadow:0 4px 0 #C27716}
+  @keyframes onde{0%,100%{height:8px}50%{height:28px}}
+  @keyframes pulse{0%,100%{box-shadow:0 6px 0 var(--violet-dark),0 0 0 0 rgba(108,79,224,.35)}50%{box-shadow:0 6px 0 var(--violet-dark),0 0 0 12px rgba(108,79,224,0)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../" aria-label="Volver">‹</a><div class="prog" style="flex:1;margin:0"><i id="bar"></i></div><span class="cpt" id="cpt"></span><a class="tag" id="grille" href="../grille.html" style="text-decoration:none">📋</a></div>
+  <div id="zone"></div>
+</div>
+<div class="sheet" id="sheet"><div class="in"><div class="tt"><img src="/img/ui/evo.png" alt=""><h3>¡Casi!</h3></div><div id="sh-c"></div><button class="okb" id="sh-ok">Continuar</button></div></div>
+<script src="../lab.js"></script>
+<script>
+// Desliza: ¿Sí o no? — une carte, on glisse à droite (Sí) si ça va ensemble, à gauche (No) sinon, ou on touche les boutons.
+// 4 niveaux (?nivel=1…4), on retire un appui à chaque niveau :
+//   1 · Compréhension : image + mot, on juge la TRADUCTION
+//   2 · Compréhension : image + mot + traduction, on juge l'AUDIO (qui se lance seul)
+//   3 · Mémorisation  : image + mot, on juge l'AUDIO
+//   4 · Mémorisation  : seulement l'audio, on juge la TRADUCTION
+// Bonne réponse : éclair vert et carte suivante, sans s'arrêter. Erreur : panneau avec la correction.
+const NIV = Math.min(4, Math.max(1, +new URLSearchParams(location.search).get("nivel") || 1));
+const NOMS = { 1: "Traducción", 2: "Traducción y audio", 3: "Palabra, imagen y audio", 4: "Solo audio" };
+const QUESTIONS = { 1: "¿Es la traducción correcta?", 2: "¿El audio corresponde a la palabra?", 3: "¿El audio corresponde a la palabra?", 4: "¿Es la traducción de lo que oyes?" };
+const TITRE = "Desliza · " + NOMS[NIV];
+document.title = TITRE + " · Laboratorio Evoala";
+document.getElementById("grille").href = "../grille.html?act=" + encodeURIComponent(TITRE);
+const JUGE_AUDIO = NIV === 2 || NIV === 3;
+const N = 12; let theme = "", list = [], k = 0, score = 0, carte = null, occupe = false;
+const $ = id => document.getElementById(id);
+const SPK = '<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const SPKW = SPK.replace('stroke="currentColor"', 'stroke="#fff"');
+const SPKV = SPK.replace('stroke="currentColor"', 'stroke="#4A33B0"');
+const SPKO = SPK.replace('stroke="currentColor"', 'stroke="#C27716"');
+const ok = p => p.fr && p.es && p.audio && (NIV === 4 || p.icon) && !/…|\.\.\./.test(p.fr);
+
+// La proposition fausse : une autre phrase du même thème, la plus ressemblante (mêmes mots, même longueur),
+// pour qu'on ne puisse pas répondre sans vraiment lire ou écouter
+const motsDe = t => t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z' ]/g, " ").split(/\s+/).filter(Boolean);
+function leurre(p){
+  const cle = JUGE_AUDIO ? "fr" : "es";
+  const cands = Lab.voisins(p, 15, x => ok(x) && x[cle].toLowerCase() !== p[cle].toLowerCase() && x.es.toLowerCase() !== p.es.toLowerCase());
+  const mp = motsDe(p[cle]);
+  const note = x => { const mx = motsDe(x[cle]); return mx.filter(w => mp.includes(w)).length * 3 - Math.abs(mx.length - mp.length) * 2 - Math.abs(x[cle].length - p[cle].length) / 6 + Math.random(); };
+  return cands.sort((a, b) => note(b) - note(a))[0];
+}
+
+function start(){
+  let pool = Lab.phrases(theme).filter(ok);
+  if(pool.length < 4) pool = Lab.phrases("").filter(ok);
+  list = pool.slice(0, N).map(p => { const vrai = Math.random() < .5, faux = vrai ? null : leurre(p); return { p, vrai: vrai || !faux, faux }; });
+  k = 0; score = 0; suivante();
+}
+
+// Une carte : ce qui est donné en haut, ce qu'on juge en bas (après la ligne pointillée)
+function suivante(){
+  fermer(); occupe = false;
+  $("bar").style.width = (k / list.length * 100) + "%";
+  $("cpt").textContent = k < list.length ? `${k + 1} / ${list.length}` : "";
+  if(k >= list.length){
+    $("zone").innerHTML = `<div class="card end"><img src="/img/ui/evo.png" alt=""><h2>${score} / ${list.length}</h2><p class="muted">${score === list.length ? "¡Perfecto!" : "¡Sigue practicando!"}</p><button class="btn" onclick="start()">Otra vez</button></div>`;
+    return;
+  }
+  const { p, vrai, faux } = list[k], prop = vrai ? p : faux;
+  const sep = t => `<div class="sep"><i></i><span>${t}</span><i></i></div>`;
+  const lecteur = `<button class="lect" id="lect" aria-label="Escuchar otra vez"><span class="rond">${SPKW}</span><span class="onde">${[10,20,28,16,24,12,20,8,14].map(h => `<i style="height:${h}px"></i>`).join("")}</span><svg class="rejouer" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>`;
+  let html = "";
+  if(NIV === 1) html = `<button class="petit-hp" id="hp" aria-label="Escuchar">${SPKV}</button>
+      <div class="ill" style="width:150px;height:150px;margin-top:8px">${Lab.icon(p, 120)}</div>
+      <div class="mot"><h2>${p.fr}</h2></div>${sep("TRADUCCIÓN")}<p class="prop">${prop.es}</p>`;
+  if(NIV === 2) html = `<div class="ill" style="width:124px;height:124px;margin-top:6px">${Lab.icon(p, 100)}</div>
+      <div class="mot boite"><h2>${p.fr}</h2><p>${p.es}</p></div>${sep("AUDIO")}${lecteur}`;
+  if(NIV === 3) html = `<div class="ill" style="width:124px;height:124px;margin-top:6px">${Lab.icon(p, 100)}</div>
+      <div class="mot boite"><h2>${p.fr}</h2></div>${sep("AUDIO")}${lecteur}`;
+  if(NIV === 4) html = `<p class="aide" style="margin-top:10px;font-weight:600;letter-spacing:.12em">ESCUCHA</p>
+      <button class="grand-hp" id="ghp" aria-label="Escuchar otra vez"><span>${SPKW}</span></button>
+      <p class="aide">Toca para escuchar otra vez</p>${sep("TRADUCCIÓN")}<p class="prop">${prop.es}</p>`;
+  $("zone").innerHTML = `<p class="question">${QUESTIONS[NIV]}</p>
+    <div class="pile"><div class="fond f2"></div><div class="fond f1"></div>
+      <div class="carte" id="carte"><div class="tampon si" id="t-si">SÍ</div><div class="tampon no" id="t-no">NO</div>${html}</div></div>
+    <div class="boutons">
+      <div><button class="bt non" id="b-no" aria-label="No"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button><span style="color:#C4313A">No</span></div>
+      <div><button class="bt oui" id="b-si" aria-label="Sí"><svg viewBox="0 0 24 24" style="width:34px;height:34px"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></button><span style="color:#237A4F">Sí</span></div>
+    </div>`;
+  carte = $("carte");
+  // le son de la carte : l'audio jugé (niveaux 2-3), le mot (niveaux 1 et 4)
+  const son = JUGE_AUDIO ? prop : p;
+  const jouer = () => ecouter(son);
+  ["hp", "lect", "ghp"].forEach(id => { const b = $(id); if(b){ b.onclick = jouer; b.onpointerdown = e => e.stopPropagation(); } });
+  if(NIV !== 1) jouer();
+  $("b-no").onclick = () => repondre(false);
+  $("b-si").onclick = () => repondre(true);
+  glisser(carte);
+}
+async function ecouter(p){
+  const b = $("lect") || $("ghp"); b && b.classList.add("on");
+  await Lab.playToEnd(p);
+  b && b.classList.remove("on");
+}
+
+// Glisser la carte : elle suit le doigt et s'incline ; au-delà de 100 px, la réponse est donnée
+function glisser(el){
+  let x0 = null, dx = 0;
+  el.addEventListener("pointerdown", e => { if(occupe) return; x0 = e.clientX; dx = 0; el.classList.remove("anime"); el.setPointerCapture(e.pointerId); });
+  el.addEventListener("pointermove", e => { if(x0 === null) return; dx = e.clientX - x0; poser(dx); });
+  const fin = () => {
+    if(x0 === null) return; x0 = null;
+    if(Math.abs(dx) > 100) return repondre(dx > 0);
+    el.classList.add("anime"); poser(0);
+  };
+  el.addEventListener("pointerup", fin); el.addEventListener("pointercancel", fin);
+}
+function poser(dx){
+  carte.style.transform = `translateX(${dx}px) rotate(${dx / 14}deg)`;
+  $("t-si").style.opacity = Math.max(0, Math.min(1, dx / 90));
+  $("t-no").style.opacity = Math.max(0, Math.min(1, -dx / 90));
+  $("b-si").classList.toggle("on", dx > 40); $("b-no").classList.toggle("on", dx < -40);
+}
+
+// Réponse : la carte s'envole du côté choisi
+function repondre(oui){
+  if(occupe) return; occupe = true;
+  const { p, vrai, faux } = list[k], juste = oui === vrai;
+  Lab.stop();
+  carte.classList.add("anime"); poser(oui ? 140 : -140);
+  if(juste){
+    score++; carte.classList.add("juste");
+    setTimeout(() => { carte.style.transform = `translateX(${oui ? 520 : -520}px) rotate(${oui ? 24 : -24}deg)`; carte.style.opacity = 0; }, 160);
+    setTimeout(() => { k++; suivante(); }, 520);
+    return;
+  }
+  setTimeout(() => corriger(p, vrai, faux), 280);
+}
+// Erreur : la correction, avec de quoi réécouter
+function corriger(p, vrai, faux){
+  const ecoute = (id, txt) => `<button id="${id}"><span class="r">${SPKO}</span><span>${txt}</span></button>`;
+  let h = "";
+  if(NIV === 1) h = vrai ? `<p>Sí era correcto: <b>« ${p.fr} »</b> quiere decir <b>${p.es}</b>.</p>`
+                         : `<p><b>« ${p.fr} »</b> no quiere decir « ${faux.es} ».<br>Quiere decir <b>${p.es}</b>.</p>`;
+  if(JUGE_AUDIO) h = vrai ? `<p>Sí correspondía: el audio era <b>« ${p.fr} »</b>.</p><div class="ecoutes">${ecoute("e1", `La palabra: <b>${p.fr}</b>`)}</div>`
+                          : `<p>El audio era <b>« ${faux.fr} »</b>.</p><div class="ecoutes">${ecoute("e1", `Oíste: <b>${faux.fr}</b>`)}${ecoute("e2", `La palabra: <b>${p.fr}</b>`)}</div>`;
+  if(NIV === 4) h = vrai ? `<p>Sí era correcto: oíste <b>« ${p.fr} »</b>, que quiere decir <b>${p.es}</b>.</p><div class="ecoutes">${ecoute("e1", `<b>${p.fr}</b> · ${p.es}`)}</div>`
+                         : `<p>Oíste <b>« ${p.fr} »</b>, que quiere decir <b>${p.es}</b>.</p><div class="ecoutes">${ecoute("e1", `<b>${p.fr}</b> · ${p.es}`)}</div>`;
+  $("sh-c").innerHTML = h;
+  if($("e1")) $("e1").onclick = () => Lab.play(JUGE_AUDIO && !vrai ? faux : p);
+  if($("e2")) $("e2").onclick = () => Lab.play(p);
+  $("sheet").className = "sheet on";
+  $("sh-ok").onclick = () => { k++; suivante(); };
+}
+function fermer(){ $("sheet").className = "sheet"; }
+
+// Premier écran : le thème et un toucher pour commencer (débloque l'audio sur iPhone)
+function accueil(){
+  $("cpt").textContent = "";
+  $("zone").innerHTML = `<div class="card end"><img src="/img/ui/evo.png" alt=""><h2>Desliza: ¿Sí o no?</h2>
+    <p class="muted">${QUESTIONS[NIV]}<br>Desliza a la derecha si es <b>sí</b>, a la izquierda si es <b>no</b>.</p>
+    <select id="theme" style="margin:6px 0 14px;width:100%"></select><button class="btn" id="go">Empezar</button></div>`;
+  Lab.themeSelect($("theme"), v => { theme = v; });
+  $("theme").value = theme;
+  $("go").onclick = start;
+}
+Lab.load().then(accueil);
+</script>
+</body>
+</html>

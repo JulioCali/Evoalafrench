@@ -38,5 +38,18 @@ const Apercu = (() => {
     oyes: () => c(60, 24, 15, M) + hp(60, 24, 1.3) + [0, 1].map(i => carte(16, 48 + i * 18, 88, 14, i === 0 ? OKF : W, i === 0 ? OK : "#E6E2F0") + ligne(36, 53 + i * 18, 48, i === 0 ? OK : "#3B3550")).join(""),
     oyesTrad: () => c(60, 20, 13, M) + hp(60, 20, 1.15) + [0, 1].map(i => carte(16, 40 + i * 22, 88, 19, i === 0 ? OKF : W, i === 0 ? OK : "#E6E2F0") + ligne(36, 44 + i * 22, 48, i === 0 ? OK : "#3B3550") + ligne(42, 52 + i * 22, 36, T, 3)).join("")
   };
+  // Desliza : une carte sur une pile, ce qui est donné en haut, ce qu'on juge en bas, et les boutons ✗ / ✓
+  const desliza = n => () => {
+    let s = r(32, 9, 56, 62, "#E9E4FB", 7) + r(29, 6, 62, 62, "#F1EDFD", 7) + carte(26, 3, 68, 64, W);
+    const sep = y => `<path d="M32 ${y}h56" stroke="#E1DCF0" stroke-width="1.2" stroke-dasharray="3 2"/>`;
+    const lect = y => r(40, y, 40, 10, L, 5) + c(45, y + 5, 3.6, V) + [0, 1, 2, 3, 4].map(i => r(52 + i * 4, y + 5 - (2 + (i % 3) * 1.3), 2, 4 + (i % 3) * 2.6, V, 1)).join("");
+    if(n === 1) s += img(50, 8, 20, 16) + ligne(46, 28, 28, "#3B3550", 4.5) + sep(39) + ligne(43, 47, 34, V, 5);
+    if(n === 2) s += img(51, 7, 18, 14) + r(40, 24, 40, 15, "#F6F3FF", 4) + ligne(46, 27, 28, "#3B3550", 4) + ligne(50, 33, 20, T, 3) + sep(44) + lect(50);
+    if(n === 3) s += img(50, 8, 20, 16) + r(40, 28, 40, 10, "#F6F3FF", 4) + ligne(46, 31, 28, "#3B3550", 4) + sep(44) + lect(50);
+    if(n === 4) s += c(60, 20, 11, L) + c(60, 20, 8, V) + `<g transform="translate(60 20) scale(.7)"><path d="M-5 -3h3l4-3.5v13L-2 3h-3z" fill="${W}"/></g>` + sep(39) + ligne(43, 47, 34, V, 5);
+    s += c(45, 80, 7, W) + `<path d="M42.5 77.5l5 5m0-5l-5 5" stroke="${R}" stroke-width="1.8" stroke-linecap="round"/>` + c(75, 80, 7, W) + `<path d="M72 80.2l2 2 4-4.2" stroke="${OK}" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    return s;
+  };
+  [1, 2, 3, 4].forEach(n => S["desliza" + n] = desliza(n));
   return nom => S[nom] ? `<svg viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${S[nom]()}</svg>` : "";
 })();
