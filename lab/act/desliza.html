@@ -23,6 +23,7 @@
   .carte .petit-hp{position:absolute;left:18px;top:18px;width:44px;height:44px;border-radius:50%;background:var(--lav);display:grid;place-items:center}
   .carte .petit-hp svg,.lect .rond svg,.grand-hp svg{fill:#fff}
   .carte .petit-hp svg{fill:#4A33B0;width:22px;height:22px}
+  .ill,.grand-hp{position:relative}
   .ill{border-radius:24px;background:#FFF6E8;display:grid;place-items:center}
   .ill .ic{border-radius:0}
   .mot{margin-top:16px;padding:10px 24px;border-radius:18px;text-align:center}
@@ -49,6 +50,9 @@
   .bravo{position:absolute;left:50%;top:50%;width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;background:#2E9E66;display:grid;place-items:center;box-shadow:0 8px 24px rgba(46,160,103,.35);transform:scale(0);z-index:3;pointer-events:none}
   .bravo svg{width:50px;height:50px;fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
   .carte.juste .bravo{animation:pop .45s cubic-bezier(.2,1.6,.4,1) forwards}
+  /* posée sur l'image ou le haut-parleur, la coche les recouvre entièrement */
+  .ill .bravo,.grand-hp .bravo{left:0;top:0;width:100%;height:100%;margin:0;border-radius:inherit}
+  .ill .bravo svg{width:44%;height:44%}
   @keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
   .tampon{position:absolute;top:30px;padding:4px 16px;border:4px solid;border-radius:12px;font-size:34px;font-weight:700;letter-spacing:.06em;background:rgba(255,255,255,.85);opacity:0;z-index:2;pointer-events:none}
   .tampon.si{left:22px;transform:rotate(-14deg);color:#2E9E66;border-color:#2E9E66}
@@ -205,6 +209,8 @@ function repondre(oui){
   carte.classList.add("anime"); poser((oui ? 1 : -1) * (juste ? 30 : 140));   // juste : la carte reste presque au centre pour qu'on voie la coche
   $(oui ? "t-si" : "t-no").style.opacity = 1;                                    // le tampon du choix, bien net
   list[k].res = juste ? "bien" : "mal"; segments();
+  // la coche se pose sur l'image (ou le haut-parleur au niveau 4) : la phrase reste lisible pendant qu'elle part
+  const cible = carte.querySelector(".ill, .grand-hp"); if(cible) cible.appendChild(carte.querySelector(".bravo"));
   if(juste){
     score++; carte.classList.add("juste");
     setTimeout(() => { carte.style.transform = `translateX(${oui ? 520 : -520}px) rotate(${oui ? 24 : -24}deg)`; carte.style.opacity = 0; }, 560);
