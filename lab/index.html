@@ -85,7 +85,7 @@ function accueil(){
         <span class="txt"><b>${e.em} ${e.nom}</b><span class="muted">${e.desc}</span></span>
         <span class="nb ${n ? "" : "vide"}">${nbTxt(n)}</span></a>`; }).join("")}</div>
     ${sansEtape.length ? `<div class="sec">Sans étape</div><div class="grid">${sansEtape.map(carteAct).join("")}</div>` : ""}
-    <div class="sec">Toutes les activités</div>
+    <div class="sec">Toutes les activités (${ETAPES.reduce((n, e) => n + actsDe(e.id).length, 0)})</div>
     <div class="menu">${ETAPES.flatMap(e => actsDe(e.id).map(a => `<a class="card mini" href="${a.href}" style="${vars(e)}">
       <span class="ap">${Apercu(a.apercu)}</span><b>${a.title}</b><span class="et"><i>${e.lettre}</i>${e.nom}</span></a>`)).join("")}</div>
     <div class="sec">Outils</div>
